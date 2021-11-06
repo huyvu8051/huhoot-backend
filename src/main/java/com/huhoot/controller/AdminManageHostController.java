@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -16,62 +17,43 @@ public class AdminManageHostController {
     private AdminService adminService;
 
     @GetMapping("/host")
-    public ResponseEntity<?> getAllHost(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "6") int size) {
-        try {
-            return ResponseEntity.ok(adminService.findAll(page, size));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+    public ResponseEntity<List<AdminDTO>> getAllHost(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "6") int size) {
+        return ResponseEntity.ok(adminService.findAll(page, size));
     }
 
     @GetMapping("/host/details")
-    public ResponseEntity<?> getDetails(@RequestParam int id) {
-        try {
-            return ResponseEntity.ok(adminService.getOneDetailsById(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+    public ResponseEntity<AdminDTO> getDetails(@RequestParam int id) throws AccountNotFoundException {
+
+        return ResponseEntity.ok(adminService.getOneDetailsById(id));
+
     }
 
     @GetMapping("/host/find")
-    public ResponseEntity<?> findOne(@RequestParam String username) {
-        try {
-            return ResponseEntity.ok(adminService.searchByUsername(username));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+    public ResponseEntity<List<AdminDTO>> findOne(@RequestParam String username) {
+
+        return ResponseEntity.ok(adminService.searchByUsername(username));
+
     }
 
     @PostMapping("/host")
-    public ResponseEntity<?> addMany(@RequestBody List<AdminDTO> hostDTOS) {
-        try {
-            return ResponseEntity.ok(adminService.addMany(hostDTOS));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+    public ResponseEntity<List<AdminDTO>> addMany(@RequestBody List<AdminDTO> hostDTOS) {
+        return ResponseEntity.ok(adminService.addMany(hostDTOS));
     }
 
     @PutMapping("/host")
     public ResponseEntity<?> update(@RequestBody @Valid AdminDTO hostDTO) {
-        try {
-            adminService.update(hostDTO);
+        adminService.update(hostDTO);
 
-            return ResponseEntity.ok(null);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/host")
-    public ResponseEntity<?> lock(
-            @RequestBody List<Integer> hostIds) {
-        try {
-            adminService.lock(hostIds);
+    public ResponseEntity<?> lock(@RequestBody List<Integer> hostIds) {
 
-            return ResponseEntity.ok(null);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
-        }
+        adminService.lock(hostIds);
+
+        return ResponseEntity.ok(null);
+
     }
 
     @Autowired

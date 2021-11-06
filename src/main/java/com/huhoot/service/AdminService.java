@@ -29,7 +29,7 @@ public interface AdminService {
      * @return List of insert error
      * @throws UsernameExistedException
      */
-    List<AdminDTO> addMany(List<AdminDTO> hostDTOS) throws UsernameExistedException;
+    List<AdminDTO> addMany(List<AdminDTO> hostDTOS);
 
 
     /**
