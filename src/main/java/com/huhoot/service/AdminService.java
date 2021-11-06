@@ -1,26 +1,24 @@
 package com.huhoot.service;
 
-import com.huhoot.dto.HostAddErrorResponse;
-import com.huhoot.dto.HostAddRequest;
-import com.huhoot.dto.HostResponse;
-import com.huhoot.dto.HostUpdateRequest;
+import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
+import org.springframework.data.domain.Pageable;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 
 public interface AdminService {
-    List<HostResponse> findAll(int page, int size);
+    PageResponse<HostResponse> findAllHostAccount(Pageable pageable);
 
-    void update(@Valid HostUpdateRequest hostDTO);
+    void updateHostAccount(@Valid HostUpdateRequest hostDTO);
 
     /**
      * Lock account, account cannot log in.
      *
      * @param hostIds
      */
-    void lock(List<Integer> hostIds);
+    void lockManyHostAccount(List<Integer> hostIds);
 
     /**
      * <ul>
@@ -32,7 +30,7 @@ public interface AdminService {
      * @return List of insert error
      * @throws UsernameExistedException
      */
-    List<HostAddErrorResponse> addMany(List<HostAddRequest> hostDTOS);
+    List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOS);
 
 
     /**
@@ -42,13 +40,52 @@ public interface AdminService {
      * @return AdminDTO
      * @throws AccountNotFoundException
      */
-    HostResponse getOneDetailsById(int id) throws AccountNotFoundException;
+    HostDetailsResponse getOneHostAccountDetailsById(int id) throws AccountNotFoundException;
 
     /**
      * Search list of host account by username.
      *
      * @param username
+     * @param pageable
      * @return AdminDTO
      */
-    List<HostResponse> searchByUsername(String username);
+    PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable);
+
+    /**
+     * Find all Student account
+     *
+     * @param pageable
+     * @return
+     */
+    PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable);
+
+    /**
+     * @param id
+     * @return
+     * @throws AccountNotFoundException
+     */
+    StudentDetailsResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException;
+
+    /**
+     * @param username
+     * @param pageable
+     * @return
+     */
+    PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable);
+
+    /**
+     * @param request
+     * @return
+     */
+    List<StudentAddErrorResponse> addManyStudentAccount(List<StudentAddRequest> request);
+
+    /**
+     * @param request
+     */
+    void updateStudentAccount(StudentUpdateRequest request);
+
+    /**
+     * @param hostIds
+     */
+    void lockManyStudentAccount(List<Integer> hostIds);
 }

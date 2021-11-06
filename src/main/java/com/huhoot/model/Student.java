@@ -39,7 +39,7 @@ public class Student implements UserDetails{
 
 	private String password;
 
-	private boolean isDeleted;
+	private boolean isNonLocked;
 	
 	@CreatedDate
 	private Date createdDate;
@@ -53,16 +53,16 @@ public class Student implements UserDetails{
 	@OneToMany(mappedBy = "primaryKey.student", cascade = CascadeType.ALL)
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();
 
-	public Student(String username, String fullName, String password) {
-		this.username = username;
+	public Student(String formattedUsername, String fullName, String hashedPassword) {
+		this.username = formattedUsername;
+		this.password = hashedPassword;
 		this.fullName = fullName;
-		this.password = password;
-		this.isDeleted = false;
+		this.isNonLocked = true;
 	}
-	
-	
-	public void setIsDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+
+
+	public void setNonLocked(boolean isNonLocked) {
+		this.isNonLocked = isNonLocked;
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Student implements UserDetails{
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return isNonLocked;
 	}
 
 	@Override

@@ -1,33 +1,54 @@
 package com.huhoot.converter;
 
+import com.huhoot.dto.HostDetailsResponse;
+import com.huhoot.dto.HostResponse;
+import com.huhoot.dto.PageResponse;
+import com.huhoot.model.Admin;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.huhoot.dto.HostResponse;
-import org.springframework.stereotype.Component;
-
-import com.huhoot.model.Admin;
-
 @Component
 public class AdminConverter {
-	public HostResponse toDto(Admin entity) {
-		HostResponse dto = new HostResponse();
-		dto.setId(entity.getId());
-		dto.setUsername(entity.getUsername());
-		dto.setNonLocked(entity.isNonLocked());
-		dto.setCreatedDate(entity.getCreatedDate());
-		dto.setModifiedDate(entity.getModifiedDate());
-		return dto;
-	}
+    public HostResponse toDto(Admin entity) {
+        HostResponse dto = new HostResponse();
+        dto.setId(entity.getId());
+        dto.setUsername(entity.getUsername());
+        dto.setNonLocked(entity.isNonLocked());
+        dto.setCreatedDate(entity.getCreatedDate());
+        dto.setModifiedDate(entity.getModifiedDate());
+        return dto;
+    }
 
-	public List<HostResponse> toListDto(List<Admin> entities) {
-		List<HostResponse> dtos = new ArrayList<>();
+    public PageResponse<HostResponse> toListDto(Page<Admin> entities) {
+        PageResponse<HostResponse> response = new PageResponse<>();
+        for (Admin e : entities) {
+            response.getList().add(toDto(e));
 
-		for (Admin e : entities) {
-			dtos.add(toDto(e));
-		}
+        }
+        response.setTotalElements(entities.getTotalElements());
+        return response;
+    }
 
-		return dtos;
-	}
+    public HostDetailsResponse toHostDetailsResponse(Admin entity) {
+        HostDetailsResponse hostDetailsResponse = new HostDetailsResponse();
+        hostDetailsResponse.setId(entity.getId());
+        hostDetailsResponse.setUsername(entity.getUsername());
+        hostDetailsResponse.setNonLocked(entity.isNonLocked());
+        hostDetailsResponse.setCreatedDate(entity.getCreatedDate());
+        hostDetailsResponse.setModifiedDate(entity.getModifiedDate());
+        return hostDetailsResponse;
+    }
 
+    public List<HostResponse> toListHostResponse(List<Admin> entities) {
+        List<HostResponse> responses = new ArrayList<>();
+
+        for (Admin e : entities) {
+            responses.add(toDto(e));
+        }
+
+        return responses;
+    }
 }

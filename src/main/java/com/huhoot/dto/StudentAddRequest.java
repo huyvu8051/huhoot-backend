@@ -1,17 +1,25 @@
 package com.huhoot.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
 @Data
-public class HostAddRequest {
+@NoArgsConstructor
+public class StudentAddRequest {
     @NotNull
     @NotEmpty
     @NotBlank
-    @Size(min = 5, max = 15)
-    @Pattern(regexp = "^admin")
+    @Size(min = 5, max = 10)
+    @Pattern(regexp = "^\\d{10}$")
     private String username;
+
+    @NotNull
+    @NotEmpty
+    @NotBlank
+    @Size(min = 5, max = 50)
+    private String fullName;
 
     @NotNull
     @NotEmpty
@@ -19,8 +27,9 @@ public class HostAddRequest {
     @Size(min = 5, max = 15)
     private String password;
 
-    public HostAddRequest(String username, String password) {
+    public StudentAddRequest(String username, String password) {
         this.username = username;
         this.password = password;
+
     }
 }
