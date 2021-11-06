@@ -1,8 +1,8 @@
 package com.huhoot.service;
 
 
-import com.huhoot.dto.AdminDTO;
+import com.huhoot.dto.HostResponse;
 
 public interface UserService {
-	AdminDTO registerNewHostAccount(AdminDTO adminDto);
+	HostResponse registerNewHostAccount(HostResponse adminDto);
 }

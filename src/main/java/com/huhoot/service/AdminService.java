@@ -1,6 +1,9 @@
 package com.huhoot.service;
 
-import com.huhoot.dto.AdminDTO;
+import com.huhoot.dto.HostAddErrorResponse;
+import com.huhoot.dto.HostAddRequest;
+import com.huhoot.dto.HostResponse;
+import com.huhoot.dto.HostUpdateRequest;
 import com.huhoot.exception.UsernameExistedException;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -8,9 +11,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 public interface AdminService {
-    List<AdminDTO> findAll(int page, int size);
+    List<HostResponse> findAll(int page, int size);
 
-    void update(@Valid AdminDTO hostDTO);
+    void update(@Valid HostUpdateRequest hostDTO);
 
     /**
      * Lock account, account cannot log in.
@@ -29,7 +32,7 @@ public interface AdminService {
      * @return List of insert error
      * @throws UsernameExistedException
      */
-    List<AdminDTO> addMany(List<AdminDTO> hostDTOS);
+    List<HostAddErrorResponse> addMany(List<HostAddRequest> hostDTOS);
 
 
     /**
@@ -39,7 +42,7 @@ public interface AdminService {
      * @return AdminDTO
      * @throws AccountNotFoundException
      */
-    AdminDTO getOneDetailsById(int id) throws AccountNotFoundException;
+    HostResponse getOneDetailsById(int id) throws AccountNotFoundException;
 
     /**
      * Search list of host account by username.
@@ -47,5 +50,5 @@ public interface AdminService {
      * @param username
      * @return AdminDTO
      */
-    List<AdminDTO> searchByUsername(String username);
+    List<HostResponse> searchByUsername(String username);
 }

@@ -1,7 +1,10 @@
 package com.huhoot.service.impl;
 
 import com.huhoot.converter.AdminConverter;
-import com.huhoot.dto.AdminDTO;
+import com.huhoot.dto.HostAddErrorResponse;
+import com.huhoot.dto.HostAddRequest;
+import com.huhoot.dto.HostResponse;
+import com.huhoot.dto.HostUpdateRequest;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.model.Admin;
 import com.huhoot.repository.AdminRepository;
@@ -12,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.ConstraintViolation;
@@ -39,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
     private Validator validator;
 
     @Override
-    public List<AdminDTO> findAll(int page, int size) {
+    public List<HostResponse> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Admin> admins = adminRepository.findAllByOrderByCreatedDateDesc(pageable);
 
@@ -47,26 +49,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public AdminDTO getOneDetailsById(int id) throws AccountNotFoundException {
+    public HostResponse getOneDetailsById(int id) throws AccountNotFoundException {
         Admin entity = adminRepository.findOneById(id);
         if (entity == null) {
             throw new AccountNotFoundException("Account not found!");
         }
-        AdminDTO result;
+        HostResponse result;
         result = adminConverter.toDto(entity);
         return result;
     }
 
     @Override
-    public List<AdminDTO> searchByUsername(String username) {
-        List<AdminDTO> result = new ArrayList<>();
+    public List<HostResponse> searchByUsername(String username) {
+        List<HostResponse> result = new ArrayList<>();
         Admin entity = adminRepository.findOneByUsername(username);
         result.add(adminConverter.toDto(entity));
         return result;
     }
 
     @Override
-    public void update(@Valid AdminDTO hostDTO) {
+    public void update(@Valid HostUpdateRequest hostDTO) {
         Admin host = adminRepository.findOneById(hostDTO.getId());
         String hashedPassword = passwordEncoder.encode(hostDTO.getPassword());
         host.setPassword(hashedPassword);
@@ -87,11 +89,11 @@ public class AdminServiceImpl implements AdminService {
 
     }
 
-    public void add(AdminDTO hostDTO) throws UsernameExistedException {
+    private void add(HostAddRequest hostDTO) throws UsernameExistedException {
 
-        Set<ConstraintViolation<AdminDTO>> violations = validator.validate(hostDTO);
+        Set<ConstraintViolation<HostAddRequest>> violations = validator.validate(hostDTO);
 
-        if(violations.size() > 0){
+        if (violations.size() > 0) {
             throw new ValidationException("Account not valid");
         }
 
@@ -109,16 +111,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminDTO> addMany(List<AdminDTO> hostDTOs) {
+    public List<HostAddErrorResponse> addMany(List<HostAddRequest> hostDTOs) {
 
-        List<AdminDTO> errors = new ArrayList<>();
+        List<HostAddErrorResponse> errors = new ArrayList<>();
 
-        for (AdminDTO hostDTO : hostDTOs) {
+        for (HostAddRequest hostDTO : hostDTOs) {
             try {
                 this.add(hostDTO);
             } catch (Exception e) {
-                hostDTO.setErrorMessage(e.getMessage());
-                errors.add(hostDTO);
+                HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO);
+
+                errResponse.setErrorMessage(e.getMessage());
+                errors.add(errResponse);
                 log.error(e.getMessage());
             }
         }
