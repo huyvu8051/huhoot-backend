@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("student")
 public class StudentController {
 
-	@GetMapping("/challenge")
-	public ResponseEntity<?> getAllHost() {
-		try {
-			return ResponseEntity.ok("this is student challenges");
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(e);
-		}
-	}
+    @GetMapping("/challenge")
+    public ResponseEntity<?> getAllHost() {
+        try {
+            return ResponseEntity.ok("this is student challenges");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

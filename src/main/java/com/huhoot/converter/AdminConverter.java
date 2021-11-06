@@ -3,28 +3,29 @@ package com.huhoot.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.huhoot.dto.AdminDTO;
 import org.springframework.stereotype.Component;
 
-import com.huhoot.dto.AdminDto;
 import com.huhoot.model.Admin;
 
 @Component
 public class AdminConverter {
-	public AdminDto toDto(Admin entity) {
-		AdminDto dto = new AdminDto();
+	public AdminDTO toDto(Admin entity) {
+		AdminDTO dto = new AdminDTO();
+		dto.setId(entity.getId());
 		dto.setUsername(entity.getUsername());
-		dto.setDeleted(entity.isDeleted());
+		dto.setNonLocked(entity.isNonLocked());
 		dto.setCreatedDate(entity.getCreatedDate());
 		dto.setModifiedDate(entity.getModifiedDate());
 		return dto;
 	}
 
-	public List<AdminDto> toListDto(List<Admin> entities) {
-		List<AdminDto> dtos = new ArrayList<>();
+	public List<AdminDTO> toListDto(List<Admin> entities) {
+		List<AdminDTO> dtos = new ArrayList<>();
 
-		entities.stream().forEach(e -> {
+		for (Admin e : entities) {
 			dtos.add(toDto(e));
-		});
+		}
 
 		return dtos;
 	}

@@ -40,7 +40,8 @@ public class Admin implements UserDetails {
 
 	private Role role;
 
-	private boolean isDeleted;
+	private boolean isNonLocked;
+
 	@CreatedDate
 	private Date createdDate;
 
@@ -66,7 +67,7 @@ public class Admin implements UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return isNonLocked;
 	}
 
 	@Override
@@ -79,10 +80,11 @@ public class Admin implements UserDetails {
 		return true;
 	}
 
+
 	public Admin(String username, String password) {
 		this.username = username;
 		this.password = password;
 		this.role = Role.HOST;
-		this.isDeleted = false;
+		this.isNonLocked = true;
 	}
 }

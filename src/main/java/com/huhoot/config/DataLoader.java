@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Role;
 import com.huhoot.model.Student;
-import com.huhoot.repository.IAdminRepository;
-import com.huhoot.repository.IStudentRepository;
+import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.StudentRepository;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -19,22 +19,22 @@ public class DataLoader implements ApplicationRunner {
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private IStudentRepository iStudentRepository;
+	private StudentRepository studentRepository;
 
 	@Autowired
-	private IAdminRepository iAdminRepository;
+	private AdminRepository adminRepository;
 
 	public void run(ApplicationArguments args) {
 
 		Admin admin = new Admin("admin", passwordEncoder.encode("admin"));
 		admin.setRole(Role.ADMIN);
 
-		iAdminRepository.save(admin);
+		adminRepository.save(admin);
 
 		for (int i = 0; i < 10; i++) {
-			iAdminRepository.save(new Admin("admin" + i, passwordEncoder.encode("admin")));
+			adminRepository.save(new Admin("admin" + i, passwordEncoder.encode("admin")));
 
-			iStudentRepository.save(new Student("student" + i, "student" + i, passwordEncoder.encode("student")));
+			studentRepository.save(new Student("student" + i, "student" + i, passwordEncoder.encode("student")));
 		}
 
 		// start time

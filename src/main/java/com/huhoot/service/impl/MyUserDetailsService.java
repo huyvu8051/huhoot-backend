@@ -6,17 +6,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.huhoot.repository.IAdminRepository;
-import com.huhoot.repository.IStudentRepository;
+import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.StudentRepository;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
 	@Autowired
-	private IAdminRepository iAdminRepository;
+	private AdminRepository adminRepository;
 
 	@Autowired
-	private IStudentRepository iStudentRepository;
+	private StudentRepository studentRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -24,9 +24,9 @@ public class MyUserDetailsService implements UserDetailsService {
 		UserDetails user = null;
 
 		if (username != null && username.startsWith("admin")) {
-			user = iAdminRepository.findOneByUsername(username);
+			user = adminRepository.findOneByUsername(username);
 		} else {
-			user = iStudentRepository.findOneByUsername(username);
+			user = studentRepository.findOneByUsername(username);
 		}
 
 		if (user == null) {
