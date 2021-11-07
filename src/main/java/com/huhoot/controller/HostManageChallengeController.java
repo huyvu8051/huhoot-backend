@@ -1,0 +1,81 @@
+package com.huhoot.controller;
+
+import com.huhoot.dto.*;
+import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.model.Admin;
+import com.huhoot.service.HostService;
+import com.huhoot.service.impl.IsNotOwnChallengeBiPredicate;
+import javassist.NotFoundException;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("host")
+public class HostManageChallengeController {
+    private HostService hostService;
+
+    @GetMapping("/challenge")
+    public ResponseEntity<PageResponse<ChallengeResponse>> findAll(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "12") int size,
+                                                                   @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                   @RequestParam(defaultValue = "DESC") String direction) {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        PageResponse<ChallengeResponse> response = hostService.findAllOwnChallenge(userDetails, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/challenge/details")
+    public ResponseEntity<ChallengeDetails> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return ResponseEntity.ok(hostService.getOneOwnChallengeDetailsById(userDetails, id));
+
+    }
+
+    @GetMapping("/challenge/search")
+    public ResponseEntity<PageResponse<ChallengeResponse>> search(@Length(min = 1, max = 15) @RequestParam String title,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "12") int size,
+                                                                  @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                  @RequestParam(defaultValue = "DESC") String direction) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return ResponseEntity.ok(hostService.searchOwnChallengeByTitle(userDetails, title, pageable));
+
+    }
+
+    @PostMapping("/challenge")
+    public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        hostService.addOneChallenge(userDetails, request);
+        return ResponseEntity.ok(null);
+
+    }
+
+    @PutMapping("/challenge")
+    public ResponseEntity<?> update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        hostService.updateOneChallenge(userDetails, request, new IsNotOwnChallengeBiPredicate());
+
+        return ResponseEntity.ok(null);
+    }
+
+    @Autowired
+    public void setHostService(HostService hostService) {
+        this.hostService = hostService;
+    }
+}

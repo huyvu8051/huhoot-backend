@@ -1,6 +1,5 @@
 package com.huhoot.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,12 +14,12 @@ import javax.security.auth.login.AccountNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({LockedException.class,BadCredentialsException.class})
+    @ExceptionHandler({LockedException.class, BadCredentialsException.class})
     public ResponseEntity<String> handleAuthenticationException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler({AccountNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, NotYourOwnException.class})
     public ResponseEntity<String> handleServiceException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }

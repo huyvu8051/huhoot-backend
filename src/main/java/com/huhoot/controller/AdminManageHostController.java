@@ -22,9 +22,15 @@ public class AdminManageHostController {
     private AdminService adminService;
 
     @GetMapping("/host")
-    public ResponseEntity<PageResponse<HostResponse>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size,@RequestParam(defaultValue = "createdDate") String sortBy,@RequestParam(defaultValue = "DESC") String direction) {
+    public ResponseEntity<PageResponse<HostResponse>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "12") int size,
+                                                             @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                             @RequestParam(defaultValue = "DESC") String direction) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+
         return ResponseEntity.ok(adminService.findAllHostAccount(pageable));
+
     }
 
     @GetMapping("/host/details")
@@ -35,19 +41,28 @@ public class AdminManageHostController {
     }
 
     @GetMapping("/host/search")
-    public ResponseEntity<PageResponse<HostResponse>> search(@Length(min = 1, max = 15) @RequestParam String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size,@RequestParam(defaultValue = "createdDate") String sortBy,@RequestParam(defaultValue = "DESC") String direction) {
+    public ResponseEntity<PageResponse<HostResponse>> search(@Length(min = 1, max = 15) @RequestParam String username,
+                                                             @RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "12") int size,
+                                                             @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                             @RequestParam(defaultValue = "DESC") String direction) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+
         return ResponseEntity.ok(adminService.searchHostAccountByUsername(username, pageable));
 
     }
 
     @PostMapping("/host")
     public ResponseEntity<List<HostAddErrorResponse>> addMany(@Size(min = 1) @RequestBody List<HostAddRequest> request) {
+
         return ResponseEntity.ok(adminService.addManyHostAccount(request));
+
     }
 
     @PutMapping("/host")
     public ResponseEntity<?> update(@Valid @RequestBody HostUpdateRequest request) {
+
         adminService.updateHostAccount(request);
 
         return ResponseEntity.ok(null);
