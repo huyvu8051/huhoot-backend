@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @RestController
@@ -54,7 +53,7 @@ public class AdminManageHostController {
     }
 
     @PostMapping("/host")
-    public ResponseEntity<List<HostAddErrorResponse>> addMany(@Size(min = 1) @RequestBody List<HostAddRequest> request) {
+    public ResponseEntity<List<HostAddErrorResponse>> addMany(@RequestBody List<HostAddRequest> request) {
 
         return ResponseEntity.ok(adminService.addManyHostAccount(request));
 
@@ -69,7 +68,7 @@ public class AdminManageHostController {
     }
 
     @DeleteMapping("/host")
-    public ResponseEntity<?> lock(@Size(min = 1) @RequestBody List<Integer> ids) {
+    public ResponseEntity<?> lock(@RequestBody List<Integer> ids) {
 
         adminService.lockManyHostAccount(ids);
 

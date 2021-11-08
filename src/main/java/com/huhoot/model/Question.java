@@ -13,6 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.huhoot.enums.AnswerTime;
+import com.huhoot.enums.Points;
+import com.huhoot.exception.AnswerOption;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @EntityListeners({ AuditingEntityListener.class })
-public class Question {
+public class Question extends Auditable{
 
 	@Id
 	@GeneratedValue
@@ -43,12 +46,6 @@ public class Question {
 	private Date askDate;
 	
 	private boolean isDeleted;
-	
-	@CreatedDate
-	private Date createdDate;
-
-	@LastModifiedDate
-	private Date modifiedDate;
 
 	@ManyToOne
 	@JoinColumn(name = "challenge_id")

@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.huhoot.model.Admin;
-import com.huhoot.model.Role;
+import com.huhoot.enums.Role;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
 import com.huhoot.repository.StudentRepository;

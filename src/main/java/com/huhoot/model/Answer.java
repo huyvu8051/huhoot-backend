@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
-public class Answer {
+public class Answer extends Auditable{
 
 	@Id
 	@GeneratedValue
@@ -39,12 +39,6 @@ public class Answer {
 	private boolean isCorrect;
 
 	private boolean isDeleted;
-	
-	@CreatedDate
-	private Date createdDate;
-
-	@LastModifiedDate
-	private Date modifiedDate;
 
 	@ManyToOne
 	@JoinColumn(name = "question_id")

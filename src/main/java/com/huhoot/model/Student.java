@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
-public class Student implements UserDetails{
+public class Student extends Auditable implements UserDetails{
 	@Id
 	@GeneratedValue
 	private int id;
@@ -40,12 +40,6 @@ public class Student implements UserDetails{
 	private String password;
 
 	private boolean isNonLocked;
-	
-	@CreatedDate
-	private Date createdDate;
-
-	@LastModifiedDate
-	private Date modifiedDate;
 
 	@OneToMany(mappedBy = "primaryKey.student")
 	private List<StudentChallenge> studentChallenges = new ArrayList<>();

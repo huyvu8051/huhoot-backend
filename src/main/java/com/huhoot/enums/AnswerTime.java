@@ -1,4 +1,4 @@
-package com.huhoot.model;
+package com.huhoot.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

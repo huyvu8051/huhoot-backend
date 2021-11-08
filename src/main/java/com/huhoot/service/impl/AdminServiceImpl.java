@@ -47,7 +47,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> admins = adminRepository.findAll(pageable);
 
-        return adminConverter.toListDto(admins);
+        return adminConverter.toListHostRespones(admins);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable) {
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-        return adminConverter.toListDto(entities);
+        return adminConverter.toListHostRespones(entities);
     }
 
 

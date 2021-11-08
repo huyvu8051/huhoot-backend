@@ -1,9 +1,7 @@
 package com.huhoot.dto;
 
-import com.huhoot.model.ChallengeStatus;
+import com.huhoot.enums.ChallengeStatus;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 public class ChallengeAddRequest {

@@ -22,7 +22,7 @@ public class AdminConverter {
         return dto;
     }
 
-    public PageResponse<HostResponse> toListDto(Page<Admin> entities) {
+    public PageResponse<HostResponse> toListHostRespones(Page<Admin> entities) {
         PageResponse<HostResponse> response = new PageResponse<>();
         for (Admin e : entities) {
             response.getList().add(toDto(e));

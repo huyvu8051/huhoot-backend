@@ -2,7 +2,6 @@ package com.huhoot.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,8 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import com.huhoot.enums.Role;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
-public class Admin implements UserDetails {
+public class Admin extends Auditable implements UserDetails {
 	@Id
 	@GeneratedValue
 	private int id;
@@ -41,12 +39,6 @@ public class Admin implements UserDetails {
 	private Role role;
 
 	private boolean isNonLocked;
-
-	@CreatedDate
-	private Date createdDate;
-
-	@LastModifiedDate
-	private Date modifiedDate;
 
 	@OneToMany(mappedBy = "admin")
 	private List<Challenge> challenges = new ArrayList<>();
