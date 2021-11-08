@@ -3,6 +3,7 @@ package com.huhoot.service.impl;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.functional.CheckedFunction;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.repository.ChallengeRepository;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.function.BiPredicate;
 
 @Service
 public class HostServiceImpl implements HostService {
@@ -48,11 +47,10 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, BiPredicate<Integer, Integer> isNotOwner) throws NotYourOwnException {
+    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException {
         Challenge challenge = challengeRepository.findOneById(request.getId());
-        if (isNotOwner.test(challenge.getAdmin().getId(), userDetails.getId())) {
-            throw new NotYourOwnException();
-        }
+
+        checker.accept(userDetails, challenge);
 
         challenge.setTitle(request.getTitle());
         challenge.setCoverImage(request.getCoverImage());

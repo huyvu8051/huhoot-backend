@@ -2,7 +2,9 @@ package com.huhoot.service;
 
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.functional.CheckedFunction;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
@@ -19,5 +21,5 @@ public interface HostService {
 
     void addOneChallenge(Admin userDetails ,ChallengeAddRequest request);
 
-    void updateOneChallenge(Admin userDetails,ChallengeUpdateRequest request, BiPredicate<Integer, Integer> biPredicate) throws NotYourOwnException;
+    void updateOneChallenge(Admin userDetails,ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> biPredicate) throws NotYourOwnException;
 }

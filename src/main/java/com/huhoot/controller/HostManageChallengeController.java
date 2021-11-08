@@ -2,9 +2,9 @@ package com.huhoot.controller;
 
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
-import com.huhoot.service.impl.IsNotOwnChallengeBiPredicate;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,8 @@ import javax.validation.Valid;
 @RequestMapping("host")
 public class HostManageChallengeController {
     private HostService hostService;
+
+    private CheckOwnerChallenge checkOwnerChallenge;
 
     @GetMapping("/challenge")
     public ResponseEntity<PageResponse<ChallengeResponse>> findAll(@RequestParam(defaultValue = "0") int page,
@@ -69,13 +71,14 @@ public class HostManageChallengeController {
     public ResponseEntity<?> update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        hostService.updateOneChallenge(userDetails, request, new IsNotOwnChallengeBiPredicate());
+        hostService.updateOneChallenge(userDetails, request, checkOwnerChallenge);
 
         return ResponseEntity.ok(null);
     }
 
     @Autowired
-    public void setHostService(HostService hostService) {
+    public void setHostService(HostService hostService,CheckOwnerChallenge checkOwnerChallenge) {
         this.hostService = hostService;
+        this.checkOwnerChallenge = checkOwnerChallenge;
     }
 }
