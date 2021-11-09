@@ -44,7 +44,7 @@ public class ChallengeConverter {
     public static Challenge toEntity(ChallengeAddRequest request) {
         Challenge challenge = new Challenge();
         challenge.setTitle(request.getTitle());
-        challenge.setCoverImage(request.getCoverImage());
+        // challenge.setCoverImage(request.getCoverImage());
         challenge.setRandomAnswer(request.isRandomAnswer());
         challenge.setRandomQuest(request.isRandomQuest());
         challenge.setChallengeStatus(ChallengeStatus.WAITING);

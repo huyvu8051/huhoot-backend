@@ -1,11 +1,13 @@
 package com.huhoot.controller;
 
+import com.huhoot.BackendApplication;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +18,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("host")
 public class HostManageChallengeController {
@@ -60,9 +65,11 @@ public class HostManageChallengeController {
     }
 
     @PostMapping("/challenge")
-    public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) {
+    public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
+
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
+
         hostService.addOneChallenge(userDetails, request);
         return ResponseEntity.ok(null);
 

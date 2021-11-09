@@ -9,6 +9,7 @@ import com.huhoot.model.Challenge;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface HostService {
@@ -18,7 +19,7 @@ public interface HostService {
 
     PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable);
 
-    void addOneChallenge(Admin userDetails, ChallengeAddRequest request);
+    void addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException;
 
     void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> biPredicate) throws NotYourOwnException;
 

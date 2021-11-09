@@ -40,11 +40,17 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers("/", "/csrf", "/authentication", "/swagger-resources/**", "/swagger-ui.html",
-                        "/v2/api-docs", "/webjars/**")
-                .permitAll().antMatchers("/admin/**").hasAuthority("ADMIN").antMatchers("/host/**")
-                .hasAnyAuthority("HOST", "ADMIN").antMatchers("/student/**").hasAuthority("STUDENT").anyRequest()
-                .authenticated().and().exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationEntryPoint)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                        "/v2/api-docs", "/webjars/**", "/resources/**")
+                .permitAll()
+                .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers("/host/**").hasAnyAuthority("HOST", "ADMIN")
+                .antMatchers("/student/**").hasAuthority("STUDENT")
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
