@@ -53,7 +53,7 @@ public class AdminManageStudentController {
     }
 
     @DeleteMapping("/student")
-    public ResponseEntity<?> lock(@Size(min=1) @RequestBody List<Integer> ids) {
+    public ResponseEntity<?> lock(@RequestBody List<Integer> ids) {
 
         adminService.lockManyStudentAccount(ids);
 

@@ -1,5 +1,6 @@
 package com.huhoot.service.impl;
 
+import com.huhoot.converter.AbstractDtoConverter;
 import com.huhoot.converter.AdminConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
@@ -37,8 +38,6 @@ public class AdminServiceImpl implements AdminService {
 
     private StudentRepository studentRepository;
 
-    private StudentConverter studentConverter;
-
     private Validator validator;
 
 
@@ -47,7 +46,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> admins = adminRepository.findAll(pageable);
 
-        return adminConverter.toListHostRespones(admins);
+        return AbstractDtoConverter.toPageResponse(admins, AdminConverter::toHostResponse);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable) {
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-        return adminConverter.toListHostRespones(entities);
+        return AbstractDtoConverter.toPageResponse(entities, AdminConverter::toHostResponse);
     }
 
 
@@ -137,7 +136,8 @@ public class AdminServiceImpl implements AdminService {
     public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
 
         Page<Student> all = studentRepository.findAllByOrderByCreatedDateDesc(pageable);
-        return studentConverter.toListStudentResponse(all);
+
+        return AbstractDtoConverter.toPageResponse(all, StudentConverter::toStudentDetailsResponse);
 
     }
 
@@ -149,13 +149,13 @@ public class AdminServiceImpl implements AdminService {
             throw new AccountNotFoundException("Account not found");
         }
 
-        return studentConverter.toStudentDetailsResponse(entity);
+        return StudentConverter.toStudentDetailsResponse(entity);
     }
 
     @Override
     public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable) {
         Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-        return studentConverter.toListStudentResponse(entity);
+        return AbstractDtoConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
     }
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
@@ -220,12 +220,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Autowired
-    public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, StudentConverter studentConverter, Validator validator) {
+    public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator) {
         this.adminRepository = adminRepository;
         this.adminConverter = adminConverter;
         this.passwordEncoder = passwordEncoder;
         this.studentRepository = studentRepository;
-        this.studentConverter = studentConverter;
         this.validator = validator;
     }
 

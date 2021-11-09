@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("host")
@@ -40,7 +41,7 @@ public class HostManageChallengeController {
     public ResponseEntity<ChallengeDetails> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return ResponseEntity.ok(hostService.getOneOwnChallengeDetailsById(userDetails, id));
+        return ResponseEntity.ok(hostService.getOneOwnChallengeDetailsById(userDetails, id, checkOwnerChallenge));
 
     }
 
@@ -76,8 +77,18 @@ public class HostManageChallengeController {
         return ResponseEntity.ok(null);
     }
 
+    @DeleteMapping("/challenge")
+    public ResponseEntity<?> delete(@RequestBody List<Integer> ids) {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        hostService.deleteManyChallenge(userDetails, ids);
+
+        return ResponseEntity.ok(null);
+
+    }
+
     @Autowired
-    public void setHostService(HostService hostService,CheckOwnerChallenge checkOwnerChallenge) {
+    public void setHostService(HostService hostService, CheckOwnerChallenge checkOwnerChallenge) {
         this.hostService = hostService;
         this.checkOwnerChallenge = checkOwnerChallenge;
     }
