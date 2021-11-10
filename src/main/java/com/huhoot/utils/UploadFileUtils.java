@@ -19,7 +19,7 @@ public class UploadFileUtils {
 
     public String uploadImage(String originalFileName, String base64) throws IOException {
 
-        Path uploadPath = Paths.get("../tmp/resources/");
+        Path uploadPath = Paths.get("../../tmp/resources/");
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
