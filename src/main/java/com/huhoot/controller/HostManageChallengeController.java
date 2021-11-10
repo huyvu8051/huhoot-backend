@@ -6,6 +6,7 @@ import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
+import com.huhoot.utils.UploadFileUtils;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
@@ -63,14 +64,17 @@ public class HostManageChallengeController {
         return ResponseEntity.ok(hostService.searchOwnChallengeByTitle(userDetails, title, pageable));
 
     }
+    @Autowired
+    private UploadFileUtils uploadFileUtils;
 
     @PostMapping("/challenge")
     public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+        .getPrincipal();
 
         hostService.addOneChallenge(userDetails, request);
+
         return ResponseEntity.ok(null);
 
     }

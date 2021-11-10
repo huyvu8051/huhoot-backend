@@ -10,7 +10,6 @@ public class HostAddRequest {
     @NotEmpty
     @NotBlank
     @Size(min = 5, max = 15)
-    @Pattern(regexp = "^admin")
     private String username;
 
     @NotNull
