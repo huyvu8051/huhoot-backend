@@ -52,7 +52,7 @@ public class DataLoader implements ApplicationRunner {
         System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
 
         Path uploadDir = Paths.get("/");
-        System.out.println(uploadDir);
+        System.out.println(uploadDir.toAbsolutePath());
 
     }
 }
