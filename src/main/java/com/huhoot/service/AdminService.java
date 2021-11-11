@@ -2,6 +2,7 @@ package com.huhoot.service;
 
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.model.Admin;
 import org.springframework.data.domain.Pageable;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -88,4 +89,8 @@ public interface AdminService {
      * @param hostIds
      */
     void lockManyStudentAccount(List<Integer> hostIds);
+
+    PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable);
+
+    PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable);
 }

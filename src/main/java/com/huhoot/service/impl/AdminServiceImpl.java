@@ -2,12 +2,15 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.AbstractDtoConverter;
 import com.huhoot.converter.AdminConverter;
+import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
@@ -219,6 +222,7 @@ public class AdminServiceImpl implements AdminService {
         studentRepository.saveAll(students);
     }
 
+
     @Autowired
     public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator) {
         this.adminRepository = adminRepository;
@@ -226,6 +230,21 @@ public class AdminServiceImpl implements AdminService {
         this.passwordEncoder = passwordEncoder;
         this.studentRepository = studentRepository;
         this.validator = validator;
+    }
+
+    @Autowired
+    private ChallengeRepository challengeRepository;
+
+    @Override
+    public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+    }
+
+    @Override
+    public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
+        return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
 }

@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
-    Page<Challenge> findAllByAdminId(int adminId, Pageable pageable);
-
     Challenge findOneById(int id);
 
     Page<Challenge> findAllByTitleContainingIgnoreCaseAndAdminId(String title, int id, Pageable pageable);
 
-    Page<Challenge> findAll(Pageable pageable);
-
     List<Challenge> findAllByAdminIdAndIdInAndIsDeletedFalse(int id, List<Integer> ids);
 
     Page<Challenge> findAllByAdminIdAndIsDeletedFalse(int id, Pageable pageable);
+
+    Page<Challenge> findAll(Pageable pageable);
+
+    Page<Challenge> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
 }
