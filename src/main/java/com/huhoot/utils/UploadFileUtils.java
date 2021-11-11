@@ -19,7 +19,7 @@ public class UploadFileUtils {
 
     public String uploadImage(String originalFileName, String base64) throws IOException {
 
-        Path uploadPath = Paths.get("../../tmp/resources/");
+        Path uploadPath = Paths.get("/resources/");
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -62,8 +62,7 @@ public class UploadFileUtils {
 
     private String getDirectPath() throws IOException {
         Path uploadDir = Paths.get("images");
-        // String uploadPath = uploadDir.toFile().getAbsolutePath();
-        String uploadPath = new File(".").getCanonicalPath() + "/src/main/resources/images/";
+        String uploadPath = uploadDir.toFile().getAbsolutePath();
         return uploadPath;
     }
 }

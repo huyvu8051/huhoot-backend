@@ -12,6 +12,11 @@ import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
 import com.huhoot.repository.StudentRepository;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Component
 public class DataLoader implements ApplicationRunner {
 
@@ -24,7 +29,7 @@ public class DataLoader implements ApplicationRunner {
 	@Autowired
 	private AdminRepository adminRepository;
 
-	public void run(ApplicationArguments args) {
+	public void run(ApplicationArguments args) throws IOException {
 
 		Admin admin = new Admin("admin", passwordEncoder.encode("admin"));
 		admin.setRole(Role.ADMIN);
@@ -46,6 +51,12 @@ public class DataLoader implements ApplicationRunner {
 
 		double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
 		System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
+
+		Path uploadPath = Paths.get("newResources");
+
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
 
 	}
 }
