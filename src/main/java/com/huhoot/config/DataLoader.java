@@ -2,8 +2,10 @@ package com.huhoot.config;
 
 import com.huhoot.enums.Role;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -28,7 +30,13 @@ public class DataLoader implements ApplicationRunner {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private ChallengeRepository challengeRepository;
+
     public void run(ApplicationArguments args) throws IOException {
+
+        // start time
+        long t0 = System.nanoTime();
 
         Admin admin = new Admin("admin", passwordEncoder.encode("admin"));
         admin.setRole(Role.ADMIN);
@@ -41,8 +49,12 @@ public class DataLoader implements ApplicationRunner {
             studentRepository.save(new Student("student" + i, "student" + i, passwordEncoder.encode("student")));
         }
 
-        // start time
-        long t0 = System.nanoTime();
+
+
+
+
+
+
 
         long t1 = System.nanoTime();
 

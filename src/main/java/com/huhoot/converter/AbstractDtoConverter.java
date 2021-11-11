@@ -1,6 +1,8 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.PageResponse;
+import com.huhoot.dto.QuestionDetails;
+import com.huhoot.model.Question;
 import org.springframework.data.domain.Page;
 
 import java.util.function.Function;
@@ -17,4 +19,6 @@ public class AbstractDtoConverter {
         result.setTotalElements(page.getTotalElements());
         return result;
     }
+
+
 }
