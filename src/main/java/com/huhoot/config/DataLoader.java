@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -49,21 +51,8 @@ public class DataLoader implements ApplicationRunner {
         double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
         System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
 
-        File tempDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "files");
-        if (tempDirectory.exists()) {
-            System.out.println("something");
-        } else {
-            tempDirectory.mkdirs();
-        }
-
-        File file = new File(tempDirectory.getAbsolutePath() + "/abcd.txt");
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        String file2 = new File(tempDirectory.getAbsolutePath() + "/something.txt").getAbsolutePath();
-
-
-        System.out.println(file2);
+        Path uploadDir = Paths.get("/");
+        System.out.println(uploadDir);
 
     }
 }
