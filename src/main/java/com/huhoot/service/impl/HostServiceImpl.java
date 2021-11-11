@@ -9,7 +9,6 @@ import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.service.HostService;
-import com.huhoot.utils.UploadFileUtils;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,7 +25,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        Page<Challenge> challenges = challengeRepository.findAllByAdminIdAndIsDeletedFalse(userDetails.getId(), pageable);
 
         return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
@@ -47,16 +46,13 @@ public class HostServiceImpl implements HostService {
         return AbstractDtoConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
     }
 
-    @Autowired
-    private UploadFileUtils uploadFileUtils;
 
     @Override
     public void addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException {
 
         Challenge challenge = ChallengeConverter.toEntity(request);
-        String fileName = uploadFileUtils.uploadImage(request.getOriginalFileName(), request.getBase64Image());
         challenge.setAdmin(userDetails);
-        challenge.setCoverImage(fileName);
+        challenge.setCoverImage(request.getOriginalFileName());
         challengeRepository.save(challenge);
     }
 
@@ -82,13 +78,13 @@ public class HostServiceImpl implements HostService {
     @Override
     public void deleteManyChallenge(Admin userDetails, List<Integer> ids) {
 
-        /*List<Challenge> challenges = challengeRepository.findAllByAdminIdAndId(userDetails.getId(), ids);
+        List<Challenge> challenges = challengeRepository.findAllByAdminIdAndIdInAndIsDeletedFalse(userDetails.getId(), ids);
 
         for(Challenge challenge : challenges){
             challenge.setDeleted(true);
         }
 
-        challengeRepository.saveAll(challenges);*/
+        challengeRepository.saveAll(challenges);
     }
 
 

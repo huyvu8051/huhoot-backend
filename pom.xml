@@ -17,11 +17,7 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
-        </dependency>
+
 
         <!-- sqlite -->
         <dependency>
@@ -50,7 +46,6 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0</version>
         </dependency>
         <!-- hibernate validator -->
         <dependency>

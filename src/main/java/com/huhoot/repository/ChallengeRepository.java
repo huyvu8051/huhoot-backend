@@ -17,5 +17,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     Page<Challenge> findAll(Pageable pageable);
 
-    // List<Challenge> findAllByAdminIdAndId(int id, List<Integer> ids);
+    List<Challenge> findAllByAdminIdAndIdInAndIsDeletedFalse(int id, List<Integer> ids);
+
+    Page<Challenge> findAllByAdminIdAndIsDeletedFalse(int id, Pageable pageable);
 }

@@ -1,12 +1,10 @@
 package com.huhoot.controller;
 
-import com.huhoot.BackendApplication;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
-import com.huhoot.utils.UploadFileUtils;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
@@ -19,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -64,8 +61,6 @@ public class HostManageChallengeController {
         return ResponseEntity.ok(hostService.searchOwnChallengeByTitle(userDetails, title, pageable));
 
     }
-    @Autowired
-    private UploadFileUtils uploadFileUtils;
 
     @PostMapping("/challenge")
     public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
