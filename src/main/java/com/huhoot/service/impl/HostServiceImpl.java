@@ -1,29 +1,25 @@
 package com.huhoot.service.impl;
 
 import com.huhoot.converter.AbstractDtoConverter;
+import com.huhoot.converter.AnswerConverter;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Answer;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
+import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.QuestionRepository;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.List;
@@ -116,6 +112,7 @@ public class HostServiceImpl implements HostService {
         checker.accept(userDetails, challenge);
 
         Question question = QuestionConverter.toEntity(request);
+        question.setChallenge(challenge);
 
         questionRepository.save(question);
 
@@ -156,11 +153,62 @@ public class HostServiceImpl implements HostService {
     public void deleteManyQuestion(Admin userDetails, List<Integer> ids) {
         List<Question> questions = questionRepository.findAllByIdIn(ids);
 
-        for (Question question : questions){
+        for (Question question : questions) {
             question.setDeleted(true);
         }
 
         questionRepository.saveAll(questions);
+    }
+
+    @Autowired
+    private AnswerRepository answerRepository;
+
+    @Override
+    public List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
+        List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
+        return AbstractDtoConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+    }
+
+    @Override
+    public AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) {
+        Answer answer = answerRepository.findOneByIdAndQuestionChallengeAdminId(answerId, userDetails.getId());
+
+        return AnswerConverter.toAnswerResponse(answer);
+    }
+
+    @Override
+    public void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws NotFoundException {
+        Question question = questionRepository.findOneById(request.getQuestionId());
+        if (question == null) {
+            throw new NotFoundException("Question not found");
+        }
+
+        Answer answer = AnswerConverter.toEntity(request);
+        answer.setQuestion(question);
+        answerRepository.save(answer);
+
+    }
+
+    @Override
+    public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException {
+        Answer answer = answerRepository.findOneById(request.getId());
+        if (answer == null) {
+            throw new NotFoundException("Answer not found");
+        }
+        answer.setOrdinalNumber(request.getOrdinalNumber());
+        answer.setAnswerContent(request.getAnswerContent());
+        answer.setCorrect(request.isCorrect());
+        answerRepository.save(answer);
+    }
+
+    @Override
+    public void deleteManyAnswer(Admin userDetails, List<Integer> ids) {
+        List<Answer> answers = answerRepository.findAllByIdIn(ids);
+        for (Answer answer : answers) {
+            answer.setDeleted(true);
+        }
+
+        answerRepository.saveAll(answers);
     }
 
 

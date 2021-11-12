@@ -34,4 +34,14 @@ public interface HostService {
     void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException;
 
     void deleteManyQuestion(Admin userDetails, List<Integer> ids);
+
+    List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId);
+
+    AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId);
+
+    void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws NotFoundException;
+
+    void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException;
+
+    void deleteManyAnswer(Admin userDetails, List<Integer> ids);
 }

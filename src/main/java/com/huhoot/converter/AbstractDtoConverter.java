@@ -1,10 +1,10 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.PageResponse;
-import com.huhoot.dto.QuestionDetails;
-import com.huhoot.model.Question;
 import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class AbstractDtoConverter {
@@ -17,6 +17,15 @@ public class AbstractDtoConverter {
         }
 
         result.setTotalElements(page.getTotalElements());
+        return result;
+    }
+
+    public static <T, R> List<R> toListResponse(List<T> list, Function<T, R> function) {
+        List<R> result = new ArrayList<>();
+        for (T entity : list) {
+            result.add(function.apply(entity));
+        }
+
         return result;
     }
 
