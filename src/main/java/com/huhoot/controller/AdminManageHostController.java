@@ -3,7 +3,6 @@ package com.huhoot.controller;
 import com.huhoot.dto.*;
 import com.huhoot.service.AdminService;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,13 +11,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @RestController
 @RequestMapping("admin")
 public class AdminManageHostController {
 
-    private AdminService adminService;
+    private final AdminService adminService;
+
+    public AdminManageHostController(AdminService adminService) {
+        this.adminService = adminService;
+    }
 
     @GetMapping("/host")
     public ResponseEntity<PageResponse<HostResponse>> getAll(@RequestParam(defaultValue = "0") int page,
@@ -33,7 +37,7 @@ public class AdminManageHostController {
     }
 
     @GetMapping("/host/details")
-    public ResponseEntity<HostDetailsResponse> getDetails(@RequestParam int id) throws AccountNotFoundException {
+    public ResponseEntity<HostResponse> getDetails(@RequestParam int id) {
 
         return ResponseEntity.ok(adminService.getOneHostAccountDetailsById(id));
 
@@ -76,9 +80,5 @@ public class AdminManageHostController {
 
     }
 
-    @Autowired
-    public void setAdminService(AdminService adminService) {
-        this.adminService = adminService;
-    }
 
 }

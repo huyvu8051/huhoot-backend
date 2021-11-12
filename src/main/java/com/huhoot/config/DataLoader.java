@@ -141,6 +141,25 @@ public class DataLoader implements ApplicationRunner {
 
         long t1 = System.nanoTime();
 
+/*
+
+        List<Answer> answers = new ArrayList<>();
+        for(int i = 0; i < 100000; i++){
+            Answer answer = new Answer();
+            answer.setOrdinalNumber(i);
+            answer.setAnswerContent("content " + i);
+            answer.setCorrect((i) % 2 == 0);
+
+            answer.setCreatedDate(date);
+            answer.setCreatedBy("BobVu");
+            answer.setModifiedDate(date);
+            answer.setModifiedBy("Nobody");
+
+            answers.add(answer);
+        }
+
+        answerRepository.saveAll(answers); */
+
         // end time
 
         double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;

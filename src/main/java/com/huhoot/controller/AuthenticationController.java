@@ -4,7 +4,6 @@ import com.huhoot.dto.AuthenticationRequest;
 import com.huhoot.dto.AuthenticationResponse;
 import com.huhoot.service.impl.MyUserDetailsService;
 import com.huhoot.utils.jwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,14 +16,17 @@ import javax.validation.Valid;
 
 @RestController
 public class AuthenticationController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
 
-    @Autowired
-    private jwtUtil jwtUtil;
+    private final jwtUtil jwtUtil;
+
+    public AuthenticationController(AuthenticationManager authenticationManager, MyUserDetailsService myUserDetailsService, jwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.myUserDetailsService = myUserDetailsService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/authentication")
     public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody @Valid AuthenticationRequest request) {

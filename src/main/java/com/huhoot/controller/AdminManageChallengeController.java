@@ -27,11 +27,15 @@ import java.util.List;
 @RequestMapping("admin")
 public class AdminManageChallengeController {
 
-    @Autowired
-    private AdminService adminService;
+    private final AdminService adminService;
 
-    @Autowired
-    private HostService hostService;
+    private final HostService hostService;
+
+    public AdminManageChallengeController(AdminService adminService, HostService hostService, NoCheckOwnChallenge noCheckOwnerChallenge) {
+        this.adminService = adminService;
+        this.hostService = hostService;
+        this.noCheckOwnerChallenge = noCheckOwnerChallenge;
+    }
 
 
     @GetMapping("/challenge")
@@ -44,8 +48,7 @@ public class AdminManageChallengeController {
         return ResponseEntity.ok(adminService.findAllChallenge(pageable));
     }
 
-    @Autowired
-    private NoCheckOwnChallenge noCheckOwnerChallenge;
+    private final NoCheckOwnChallenge noCheckOwnerChallenge;
 
     @GetMapping("/challenge/details")
     public ResponseEntity<ChallengeDetails> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {

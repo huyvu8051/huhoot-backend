@@ -7,12 +7,15 @@ import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Answer;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminService;
+import jdk.nashorn.internal.runtime.options.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,12 +24,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import javax.swing.text.html.parser.Entity;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -43,6 +48,9 @@ public class AdminServiceImpl implements AdminService {
 
     private Validator validator;
 
+    @Autowired
+    private AnswerRepository answerRepository;
+
 
     @Override
     public PageResponse<HostResponse> findAllHostAccount(Pageable pageable) {
@@ -53,30 +61,27 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public HostDetailsResponse getOneHostAccountDetailsById(int id) throws AccountNotFoundException {
-        Admin entity = adminRepository.findOneById(id);
-        if (entity == null) {
-            throw new AccountNotFoundException("Account not found!");
-        }
-        HostDetailsResponse result;
-        result = adminConverter.toHostDetailsResponse(entity);
-        return result;
+    public HostResponse getOneHostAccountDetailsById(int id) {
+        Optional<Admin> entity = adminRepository.findOneById(id);
+        return AdminConverter.toHostResponse(entity.get());
     }
 
     @Override
     public PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable) {
+
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
+
         return AbstractDtoConverter.toPageResponse(entities, AdminConverter::toHostResponse);
     }
 
 
     @Override
     public void updateHostAccount(@Valid HostUpdateRequest hostDTO) {
-        Admin host = adminRepository.findOneById(hostDTO.getId());
+        Optional<Admin> host = adminRepository.findOneById(hostDTO.getId());
         String hashedPassword = passwordEncoder.encode(hostDTO.getPassword());
-        host.setPassword(hashedPassword);
-        host.setNonLocked(hostDTO.isNonLocked());
-        adminRepository.save(host);
+        host.get().setPassword(hashedPassword);
+        host.get().setNonLocked(hostDTO.isNonLocked());
+        adminRepository.save(host.get());
 
     }
 
@@ -97,7 +102,18 @@ public class AdminServiceImpl implements AdminService {
         Set<ConstraintViolation<HostAddRequest>> violations = validator.validate(addRequest);
 
         if (violations.size() > 0) {
-            throw new ValidationException("Account not valid");
+
+            StringBuilder sb = new StringBuilder();
+
+            for(ConstraintViolation<HostAddRequest> violation : violations){
+                sb.append(violation.getPropertyPath());
+                sb.append(" :");
+                sb.append(violation.getMessage());
+                sb.append(" | ");
+            }
+
+
+            throw new ValidationException(sb.toString());
         }
 
         String formattedUsername = addRequest.getUsername().trim().toLowerCase();

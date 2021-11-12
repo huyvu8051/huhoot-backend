@@ -11,7 +11,7 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
 
     Admin findOneByUsername(String username);
 
-    Admin findOneById(int id);
+    Optional<Admin> findOneById(int id);
 
     Page<Admin> findAllByUsernameContainingIgnoreCase(String username, Pageable pageable);
 }

@@ -41,7 +41,7 @@ public interface AdminService {
      * @return AdminDTO
      * @throws AccountNotFoundException
      */
-    HostDetailsResponse getOneHostAccountDetailsById(int id) throws AccountNotFoundException;
+    HostResponse getOneHostAccountDetailsById(int id);
 
     /**
      * Search list of host account by username.
