@@ -1,13 +1,12 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.AbstractDtoConverter;
+import com.huhoot.converter.PageConverter;
 import com.huhoot.converter.AdminConverter;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.model.Admin;
-import com.huhoot.model.Answer;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;
@@ -15,7 +14,6 @@ import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminService;
-import jdk.nashorn.internal.runtime.options.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import javax.swing.text.html.parser.Entity;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -37,19 +34,23 @@ import java.util.Set;
 @Slf4j
 @Service
 public class AdminServiceImpl implements AdminService {
+    private final AdminRepository adminRepository;
+    private final AdminConverter adminConverter;
+    private final PasswordEncoder passwordEncoder;
+    private final StudentRepository studentRepository;
+    private final Validator validator;
 
-    private AdminRepository adminRepository;
+    private final AnswerRepository answerRepository;
 
-    private AdminConverter adminConverter;
-
-    private PasswordEncoder passwordEncoder;
-
-    private StudentRepository studentRepository;
-
-    private Validator validator;
-
-    @Autowired
-    private AnswerRepository answerRepository;
+    public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator, AnswerRepository answerRepository, ChallengeRepository challengeRepository) {
+        this.adminRepository = adminRepository;
+        this.adminConverter = adminConverter;
+        this.passwordEncoder = passwordEncoder;
+        this.studentRepository = studentRepository;
+        this.validator = validator;
+        this.answerRepository = answerRepository;
+        this.challengeRepository = challengeRepository;
+    }
 
 
     @Override
@@ -57,7 +58,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> admins = adminRepository.findAll(pageable);
 
-        return AbstractDtoConverter.toPageResponse(admins, AdminConverter::toHostResponse);
+        return PageConverter.toPageResponse(admins, AdminConverter::toHostResponse);
     }
 
     @Override
@@ -71,17 +72,18 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
 
-        return AbstractDtoConverter.toPageResponse(entities, AdminConverter::toHostResponse);
+        return PageConverter.toPageResponse(entities, AdminConverter::toHostResponse);
     }
 
 
     @Override
     public void updateHostAccount(@Valid HostUpdateRequest hostDTO) {
-        Optional<Admin> host = adminRepository.findOneById(hostDTO.getId());
+        Optional<Admin> optional = adminRepository.findOneById(hostDTO.getId());
+        Admin host = optional.get();
         String hashedPassword = passwordEncoder.encode(hostDTO.getPassword());
-        host.get().setPassword(hashedPassword);
-        host.get().setNonLocked(hostDTO.isNonLocked());
-        adminRepository.save(host.get());
+        host.setPassword(hashedPassword);
+        host.setNonLocked(hostDTO.isNonLocked());
+        adminRepository.save(host);
 
     }
 
@@ -105,18 +107,20 @@ public class AdminServiceImpl implements AdminService {
 
             StringBuilder sb = new StringBuilder();
 
-            for(ConstraintViolation<HostAddRequest> violation : violations){
+            for (ConstraintViolation<HostAddRequest> violation : violations) {
                 sb.append(violation.getPropertyPath());
                 sb.append(" :");
                 sb.append(violation.getMessage());
                 sb.append(" | ");
             }
 
-
             throw new ValidationException(sb.toString());
         }
 
         String formattedUsername = addRequest.getUsername().trim().toLowerCase();
+
+        /**Because of sqlite can't check the unique, so we need check it manually
+         */
 
         Admin duplicate = adminRepository.findOneByUsername(formattedUsername);
 
@@ -138,11 +142,8 @@ public class AdminServiceImpl implements AdminService {
             try {
                 this.addOneHostAccount(hostDTO);
             } catch (Exception e) {
-                HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO);
-
-                errResponse.setErrorMessage(e.getMessage());
+                HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO, e.getMessage());
                 errors.add(errResponse);
-                log.warn(e.getMessage());
             }
         }
 
@@ -154,34 +155,43 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
 
-        Page<Student> all = studentRepository.findAllByOrderByCreatedDateDesc(pageable);
+        Page<Student> all = studentRepository.findAll(pageable);
 
-        return AbstractDtoConverter.toPageResponse(all, StudentConverter::toStudentDetailsResponse);
+        return PageConverter.toPageResponse(all, StudentConverter::toStudentResponse);
 
     }
 
     @Override
-    public StudentDetailsResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException {
+    public StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException {
         Student entity = studentRepository.findOneById(id);
 
         if (entity == null) {
             throw new AccountNotFoundException("Account not found");
         }
 
-        return StudentConverter.toStudentDetailsResponse(entity);
+        return StudentConverter.toStudentResponse(entity);
     }
 
     @Override
     public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable) {
         Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-        return AbstractDtoConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
+        return PageConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
     }
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
         Set<ConstraintViolation<StudentAddRequest>> violations = validator.validate(addRequest);
 
         if (violations.size() > 0) {
-            throw new ValidationException("Account not valid");
+            StringBuilder sb = new StringBuilder();
+
+            for (ConstraintViolation<StudentAddRequest> violation : violations) {
+                sb.append(violation.getPropertyPath());
+                sb.append(" :");
+                sb.append(violation.getMessage());
+                sb.append(" | ");
+            }
+
+            throw new ValidationException(sb.toString());
         }
 
 
@@ -238,29 +248,18 @@ public class AdminServiceImpl implements AdminService {
         studentRepository.saveAll(students);
     }
 
-
-    @Autowired
-    public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator) {
-        this.adminRepository = adminRepository;
-        this.adminConverter = adminConverter;
-        this.passwordEncoder = passwordEncoder;
-        this.studentRepository = studentRepository;
-        this.validator = validator;
-    }
-
-    @Autowired
-    private ChallengeRepository challengeRepository;
+    private final ChallengeRepository challengeRepository;
 
     @Override
     public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAll(pageable);
-        return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
     public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
-        return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
 }

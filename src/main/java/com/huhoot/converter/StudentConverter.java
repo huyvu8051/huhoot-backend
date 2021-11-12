@@ -1,7 +1,6 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.PageResponse;
-import com.huhoot.dto.StudentDetailsResponse;
 import com.huhoot.dto.StudentResponse;
 import com.huhoot.model.Student;
 import lombok.extern.slf4j.Slf4j;
@@ -36,15 +35,4 @@ public class StudentConverter {
         return result;
     }
 
-    public static StudentDetailsResponse toStudentDetailsResponse(Student entity) {
-        StudentDetailsResponse result = new StudentDetailsResponse();
-
-        result.setId(entity.getId());
-        result.setUsername(entity.getUsername());
-        result.setFullName(entity.getFullName());
-        result.setNonLocked(entity.isNonLocked());
-        result.setCreatedDate(entity.getCreatedDate());
-        result.setModifiedDate(entity.getModifiedDate());
-        return result;
-    }
 }

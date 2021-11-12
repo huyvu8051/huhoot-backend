@@ -1,7 +1,6 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.QuestionAddRequest;
-import com.huhoot.dto.QuestionDetails;
 import com.huhoot.dto.QuestionResponse;
 import com.huhoot.model.Question;
 
@@ -29,18 +28,4 @@ public class QuestionConverter {
         return question;
     }
 
-
-    public static QuestionDetails toQuestionDetails(Question question) {
-
-        QuestionDetails response = new QuestionDetails();
-        response.setId(question.getId());
-        response.setOrdinalNumber(question.getOrdinalNumber());
-        response.setQuestionContent(question.getQuestionContent());
-        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
-        response.setPoint(question.getPoint());
-        response.setAnswerOption(question.getAnswerOption());
-        return response;
-
-
-    }
 }

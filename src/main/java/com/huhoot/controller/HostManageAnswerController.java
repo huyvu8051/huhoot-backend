@@ -31,14 +31,14 @@ public class HostManageAnswerController {
 
     }
     @GetMapping("/answer/details")
-    public ResponseEntity<AnswerResponse> getDetails(@RequestParam int answerId) throws NotYourOwnException, NotFoundException {
+    public ResponseEntity<AnswerResponse> getDetails(@RequestParam int answerId) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return ResponseEntity.ok(hostService.getOneAnswerDetailsById(userDetails, answerId));
 
     }
     @PostMapping("/answer")
-    public ResponseEntity<?> add(@Valid @RequestBody AnswerAddRequest request) throws IOException, NotFoundException {
+    public ResponseEntity<?> add(@Valid @RequestBody AnswerAddRequest request) throws Exception {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

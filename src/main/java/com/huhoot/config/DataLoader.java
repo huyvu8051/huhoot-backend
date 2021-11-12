@@ -14,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -118,6 +120,8 @@ public class DataLoader implements ApplicationRunner {
 
                     Question quest = questionRepository.save(question);
 
+                    List<Answer> answers = new ArrayList<>();
+
                     for (int a = 0; a < 4; a++) {
                         Answer answer = new Answer();
                         answer.setOrdinalNumber(a);
@@ -130,8 +134,9 @@ public class DataLoader implements ApplicationRunner {
                         answer.setModifiedDate(date);
                         answer.setModifiedBy("Nobody");
 
-                        answerRepository.save(answer);
+                        answers.add(answer);
                     }
+                    answerRepository.saveAll(answers);
 
                 }
 

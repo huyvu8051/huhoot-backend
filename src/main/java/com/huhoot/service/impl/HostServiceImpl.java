@@ -1,8 +1,8 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.AbstractDtoConverter;
 import com.huhoot.converter.AnswerConverter;
 import com.huhoot.converter.ChallengeConverter;
+import com.huhoot.converter.PageConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
@@ -16,45 +16,52 @@ import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.QuestionRepository;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HostServiceImpl implements HostService {
-    @Autowired
-    private ChallengeRepository challengeRepository;
+    private final ChallengeRepository challengeRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
+
+    public HostServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
+        this.challengeRepository = challengeRepository;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
+    }
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByAdminIdAndIsDeletedFalse(userDetails.getId(), pageable);
 
-        return AbstractDtoConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
-    public ChallengeDetails getOneOwnChallengeDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
-        Challenge challenge = challengeRepository.findOneById(id);
-        if (challenge == null) {
-            throw new NotFoundException("Challenge not found");
-        }
+    public ChallengeResponse getOneOwnChallengeDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneById(id);
+
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
         checker.accept(userDetails, challenge);
-        return ChallengeConverter.toChallengeDetails(challenge);
+
+        return ChallengeConverter.toChallengeResponse(challenge);
     }
 
     @Override
     public PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> result = challengeRepository.findAllByTitleContainingIgnoreCaseAndAdminId(title, userDetails.getId(), pageable);
-        return AbstractDtoConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
+        return PageConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
     }
 
 
     @Override
-    public void addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException {
+    public void addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
 
         Challenge challenge = ChallengeConverter.toEntity(request);
         challenge.setAdmin(userDetails);
@@ -64,13 +71,14 @@ public class HostServiceImpl implements HostService {
 
 
     @Override
-    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException {
-        Challenge challenge = challengeRepository.findOneById(request.getId());
+    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneById(request.getId());
+
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         checker.accept(userDetails, challenge);
 
         challenge.setTitle(request.getTitle());
-
         challenge.setCoverImage(request.getOriginalFileName());
         challenge.setRandomAnswer(request.isRandomAnswer());
         challenge.setRandomQuest(request.isRandomQuest());
@@ -84,7 +92,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public void deleteManyChallenge(Admin userDetails, List<Integer> ids) {
 
-        List<Challenge> challenges = challengeRepository.findAllByAdminIdAndIdInAndIsDeletedFalse(userDetails.getId(), ids);
+        List<Challenge> challenges = challengeRepository.findAllByAdminIdAndIdIn(userDetails.getId(), ids);
 
         for (Challenge challenge : challenges) {
             challenge.setDeleted(true);
@@ -93,25 +101,23 @@ public class HostServiceImpl implements HostService {
         challengeRepository.saveAll(challenges);
     }
 
-    @Autowired
-    private QuestionRepository questionRepository;
 
     @Override
     public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
         Page<Question> questions = questionRepository.findAllByChallengeIdAndChallengeAdminId(challengeId, userDetails.getId(), pageable);
-        return AbstractDtoConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
+        return PageConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
     }
 
     @Override
-    public void addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotFoundException, NotYourOwnException {
-        Challenge challenge = challengeRepository.findOneById(request.getChallengeId());
-        if (challenge == null) {
-            throw new NotFoundException("Challenge not found");
-        }
+    public void addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneById(request.getChallengeId());
+
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         checker.accept(userDetails, challenge);
 
         Question question = QuestionConverter.toEntity(request);
+
         question.setChallenge(challenge);
 
         questionRepository.save(question);
@@ -119,23 +125,23 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public QuestionDetails getOneOwnQuestionDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException {
-        Question question = questionRepository.findOneById(id);
+    public QuestionResponse getOneOwnQuestionDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+        Optional<Question> optional = questionRepository.findOneById(id);
+
+        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         checker.accept(userDetails, question.getChallenge());
 
-        return QuestionConverter.toQuestionDetails(question);
+        return QuestionConverter.toQuestionResponse(question);
 
     }
 
 
     @Override
     public void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
-        Question question = questionRepository.findOneById(request.getId());
+        Optional<Question> optional = questionRepository.findOneById(request.getId());
 
-        if (question == null) {
-            throw new NotFoundException("Question not found");
-        }
+        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         checker.accept(userDetails, question.getChallenge());
 
@@ -160,44 +166,50 @@ public class HostServiceImpl implements HostService {
         questionRepository.saveAll(questions);
     }
 
-    @Autowired
-    private AnswerRepository answerRepository;
 
     @Override
     public List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
         List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
-        return AbstractDtoConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+        return PageConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
     }
 
     @Override
-    public AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) {
-        Answer answer = answerRepository.findOneByIdAndQuestionChallengeAdminId(answerId, userDetails.getId());
+    public AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException {
+        Optional<Answer> optional = answerRepository.findOneByIdAndQuestionChallengeAdminId(answerId, userDetails.getId());
+
+        Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         return AnswerConverter.toAnswerResponse(answer);
     }
 
     @Override
-    public void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws NotFoundException {
-        Question question = questionRepository.findOneById(request.getQuestionId());
-        if (question == null) {
-            throw new NotFoundException("Question not found");
+    public void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws Exception {
+        Optional<Question> optional = questionRepository.findOneById(request.getQuestionId());
+
+        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+        if(question.getAnswers().size() >=4 ){
+            throw new Exception("Reach maximum answer");
         }
 
         Answer answer = AnswerConverter.toEntity(request);
+
         answer.setQuestion(question);
+
         answerRepository.save(answer);
 
     }
 
     @Override
     public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException {
-        Answer answer = answerRepository.findOneById(request.getId());
-        if (answer == null) {
-            throw new NotFoundException("Answer not found");
-        }
+        Optional<Answer> optional = answerRepository.findOneById(request.getId());
+
+        Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
         answer.setOrdinalNumber(request.getOrdinalNumber());
         answer.setAnswerContent(request.getAnswerContent());
         answer.setCorrect(request.isCorrect());
+
         answerRepository.save(answer);
     }
 

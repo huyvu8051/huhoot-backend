@@ -21,11 +21,14 @@ import java.util.List;
 @RestController
 @RequestMapping("host")
 public class HostManageQuestionController {
-    @Autowired
-    private HostService hostService;
+    private final HostService hostService;
 
-    @Autowired
-    private CheckOwnerChallenge checkOwnerChallenge;
+    private final CheckOwnerChallenge checkOwnerChallenge;
+
+    public HostManageQuestionController(HostService hostService, CheckOwnerChallenge checkOwnerChallenge) {
+        this.hostService = hostService;
+        this.checkOwnerChallenge = checkOwnerChallenge;
+    }
 
     @GetMapping("/question")
     public ResponseEntity<PageResponse<QuestionResponse>> findAll(@RequestParam int challengeId,
@@ -53,12 +56,13 @@ public class HostManageQuestionController {
     }
 
     @GetMapping("/question/details")
-    public ResponseEntity<QuestionDetails> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
+    public ResponseEntity<QuestionResponse> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return ResponseEntity.ok(hostService.getOneOwnQuestionDetailsById(userDetails, id, checkOwnerChallenge));
 
     }
+
     @PutMapping("/question")
     public ResponseEntity<?> update(@Valid @RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()

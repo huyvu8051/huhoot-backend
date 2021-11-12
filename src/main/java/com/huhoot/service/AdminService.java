@@ -65,7 +65,7 @@ public interface AdminService {
      * @return
      * @throws AccountNotFoundException
      */
-    StudentDetailsResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException;
+    StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException;
 
     /**
      * @param username

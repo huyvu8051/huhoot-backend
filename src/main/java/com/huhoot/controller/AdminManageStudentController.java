@@ -19,7 +19,11 @@ import java.util.List;
 @RequestMapping("admin")
 public class AdminManageStudentController {
 
-    private AdminService adminService;
+    private final AdminService adminService;
+
+    public AdminManageStudentController(AdminService adminService) {
+        this.adminService = adminService;
+    }
 
     @GetMapping("/student")
     public ResponseEntity<PageResponse<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size,@RequestParam(defaultValue = "createdDate") String sortBy,@RequestParam(defaultValue = "DESC") String direction) {
@@ -28,7 +32,7 @@ public class AdminManageStudentController {
     }
 
     @GetMapping("/student/details")
-    public ResponseEntity<StudentDetailsResponse> getDetails(@RequestParam int id) throws AccountNotFoundException {
+    public ResponseEntity<StudentResponse> getDetails(@RequestParam int id) throws AccountNotFoundException {
 
         return ResponseEntity.ok(adminService.getOneStudentAccountDetailsById(id));
     }
@@ -61,8 +65,4 @@ public class AdminManageStudentController {
 
     }
 
-    @Autowired
-    public void setAdminService(AdminService adminService){
-        this.adminService = adminService;
-    }
 }

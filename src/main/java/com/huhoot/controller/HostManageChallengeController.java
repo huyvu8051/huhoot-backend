@@ -1,6 +1,9 @@
 package com.huhoot.controller;
 
-import com.huhoot.dto.*;
+import com.huhoot.dto.ChallengeAddRequest;
+import com.huhoot.dto.ChallengeResponse;
+import com.huhoot.dto.ChallengeUpdateRequest;
+import com.huhoot.dto.PageResponse;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
@@ -8,7 +11,6 @@ import com.huhoot.service.HostService;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,9 +26,14 @@ import java.util.List;
 @RestController
 @RequestMapping("host")
 public class HostManageChallengeController {
-    private HostService hostService;
+    private final HostService hostService;
 
-    private CheckOwnerChallenge checkOwnerChallenge;
+    private final CheckOwnerChallenge checkOwnerChallenge;
+
+    public HostManageChallengeController(HostService hostService, CheckOwnerChallenge checkOwnerChallenge) {
+        this.hostService = hostService;
+        this.checkOwnerChallenge = checkOwnerChallenge;
+    }
 
     @GetMapping("/challenge")
     public ResponseEntity<PageResponse<ChallengeResponse>> findAll(@RequestParam(defaultValue = "0") int page,
@@ -36,12 +43,12 @@ public class HostManageChallengeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        PageResponse<ChallengeResponse> response = hostService.findAllOwnChallenge(userDetails, pageable);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(hostService.findAllOwnChallenge(userDetails, pageable));
     }
 
     @GetMapping("/challenge/details")
-    public ResponseEntity<ChallengeDetails> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
+    public ResponseEntity<ChallengeResponse> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return ResponseEntity.ok(hostService.getOneOwnChallengeDetailsById(userDetails, id, checkOwnerChallenge));
@@ -66,7 +73,7 @@ public class HostManageChallengeController {
     public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
+                .getPrincipal();
 
         hostService.addOneChallenge(userDetails, request);
 
@@ -75,7 +82,7 @@ public class HostManageChallengeController {
     }
 
     @PutMapping("/challenge")
-    public ResponseEntity<?> update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException {
+    public ResponseEntity<?> update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneChallenge(userDetails, request, checkOwnerChallenge);
@@ -93,9 +100,4 @@ public class HostManageChallengeController {
 
     }
 
-    @Autowired
-    public void setHostService(HostService hostService, CheckOwnerChallenge checkOwnerChallenge) {
-        this.hostService = hostService;
-        this.checkOwnerChallenge = checkOwnerChallenge;
-    }
 }

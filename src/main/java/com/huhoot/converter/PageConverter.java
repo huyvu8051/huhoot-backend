@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class AbstractDtoConverter {
+public class PageConverter {
     public static <T, R> PageResponse<R> toPageResponse(Page<T> page, Function<T, R> function) {
         PageResponse<R> result = new PageResponse<>();
 
