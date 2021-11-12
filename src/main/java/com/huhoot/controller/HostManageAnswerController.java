@@ -1,28 +1,30 @@
 package com.huhoot.controller;
 
-import com.huhoot.dto.*;
-import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.dto.AnswerAddRequest;
+import com.huhoot.dto.AnswerResponse;
+import com.huhoot.dto.AnswerUpdateRequest;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("host")
 public class HostManageAnswerController {
 
-    @Autowired
-    private HostService hostService;
+    private final HostService hostService;
+
+    public HostManageAnswerController(HostService hostService) {
+        this.hostService = hostService;
+    }
 
     @GetMapping("/answer")
-    public ResponseEntity<List<AnswerResponse>> findAll(@RequestParam int questionId){
+    public ResponseEntity<List<AnswerResponse>> findAll(@RequestParam int questionId) {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -30,6 +32,7 @@ public class HostManageAnswerController {
         return ResponseEntity.ok(hostService.findAllAnswerByQuestionId(userDetails, questionId));
 
     }
+
     @GetMapping("/answer/details")
     public ResponseEntity<AnswerResponse> getDetails(@RequestParam int answerId) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
@@ -37,6 +40,7 @@ public class HostManageAnswerController {
         return ResponseEntity.ok(hostService.getOneAnswerDetailsById(userDetails, answerId));
 
     }
+
     @PostMapping("/answer")
     public ResponseEntity<?> add(@Valid @RequestBody AnswerAddRequest request) throws Exception {
 
@@ -50,7 +54,7 @@ public class HostManageAnswerController {
     }
 
     @PutMapping("/answer")
-    public ResponseEntity<?> update(@Valid @RequestBody AnswerUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public ResponseEntity<?> update(@Valid @RequestBody AnswerUpdateRequest request) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneAnswer(userDetails, request);

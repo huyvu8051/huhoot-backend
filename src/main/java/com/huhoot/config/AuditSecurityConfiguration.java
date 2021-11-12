@@ -1,6 +1,5 @@
 package com.huhoot.config;
 
-import com.huhoot.repository.AdminRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -15,7 +14,7 @@ import java.util.Optional;
 @EnableJpaAuditing
 public class AuditSecurityConfiguration {
     @Bean
-    AuditorAware<String> auditorAware(AdminRepository repo) {
+    AuditorAware<String> auditorAware() {
         return () -> Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)

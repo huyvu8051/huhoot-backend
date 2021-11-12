@@ -21,26 +21,29 @@ import java.util.List;
 @Component
 public class DataLoader implements ApplicationRunner {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
 
-    @Autowired
-    private ChallengeRepository challengeRepository;
+    private final ChallengeRepository challengeRepository;
 
-    @Autowired
-    private QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
 
-    @Autowired
-    private StudentChallengeRepository studentChallengeRepository;
+    private final StudentChallengeRepository studentChallengeRepository;
 
-    @Autowired
-    private AnswerRepository answerRepository;
+    private final AnswerRepository answerRepository;
+
+    public DataLoader(PasswordEncoder passwordEncoder, StudentRepository studentRepository, AdminRepository adminRepository, ChallengeRepository challengeRepository, QuestionRepository questionRepository, StudentChallengeRepository studentChallengeRepository, AnswerRepository answerRepository) {
+        this.passwordEncoder = passwordEncoder;
+        this.studentRepository = studentRepository;
+        this.adminRepository = adminRepository;
+        this.challengeRepository = challengeRepository;
+        this.questionRepository = questionRepository;
+        this.studentChallengeRepository = studentChallengeRepository;
+        this.answerRepository = answerRepository;
+    }
 
     public void run(ApplicationArguments args) throws IOException {
         Date date = new Date();

@@ -3,14 +3,13 @@ package com.huhoot.controller;
 import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.dto.ChallengeUpdateRequest;
 import com.huhoot.dto.PageResponse;
-import com.huhoot.functional.NoCheckOwnChallenge;
 import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.functional.NoCheckOwnChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.AdminService;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -50,7 +49,7 @@ public class AdminManageChallengeController {
     private final NoCheckOwnChallenge noCheckOwnerChallenge;
 
     @GetMapping("/challenge/details")
-    public ResponseEntity<ChallengeResponse> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException, ChangeSetPersister.NotFoundException {
+    public ResponseEntity<ChallengeResponse> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return ResponseEntity.ok(hostService.getOneOwnChallengeDetailsById(userDetails, id, noCheckOwnerChallenge));
@@ -90,7 +89,6 @@ public class AdminManageChallengeController {
         return ResponseEntity.ok(null);
 
     }
-
 
 
 }

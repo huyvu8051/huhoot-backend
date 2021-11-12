@@ -1,12 +1,14 @@
 package com.huhoot.controller;
 
-import com.huhoot.dto.*;
+import com.huhoot.dto.PageResponse;
+import com.huhoot.dto.QuestionAddRequest;
+import com.huhoot.dto.QuestionResponse;
+import com.huhoot.dto.QuestionUpdateRequest;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

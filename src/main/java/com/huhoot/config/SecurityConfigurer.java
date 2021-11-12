@@ -4,7 +4,6 @@ import com.huhoot.exception.RestAccessDeniedHandler;
 import com.huhoot.exception.RestAuthenticationEntryPoint;
 import com.huhoot.filter.JwtRequestFilter;
 import com.huhoot.service.impl.MyUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,17 +17,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
 
-    @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    private final JwtRequestFilter jwtRequestFilter;
 
-    @Autowired
-    private RestAccessDeniedHandler accessDeniedHandler;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
-    @Autowired
-    private RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+
+    public SecurityConfigurer(MyUserDetailsService myUserDetailsService, JwtRequestFilter jwtRequestFilter, RestAccessDeniedHandler accessDeniedHandler, RestAuthenticationEntryPoint authenticationEntryPoint) {
+        this.myUserDetailsService = myUserDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
