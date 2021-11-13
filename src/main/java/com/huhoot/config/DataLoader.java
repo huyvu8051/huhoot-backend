@@ -89,7 +89,7 @@ public class DataLoader implements ApplicationRunner {
 
 
                 for (int x = 0; x < 7; x++) {
-                    Student student1 = new Student("student" + i + j, "student" + i + j, passwordEncoder.encode("student"));
+                    Student student1 = new Student("student" + i + j + x, "student" + i + j, passwordEncoder.encode("student"));
                     student1.setCreatedDate(date);
                     student1.setCreatedBy("BobVu");
                     student1.setModifiedDate(date);
