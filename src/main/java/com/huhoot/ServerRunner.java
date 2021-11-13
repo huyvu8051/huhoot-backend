@@ -60,9 +60,13 @@ public class ServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Detected local ip : "+ this.host);
-        server.start();
-        log.info("Socket launch successful!");
+        try {
+            log.info("Detected local ip : "+ this.host);
+            server.start();
+            log.info("Socket launch successful!");
+        }catch (Exception e){
+            log.error("cannot start socket server");
+        }
 
     }
 }
