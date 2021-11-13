@@ -17,19 +17,19 @@ import java.net.UnknownHostException;
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "";
+    private String host = "localhost";
     private Integer port = 8082;
 
     @Bean
     public SocketIOServer socketioserver() {
 
-        try {
+        /*try {
             InetAddress IP = InetAddress.getLocalHost();
             this.host = IP.getHostAddress();
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        }*/
 
         Configuration config = new Configuration();
         config.setHostname(host);
