@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">F
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
+</head>
+<body>
+<script>
+    var socketurl = "http://192.168.1.7" + ":8082?gameId="+ "concu";
+    var socket = io.connect(socketurl);
+    var that = this;
+    socket.on("connect", (data) =>{
+        console.log(data);
+
+    });
+   // alert("success")
+</script>
+</body>
+</html>

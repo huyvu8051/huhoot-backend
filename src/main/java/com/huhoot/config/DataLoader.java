@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -46,6 +47,9 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public void run(ApplicationArguments args) throws IOException {
+
+
+
         Date date = new Date();
 
         // start time
@@ -76,7 +80,8 @@ public class DataLoader implements ApplicationRunner {
                 Challenge challenge = new Challenge();
                 challenge.setTitle("title " + i + j);
                 challenge.setChallengeStatus(ChallengeStatus.WAITING);
-                challenge.setCoverImage("cover image" + i + j);
+
+                challenge.setCoverImage(getRandomImgUrl());
                 challenge.setRandomQuest(true);
                 challenge.setRandomAnswer(true);
                 challenge.setAdmin(host);
@@ -109,12 +114,14 @@ public class DataLoader implements ApplicationRunner {
                     Question question
                             = new Question();
                     question.setOrdinalNumber(x);
-                    question.setQuestionContent("content " + i + j + x);
+                    question.setQuestionContent(getRandomImgUrl());
                     question.setAnswerTimeLimit(AnswerTime.TWENTY_SEC);
                     question.setPoint(Points.STANDARD);
                     question.setAnswerOption(AnswerOption.SINGLE_SELECT);
 
                     question.setChallenge(chall);
+
+
 
                     question.setCreatedDate(date);
                     question.setCreatedBy("BobVu");
@@ -173,5 +180,21 @@ public class DataLoader implements ApplicationRunner {
         double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
         System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
 
+    }
+
+    private String getRandomImgUrl(){
+        List<String> imgUrls = new ArrayList<>();
+
+        imgUrls.add("https://i.imgur.com/BpnU5U9.jpeg");
+        imgUrls.add("https://i.imgur.com/ZMovdZu.jpg");
+        imgUrls.add("https://i.imgur.com/e03sCWa.jpg");
+        imgUrls.add("https://i.imgur.com/nI5UWV8.jpg");
+        imgUrls.add("https://i.imgur.com/o9CI562.jpg");
+        imgUrls.add("https://i.imgur.com/9bjVfKI.jpg");
+
+        Random random = new Random();
+        int rand = random.nextInt(6);
+
+        return imgUrls.get(rand);
     }
 }
