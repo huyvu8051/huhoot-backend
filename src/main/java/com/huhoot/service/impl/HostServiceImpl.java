@@ -2,7 +2,7 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.AnswerConverter;
 import com.huhoot.converter.ChallengeConverter;
-import com.huhoot.converter.PageConverter;
+import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
@@ -39,7 +39,7 @@ public class HostServiceImpl implements HostService {
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByAdminIdAndIsDeletedFalse(userDetails.getId(), pageable);
 
-        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> result = challengeRepository.findAllByTitleContainingIgnoreCaseAndAdminId(title, userDetails.getId(), pageable);
-        return PageConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
+        return ListConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
     }
 
 
@@ -105,7 +105,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
         Page<Question> questions = questionRepository.findAllByChallengeIdAndChallengeAdminId(challengeId, userDetails.getId(), pageable);
-        return PageConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
+        return ListConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
         List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
-        return PageConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+        return ListConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
     }
 
     @Override
@@ -221,6 +221,26 @@ public class HostServiceImpl implements HostService {
         }
 
         answerRepository.saveAll(answers);
+    }
+
+    @Override
+    public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
+        return null;
+    }
+
+    @Override
+    public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, int studentUsername, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public void addOneStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) {
+
+    }
+
+    @Override
+    public void deleteManyStudentInChallenge(Admin userDetails, List<Integer> ids) {
+
     }
 
 

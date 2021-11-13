@@ -43,4 +43,12 @@ public interface HostService {
     void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException;
 
     void deleteManyAnswer(Admin userDetails, List<Integer> ids);
+
+    PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId);
+
+    PageResponse<StudentInChallengeResponse>  searchStudentInChallengeByTitle(Admin userDetails, int studentUsername, Pageable pageable);
+
+    void addOneStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request);
+
+    void deleteManyStudentInChallenge(Admin userDetails, List<Integer> ids);
 }

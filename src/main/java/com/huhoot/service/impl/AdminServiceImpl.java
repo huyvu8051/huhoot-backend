@@ -1,6 +1,6 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.PageConverter;
+import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.AdminConverter;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.StudentConverter;
@@ -15,7 +15,6 @@ import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> admins = adminRepository.findAll(pageable);
 
-        return PageConverter.toPageResponse(admins, AdminConverter::toHostResponse);
+        return ListConverter.toPageResponse(admins, AdminConverter::toHostResponse);
     }
 
     @Override
@@ -72,7 +71,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
 
-        return PageConverter.toPageResponse(entities, AdminConverter::toHostResponse);
+        return ListConverter.toPageResponse(entities, AdminConverter::toHostResponse);
     }
 
 
@@ -157,7 +156,7 @@ public class AdminServiceImpl implements AdminService {
 
         Page<Student> all = studentRepository.findAll(pageable);
 
-        return PageConverter.toPageResponse(all, StudentConverter::toStudentResponse);
+        return ListConverter.toPageResponse(all, StudentConverter::toStudentResponse);
 
     }
 
@@ -175,7 +174,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable) {
         Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-        return PageConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
+        return ListConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
     }
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
@@ -253,13 +252,13 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAll(pageable);
-        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
     public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
-        return PageConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
 }

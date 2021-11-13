@@ -29,6 +29,8 @@ public class AdminManageChallengeController {
 
     private final HostService hostService;
 
+    private final NoCheckOwnChallenge noCheckOwnerChallenge;
+
     public AdminManageChallengeController(AdminService adminService, HostService hostService, NoCheckOwnChallenge noCheckOwnerChallenge) {
         this.adminService = adminService;
         this.hostService = hostService;
@@ -45,8 +47,6 @@ public class AdminManageChallengeController {
 
         return ResponseEntity.ok(adminService.findAllChallenge(pageable));
     }
-
-    private final NoCheckOwnChallenge noCheckOwnerChallenge;
 
     @GetMapping("/challenge/details")
     public ResponseEntity<ChallengeResponse> getDetails(@RequestParam int id) throws NotYourOwnException, NotFoundException {
