@@ -17,7 +17,7 @@ import java.net.UnknownHostException;
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "157.245.147.167";
+    private String host = "localhost";
     private Integer port = 8082;
 
     @Bean
