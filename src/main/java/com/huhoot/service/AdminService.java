@@ -3,6 +3,7 @@ package com.huhoot.service;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.model.Admin;
+import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -83,7 +84,7 @@ public interface AdminService {
     /**
      * @param request
      */
-    void updateStudentAccount(StudentUpdateRequest request);
+    void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException;
 
     /**
      * @param hostIds

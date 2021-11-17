@@ -1,25 +1,18 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.AnswerConverter;
-import com.huhoot.converter.ChallengeConverter;
-import com.huhoot.converter.ListConverter;
-import com.huhoot.converter.QuestionConverter;
+import com.huhoot.converter.*;
 import com.huhoot.dto.*;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
-import com.huhoot.model.Admin;
-import com.huhoot.model.Answer;
-import com.huhoot.model.Challenge;
-import com.huhoot.model.Question;
-import com.huhoot.repository.AnswerRepository;
-import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.QuestionRepository;
+import com.huhoot.model.*;
+import com.huhoot.repository.*;
 import com.huhoot.service.HostService;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +22,12 @@ public class HostServiceImpl implements HostService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
-    public HostServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
+    public HostServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentChallengeRepository studentChallengeRepository, StudentRepository studentRepository) {
         this.challengeRepository = challengeRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.studentChallengeRepository = studentChallengeRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -188,7 +183,7 @@ public class HostServiceImpl implements HostService {
 
         Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
-        if(question.getAnswers().size() >=4 ){
+        if (question.getAnswers().size() >= 4) {
             throw new Exception("Reach maximum answer");
         }
 
@@ -223,23 +218,63 @@ public class HostServiceImpl implements HostService {
         answerRepository.saveAll(answers);
     }
 
+    private final StudentChallengeRepository studentChallengeRepository;
+
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        return null;
+        Page<StudentChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsDeletedFalse(challengeId, userDetails.getId(), pageable);
+
+        return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
     }
 
     @Override
-    public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, int studentUsername, Pageable pageable) {
-        return null;
+    public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, String studentUsername, int challengeId, Pageable pageable) {
+
+        Page<StudentChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
+
+        return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
     }
 
+    private final StudentRepository studentRepository;
+
+    /**
+     * @param userDetails
+     * @param request
+     * @throws NotFoundException
+     */
     @Override
-    public void addOneStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) {
+    public List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneById(request.getChallengeId());
+
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+        List<StudentChallengeAddError> errors = new ArrayList<>();
+
+        for (int id : request.getStudentIds()) {
+            try {
+                Optional<Student> optionalStudent = studentRepository.findOneById(id);
+                Student student = optionalStudent.orElseThrow(() -> new NotFoundException("Student not found"));
+
+                studentChallengeRepository.save(new StudentChallenge(student, challenge));
+            } catch (Exception e) {
+                errors.add(new StudentChallengeAddError(id, e.getMessage()));
+            }
+        }
+
+        return errors;
 
     }
 
+
     @Override
-    public void deleteManyStudentInChallenge(Admin userDetails, List<Integer> ids) {
+    public void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request) {
+        List<StudentChallenge> list = studentChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(request.getStudentIds(), request.getChallengeId());
+
+        for (StudentChallenge studentChallenge : list) {
+            studentChallenge.setDeleted(true);
+        }
+
+        studentChallengeRepository.saveAll(list);
 
     }
 

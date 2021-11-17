@@ -1,11 +1,13 @@
 package com.huhoot.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+@NoArgsConstructor
 @Entity
 @AssociationOverrides({
         @AssociationOverride(name = "primaryKey.student", joinColumns = @JoinColumn(name = "student_id")),
@@ -13,6 +15,8 @@ import javax.persistence.*;
 @EntityListeners({AuditingEntityListener.class})
 public class StudentChallenge extends Auditable {
 
+    @Getter
+    @Setter
     private boolean isLogin;
 
     @EmbeddedId
@@ -30,6 +34,22 @@ public class StudentChallenge extends Auditable {
     @Getter
     @Setter
     private boolean isOnline;
+
+    @Getter
+    @Setter
+    private boolean isDeleted;
+
+    public StudentChallenge(Student student, Challenge challenge ){
+        this.setStudent(student);
+        this.setChallenge(challenge);
+        this.isLogin = false;
+        this.totalScore = 0;
+        this.isKicked = false;
+        this.isOnline = false;
+        this.isDeleted = false;
+    }
+
+
 
     @Transient
     public Student getStudent() {

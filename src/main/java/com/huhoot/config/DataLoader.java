@@ -48,7 +48,7 @@ public class DataLoader implements ApplicationRunner {
 
     public void run(ApplicationArguments args) throws IOException {
 
-
+/*
 
         Date date = new Date();
 
@@ -156,7 +156,7 @@ public class DataLoader implements ApplicationRunner {
 
         long t1 = System.nanoTime();
 
-/*
+
 
         List<Answer> answers = new ArrayList<>();
         for(int i = 0; i < 100000; i++){
@@ -173,12 +173,14 @@ public class DataLoader implements ApplicationRunner {
             answers.add(answer);
         }
 
-        answerRepository.saveAll(answers); */
+        answerRepository.saveAll(answers);
 
         // end time
 
         double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
         System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
+
+        */
 
     }
 

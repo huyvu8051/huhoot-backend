@@ -14,6 +14,7 @@ import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminService;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -162,13 +163,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException {
-        Student entity = studentRepository.findOneById(id);
+        Optional<Student> optional = studentRepository.findOneById(id);
 
-        if (entity == null) {
-            throw new AccountNotFoundException("Account not found");
-        }
+        Student student = optional.orElseThrow(()->new AccountNotFoundException("Account not found"));
 
-        return StudentConverter.toStudentResponse(entity);
+        return StudentConverter.toStudentResponse(student);
     }
 
     @Override
@@ -227,8 +226,11 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public void updateStudentAccount(StudentUpdateRequest request) {
-        Student student = studentRepository.findOneById(request.getId());
+    public void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException {
+        Optional<Student> optional = studentRepository.findOneById(request.getId());
+
+        Student student = optional.orElseThrow(()->new NotFoundException("Student not found"));
+
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         student.setPassword(hashedPassword);
         student.setFullName(request.getFullName());

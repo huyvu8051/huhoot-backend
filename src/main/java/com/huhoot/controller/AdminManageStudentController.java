@@ -2,6 +2,7 @@ package com.huhoot.controller;
 
 import com.huhoot.dto.*;
 import com.huhoot.service.AdminService;
+import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +50,7 @@ public class AdminManageStudentController {
     }
 
     @PutMapping("/student")
-    public ResponseEntity<?> update(@Valid @RequestBody StudentUpdateRequest request) {
+    public ResponseEntity<?> update(@Valid @RequestBody StudentUpdateRequest request) throws NotFoundException {
         adminService.updateStudentAccount(request);
 
         return ResponseEntity.ok(null);

@@ -46,9 +46,9 @@ public interface HostService {
 
     PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId);
 
-    PageResponse<StudentInChallengeResponse>  searchStudentInChallengeByTitle(Admin userDetails, int studentUsername, Pageable pageable);
+    PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, String studentUsername,int challengeId, Pageable pageable);
 
-    void addOneStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request);
+    List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException;
 
-    void deleteManyStudentInChallenge(Admin userDetails, List<Integer> ids);
+    void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request);
 }

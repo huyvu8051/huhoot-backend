@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class StudentInChallengeAddRequest {
-    private int challengeId;
+public class StudentInChallengeDeleteRequest {
     private List<Integer> studentIds;
+    private int challengeId;
 }
