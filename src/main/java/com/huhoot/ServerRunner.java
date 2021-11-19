@@ -65,6 +65,7 @@ public class ServerRunner implements CommandLineRunner {
             log.info("Socket launch successful!");
         }catch (Exception e){
             log.error("Socket launch failure!");
+            e.printStackTrace();
         }
 
     }
