@@ -23,7 +23,8 @@ public class ServerRunner implements CommandLineRunner {
     @Bean
     public SocketIOServer socketioserver() {
 
-        /*try {
+        /*
+        try {
             InetAddress IP = InetAddress.getLocalHost();
             this.host = IP.getHostAddress();
         } catch (UnknownHostException e) {
@@ -59,8 +60,12 @@ public class ServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        server.start();
-        log.info("Socket launch successful!");
+        try{
+            server.start();
+            log.info("Socket launch successful!");
+        }catch (Exception e){
+            log.error("Socket launch failure!");
+        }
 
     }
 }

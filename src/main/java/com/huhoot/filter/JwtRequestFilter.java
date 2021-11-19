@@ -16,6 +16,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -61,7 +64,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return "/authentication".equals(path) || path.startsWith("/resources")|| path.startsWith("/index");
+        return this.isNotFilter(path);
+    }
+
+    private boolean isNotFilter(String path){
+        List<String> uri = new ArrayList<>(Arrays.asList("/csrf", "/authentication", "/swagger-resources", "/swagger-ui.html",
+                "/v2/api-docs", "/webjars", "/resources", "/index.html", "/test", "/socket.io"));
+
+        for(String e : uri){
+            if(path.startsWith(e)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

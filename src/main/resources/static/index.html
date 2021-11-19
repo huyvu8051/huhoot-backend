@@ -9,10 +9,14 @@
 <body>
 <h1 id="message">connecting...</h1>
 <script>
-    var socketurl = "157.245.147.167" + ":8082?gameId=" + "concu";
+    var socketurl = "http://localhost" + ":8082?gameId=" + "concu";
     var socket = io.connect(socketurl);
     var that = this;
     socket.on("connect", (data) => {
+        $("#message").append("<br/><b> " + data + "</b>");
+
+    });
+    socket.on("message", (data) => {
         $("#message").append("<br/><b> " + data + "</b>");
 
     });
