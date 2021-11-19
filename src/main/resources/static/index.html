@@ -9,7 +9,7 @@
 <body>
 <h1 id="message">connecting...</h1>
 <script>
-    var socketurl = "http://localhost" + ":8082?gameId=" + "concu";
+    var socketurl = "http://159.223.38.181" + ":8082?gameId=" + "concu";
     var socket = io.connect(socketurl);
     var that = this;
     socket.on("connect", (data) => {
