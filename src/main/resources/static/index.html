@@ -8,11 +8,12 @@
 </head>
 <body>
 <h1 id="message">connecting...</h1>
+<button id="btn">sent</button>
 <script>
-    // var socketurl = "http://159.223.38.181" + ":8082?gameId=" + "concu";
-    var socketurl = "http://localhost" + ":8082?gameId=" + "GAME21";
-    var socket = io.connect(socketurl);
-    var that = this;
+    // const socketurl = "http://159.223.38.181" + ":8082?gameId=" + "concu";
+     var socketurl = "http://localhost" + ":8082?gameId=" + "GAME21";
+    const socket = io.connect(socketurl);
+    const that = this;
     socket.on("connect", (data) => {
         $("#message").append("<br/><b> " + data + "</b>");
 
@@ -21,6 +22,11 @@
         $("#message").append("<br/><b> " + data + "</b>");
 
     });
+
+    $("#btn").click(e=>{
+        socket.emit('registHostSocket', "con cu hay cung");
+    })
+
     // alert("success")
 </script>
 </body>

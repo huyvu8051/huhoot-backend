@@ -46,6 +46,18 @@ public class MessageEventHandler {
     @OnEvent("messageEvent")
     public void onEvent(SocketIOClient client, AckRequest request, String data) {
         log.info("get data = " + data.toString());
-        client.sendEvent("messageevent", "chung ta cua hien tai");
+        client.sendEvent("message", "chung ta cua hien tai");
+    }
+
+    @OnEvent("registHostSocket")
+    public void registHostSocket(SocketIOClient client, AckRequest request, String data) {
+
+
+        String authorization = client.getHandshakeData().getHttpHeaders().get("Authorization");
+
+
+
+        log.info("get data = " + data.toString());
+        client.sendEvent("message", "chung ta cua hien tai");
     }
 }
