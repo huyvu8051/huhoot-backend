@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Embeddable
 @Data
-public class StudentChallengeId implements Serializable {
+public class StudentInChallengeId implements Serializable {
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "student_id")

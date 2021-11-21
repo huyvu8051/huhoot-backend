@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Integer>{
 	Student findOneByUsername(String username);
 
-    Page<Student> findAllByOrderByCreatedDateDesc(Pageable pageable);
-
     Optional<Student> findOneById(int id);
 
-    Page<Student> findAllByUsernameContainingIgnoreCase(String username, Pageable pageable);
+    Page<Student> findAllByIsNonLocked(boolean isLocked, Pageable pageable);
+
+    Page<Student> findAllByUsernameContainingIgnoreCaseAndIsNonLocked(String username, boolean isNonLocked, Pageable pageable);
 }

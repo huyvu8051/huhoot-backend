@@ -51,4 +51,7 @@ public interface HostService {
     List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException;
 
     void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request);
+
+
+    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException;
 }

@@ -7,7 +7,6 @@ import com.huhoot.enums.Role;
 import com.huhoot.exception.AnswerOption;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,13 +47,13 @@ public class DataLoader implements ApplicationRunner {
 
     public void run(ApplicationArguments args) throws IOException {
 
-/*
+
 
         Date date = new Date();
 
         // start time
         long t0 = System.nanoTime();
-
+/*
         Admin admin = new Admin("admin", passwordEncoder.encode("admin"));
         admin.setRole(Role.ADMIN);
         admin.setCreatedDate(date);
@@ -101,7 +100,7 @@ public class DataLoader implements ApplicationRunner {
                     student1.setModifiedBy("Nobody");
                     Student student = studentRepository.save(student1);
 
-                    StudentChallenge studentChallenge = new StudentChallenge();
+                    StudentInChallenge studentChallenge = new StudentInChallenge();
                     studentChallenge.setStudent(student);
                     studentChallenge.setChallenge(chall);
                     studentChallenge.setCreatedDate(date);
@@ -156,10 +155,10 @@ public class DataLoader implements ApplicationRunner {
 
         long t1 = System.nanoTime();
 
-
+/*
 
         List<Answer> answers = new ArrayList<>();
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < 10; i++){
             Answer answer = new Answer();
             answer.setOrdinalNumber(i);
             answer.setAnswerContent("content " + i);
@@ -175,13 +174,15 @@ public class DataLoader implements ApplicationRunner {
 
         answerRepository.saveAll(answers);
 
+
+
         // end time
 
         double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
         System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
 
-        */
 
+ */
     }
 
     private String getRandomImgUrl(){

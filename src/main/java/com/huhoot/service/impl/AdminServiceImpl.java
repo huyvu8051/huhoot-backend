@@ -153,9 +153,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
+    public PageResponse<StudentResponse> findAllStudentAccount(boolean isNonLocked, Pageable pageable) {
 
-        Page<Student> all = studentRepository.findAll(pageable);
+        Page<Student> all = studentRepository.findAllByIsNonLocked(isNonLocked, pageable);
 
         return ListConverter.toPageResponse(all, StudentConverter::toStudentResponse);
 
@@ -171,8 +171,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable) {
-        Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
+    public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, boolean isNonLocked, Pageable pageable) {
+        Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCaseAndIsNonLocked(username, isNonLocked, pageable);
         return ListConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
     }
 

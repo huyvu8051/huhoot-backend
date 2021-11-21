@@ -13,7 +13,7 @@ import javax.persistence.*;
         @AssociationOverride(name = "primaryKey.student", joinColumns = @JoinColumn(name = "student_id")),
         @AssociationOverride(name = "primaryKey.challenge", joinColumns = @JoinColumn(name = "challenge_id"))})
 @EntityListeners({AuditingEntityListener.class})
-public class StudentChallenge extends Auditable {
+public class StudentInChallenge extends Auditable {
 
     @Getter
     @Setter
@@ -21,7 +21,7 @@ public class StudentChallenge extends Auditable {
 
     @EmbeddedId
     @Getter
-    private StudentChallengeId primaryKey = new StudentChallengeId();
+    private StudentInChallengeId primaryKey = new StudentInChallengeId();
 
     @Getter
     @Setter
@@ -37,16 +37,16 @@ public class StudentChallenge extends Auditable {
 
     @Getter
     @Setter
-    private boolean isDeleted;
+    private boolean isNonDeleted;
 
-    public StudentChallenge(Student student, Challenge challenge ){
+    public StudentInChallenge(Student student, Challenge challenge ){
         this.setStudent(student);
         this.setChallenge(challenge);
         this.isLogin = false;
         this.totalScore = 0;
         this.isKicked = false;
         this.isOnline = false;
-        this.isDeleted = false;
+        this.isNonDeleted = true;
     }
 
 

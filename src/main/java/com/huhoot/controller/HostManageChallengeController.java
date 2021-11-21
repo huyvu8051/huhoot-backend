@@ -70,33 +70,28 @@ public class HostManageChallengeController {
     }
 
     @PostMapping("/challenge")
-    public ResponseEntity<?> add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
+    public void add(@Valid @RequestBody ChallengeAddRequest request) throws IOException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
         hostService.addOneChallenge(userDetails, request);
 
-        return ResponseEntity.ok(null);
-
     }
 
     @PutMapping("/challenge")
-    public ResponseEntity<?> update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public void update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneChallenge(userDetails, request, checkOwnerChallenge);
 
-        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/challenge")
-    public ResponseEntity<?> delete(@RequestBody List<Integer> ids) {
+    public void delete(@RequestBody List<Integer> ids) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.deleteManyChallenge(userDetails, ids);
-
-        return ResponseEntity.ok(null);
 
     }
 

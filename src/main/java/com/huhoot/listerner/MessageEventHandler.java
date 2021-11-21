@@ -21,7 +21,11 @@ public class MessageEventHandler {
     }
 
     @OnConnect
-    public void onconnect(SocketIOClient client) {
+    public void onConnect(SocketIOClient client) {
+
+        String s1 = client.getSessionId().toString();
+
+
 
         String gameId = client.getHandshakeData().getSingleUrlParam("gameId");
         client.joinRoom(gameId);
@@ -32,14 +36,15 @@ public class MessageEventHandler {
 
 
     @OnDisconnect
-    public void ondisconnect(SocketIOClient client) {
+    public void onDisconnect(SocketIOClient client) {
         String gameId = client.getHandshakeData().getSingleUrlParam("gameId");
+        client.disconnect();
         log.info("disconnect to GameId = " + gameId);
-        client.sendEvent("disconnect", "disconnected");
+
     }
 
-    @OnEvent("messageevent")
-    public void onevent(SocketIOClient client, AckRequest request, String data) {
+    @OnEvent("messageEvent")
+    public void onEvent(SocketIOClient client, AckRequest request, String data) {
         log.info("get data = " + data.toString());
         client.sendEvent("messageevent", "chung ta cua hien tai");
     }

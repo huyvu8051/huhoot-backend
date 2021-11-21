@@ -11,13 +11,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "159.223.38.181";
+    // private String host = "159.223.38.181";
+    private String host = "localhost";
     private Integer port = 8082;
 
     @Bean
@@ -42,6 +40,7 @@ public class ServerRunner implements CommandLineRunner {
 
             @Override
             public boolean isAuthorized(HandshakeData data) {
+
                 return true;
             }
         });
@@ -60,12 +59,12 @@ public class ServerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        try{
+        try {
             server.start();
             log.info("Socket launch successful!");
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Socket launch failure!");
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
     }

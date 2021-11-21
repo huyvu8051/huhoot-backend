@@ -1,13 +1,12 @@
 package com.huhoot.converter;
 
-import com.google.common.collect.Interners;
 import com.huhoot.dto.StudentInChallengeResponse;
 import com.huhoot.model.Student;
-import com.huhoot.model.StudentChallenge;
+import com.huhoot.model.StudentInChallenge;
 
 public class StudentChallengeConverter {
 
-    public static StudentInChallengeResponse toStudentChallengeResponse(StudentChallenge entity){
+    public static StudentInChallengeResponse toStudentChallengeResponse(StudentInChallenge entity){
         StudentInChallengeResponse response = new StudentInChallengeResponse();
 
         Student student = entity.getStudent();

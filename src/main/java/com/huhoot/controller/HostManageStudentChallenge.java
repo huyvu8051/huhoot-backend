@@ -40,7 +40,7 @@ public class HostManageStudentChallenge {
                                                                         @RequestParam(defaultValue = "createdDate") String sortBy,
                                                                         @RequestParam(defaultValue = "DESC") String direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.findAllStudentAccount(pageable));
+        return ResponseEntity.ok(adminService.findAllStudentAccount(true, pageable));
     }
 
     @GetMapping("/student/search")
@@ -49,9 +49,10 @@ public class HostManageStudentChallenge {
                                                                 @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "12") int size,
                                                                 @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                                @RequestParam(defaultValue = "DESC") String direction) {
+                                                                @RequestParam(defaultValue = "DESC") String direction,
+                                                                @RequestParam(defaultValue = "true") boolean isNonLocked) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.searchStudentAccountByUsername(username, pageable));
+        return ResponseEntity.ok(adminService.searchStudentAccountByUsername(username, isNonLocked, pageable));
 
     }
 
@@ -97,12 +98,10 @@ public class HostManageStudentChallenge {
     }
 
     @DeleteMapping("/studentChallenge")
-    public ResponseEntity<?> delete(@RequestBody StudentInChallengeDeleteRequest request) {
+    public void delete(@RequestBody StudentInChallengeDeleteRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.deleteManyStudentInChallenge(userDetails, request);
-
-        return ResponseEntity.ok(null);
 
     }
 

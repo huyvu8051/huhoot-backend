@@ -46,14 +46,12 @@ public class HostManageQuestionController {
     }
 
     @PostMapping("/question")
-    public ResponseEntity<?> add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NotFoundException, NotYourOwnException {
+    public void add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NotFoundException, NotYourOwnException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
         hostService.addOneQuestion(userDetails, request, checkOwnerChallenge);
-
-        return ResponseEntity.ok(null);
 
     }
 
@@ -66,21 +64,18 @@ public class HostManageQuestionController {
     }
 
     @PutMapping("/question")
-    public ResponseEntity<?> update(@Valid @RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public void update(@Valid @RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
 
-        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/question")
-    public ResponseEntity<?> delete(@RequestBody List<Integer> ids) {
+    public void delete(@RequestBody List<Integer> ids) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.deleteManyQuestion(userDetails, ids);
-
-        return ResponseEntity.ok(null);
 
     }
 }

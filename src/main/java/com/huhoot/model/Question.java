@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.Points;
 import com.huhoot.exception.AnswerOption;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,9 +25,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 @Data
 @EntityListeners({ AuditingEntityListener.class })
+@Where(clause="is_non_deleted=1")
 public class Question extends Auditable{
 
 	@Id
@@ -44,8 +45,9 @@ public class Question extends Auditable{
 	private AnswerOption answerOption;
 
 	private Date askDate;
-	
-	private boolean isDeleted;
+
+
+	private boolean isNonDeleted;
 
 	@ManyToOne
 	@JoinColumn(name = "challenge_id")
@@ -56,5 +58,9 @@ public class Question extends Auditable{
 
 	@OneToMany(mappedBy = "primaryKey.question", cascade = CascadeType.ALL)
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();
+
+	public Question(){
+		this.isNonDeleted = true;
+	}
 
 }

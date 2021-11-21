@@ -56,10 +56,12 @@ public interface AdminService {
     /**
      * Find all Student account
      *
+     *
+     * @param isNonLocked
      * @param pageable
      * @return
      */
-    PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable);
+    PageResponse<StudentResponse> findAllStudentAccount(boolean isNonLocked, Pageable pageable);
 
     /**
      * @param id
@@ -70,10 +72,11 @@ public interface AdminService {
 
     /**
      * @param username
+     * @param isNonLocked
      * @param pageable
      * @return
      */
-    PageResponse<StudentResponse> searchStudentAccountByUsername(String username, Pageable pageable);
+    PageResponse<StudentResponse> searchStudentAccountByUsername(String username, boolean isNonLocked, Pageable pageable);
 
     /**
      * @param request

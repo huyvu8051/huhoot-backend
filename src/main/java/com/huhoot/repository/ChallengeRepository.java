@@ -14,11 +14,14 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     Page<Challenge> findAllByTitleContainingIgnoreCaseAndAdminId(String title, int id, Pageable pageable);
 
-    Page<Challenge> findAllByAdminIdAndIsDeletedFalse(int id, Pageable pageable);
+    Page<Challenge> findAllByAdminId(int id, Pageable pageable);
 
     Page<Challenge> findAll(Pageable pageable);
 
     Page<Challenge> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     List<Challenge> findAllByAdminIdAndIdIn(int id, List<Integer> ids);
+
+    Optional<Challenge> findOneByIdAndAdminId(int challengeId, int adminId);
+
 }

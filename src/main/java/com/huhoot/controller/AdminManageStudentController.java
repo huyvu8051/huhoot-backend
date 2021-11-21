@@ -26,9 +26,13 @@ public class AdminManageStudentController {
     }
 
     @GetMapping("/student")
-    public ResponseEntity<PageResponse<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size, @RequestParam(defaultValue = "createdDate") String sortBy, @RequestParam(defaultValue = "DESC") String direction) {
+    public ResponseEntity<PageResponse<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "12") int size,
+                                                                @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                @RequestParam(defaultValue = "DESC") String direction,
+                                                                @RequestParam(defaultValue = "true") boolean isNonLocked) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.findAllStudentAccount(pageable));
+        return ResponseEntity.ok(adminService.findAllStudentAccount(isNonLocked, pageable));
     }
 
     @GetMapping("/student/details")
@@ -38,9 +42,14 @@ public class AdminManageStudentController {
     }
 
     @GetMapping("/student/search")
-    public ResponseEntity<PageResponse<StudentResponse>> search(@Length(min = 1, max = 10) @RequestParam String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size, @RequestParam(defaultValue = "createdDate") String sortBy, @RequestParam(defaultValue = "DESC") String direction) {
+    public ResponseEntity<PageResponse<StudentResponse>> search(@Length(min = 1, max = 10) @RequestParam String username,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "12") int size,
+                                                                @RequestParam(defaultValue = "createdDate") String sortBy,
+                                                                @RequestParam(defaultValue = "DESC") String direction,
+                                                                @RequestParam(defaultValue = "true") boolean isNonLocked) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.searchStudentAccountByUsername(username, pageable));
+        return ResponseEntity.ok(adminService.searchStudentAccountByUsername(username, isNonLocked, pageable));
 
     }
 
@@ -50,18 +59,14 @@ public class AdminManageStudentController {
     }
 
     @PutMapping("/student")
-    public ResponseEntity<?> update(@Valid @RequestBody StudentUpdateRequest request) throws NotFoundException {
+    public void update(@Valid @RequestBody StudentUpdateRequest request) throws NotFoundException {
         adminService.updateStudentAccount(request);
-
-        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/student")
-    public ResponseEntity<?> lock(@RequestBody List<Integer> ids) {
+    public void lock(@RequestBody List<Integer> ids) {
 
         adminService.lockManyStudentAccount(ids);
-
-        return ResponseEntity.ok(null);
 
     }
 

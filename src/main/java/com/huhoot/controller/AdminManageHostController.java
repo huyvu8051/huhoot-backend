@@ -62,19 +62,15 @@ public class AdminManageHostController {
     }
 
     @PutMapping("/host")
-    public ResponseEntity<?> update(@Valid @RequestBody HostUpdateRequest request) {
+    public void update(@Valid @RequestBody HostUpdateRequest request) {
 
         adminService.updateHostAccount(request);
-
-        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/host")
-    public ResponseEntity<?> lock(@RequestBody List<Integer> ids) {
+    public void lock(@RequestBody List<Integer> ids) {
 
         adminService.lockManyHostAccount(ids);
-
-        return ResponseEntity.ok(null);
 
     }
 

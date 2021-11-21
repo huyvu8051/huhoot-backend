@@ -23,11 +23,14 @@ import java.util.List;
 @Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-    @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
 
-    @Autowired
-    private jwtUtil jwtUtil;
+    private final jwtUtil jwtUtil;
+
+    public JwtRequestFilter(MyUserDetailsService myUserDetailsService, jwtUtil jwtUtil) {
+        this.myUserDetailsService = myUserDetailsService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,13 +38,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         log.warn("run over jwt filter");
 
-        final String authorizaionHeader = request.getHeader("Authorization");
+        final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
-        if (authorizaionHeader != null && authorizaionHeader.startsWith("Bearer ")) {
-            jwt = authorizaionHeader.substring(7);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractUsername(jwt);
         }
 

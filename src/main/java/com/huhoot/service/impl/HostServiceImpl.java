@@ -2,6 +2,7 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.*;
 import com.huhoot.dto.*;
+import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
 import com.huhoot.model.*;
@@ -32,7 +33,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAllByAdminIdAndIsDeletedFalse(userDetails.getId(), pageable);
+        Page<Challenge> challenges = challengeRepository.findAllByAdminId(userDetails.getId(), pageable);
 
         return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
@@ -78,7 +79,7 @@ public class HostServiceImpl implements HostService {
         challenge.setRandomAnswer(request.isRandomAnswer());
         challenge.setRandomQuest(request.isRandomQuest());
         challenge.setChallengeStatus(request.getChallengeStatus());
-        challenge.setDeleted(request.isDeleted());
+        challenge.setNonDeleted(request.isDeleted());
 
         challengeRepository.save(challenge);
 
@@ -90,7 +91,7 @@ public class HostServiceImpl implements HostService {
         List<Challenge> challenges = challengeRepository.findAllByAdminIdAndIdIn(userDetails.getId(), ids);
 
         for (Challenge challenge : challenges) {
-            challenge.setDeleted(true);
+            challenge.setNonDeleted(false);
         }
 
         challengeRepository.saveAll(challenges);
@@ -155,7 +156,7 @@ public class HostServiceImpl implements HostService {
         List<Question> questions = questionRepository.findAllByIdIn(ids);
 
         for (Question question : questions) {
-            question.setDeleted(true);
+            question.setNonDeleted(false);
         }
 
         questionRepository.saveAll(questions);
@@ -212,7 +213,7 @@ public class HostServiceImpl implements HostService {
     public void deleteManyAnswer(Admin userDetails, List<Integer> ids) {
         List<Answer> answers = answerRepository.findAllByIdIn(ids);
         for (Answer answer : answers) {
-            answer.setDeleted(true);
+            answer.setNonDeleted(false);
         }
 
         answerRepository.saveAll(answers);
@@ -222,7 +223,7 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        Page<StudentChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsDeletedFalse(challengeId, userDetails.getId(), pageable);
+        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId(), pageable);
 
         return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
     }
@@ -230,7 +231,7 @@ public class HostServiceImpl implements HostService {
     @Override
     public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, String studentUsername, int challengeId, Pageable pageable) {
 
-        Page<StudentChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
+        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
 
         return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
     }
@@ -255,7 +256,7 @@ public class HostServiceImpl implements HostService {
                 Optional<Student> optionalStudent = studentRepository.findOneById(id);
                 Student student = optionalStudent.orElseThrow(() -> new NotFoundException("Student not found"));
 
-                studentChallengeRepository.save(new StudentChallenge(student, challenge));
+                studentChallengeRepository.save(new StudentInChallenge(student, challenge));
             } catch (Exception e) {
                 errors.add(new StudentChallengeAddError(id, e.getMessage()));
             }
@@ -268,13 +269,29 @@ public class HostServiceImpl implements HostService {
 
     @Override
     public void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request) {
-        List<StudentChallenge> list = studentChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(request.getStudentIds(), request.getChallengeId());
+        List<StudentInChallenge> list = studentChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(request.getStudentIds(), request.getChallengeId());
 
-        for (StudentChallenge studentChallenge : list) {
-            studentChallenge.setDeleted(true);
+        for (StudentInChallenge studentChallenge : list) {
+            studentChallenge.setNonDeleted(false);
         }
 
         studentChallengeRepository.saveAll(list);
+
+    }
+
+    @Override
+    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(id, userDetails.getId());
+
+        Challenge challenge = optional.orElseThrow(()->new NotFoundException("Challenge not found"));
+
+        challenge.setChallengeStatus(ChallengeStatus.WAITING);
+
+        challengeRepository.save(challenge);
+
+        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(id, userDetails.getId());
+
+        return ListConverter.toListResponse(studentsInChallenge, StudentChallengeConverter::toStudentChallengeResponse);
 
     }
 

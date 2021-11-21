@@ -2,6 +2,7 @@ package com.huhoot.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -9,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Data
+@Where(clause="is_non_deleted=1")
 public class Challenge extends Auditable{
 	@Id
 	@GeneratedValue
@@ -38,7 +39,11 @@ public class Challenge extends Auditable{
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "primaryKey.challenge")
-	private List<StudentChallenge> studentChallenges = new ArrayList<>();
+	private List<StudentInChallenge> studentChallenges = new ArrayList<>();
 
-	private boolean isDeleted;
+	private boolean isNonDeleted;
+
+	public Challenge(){
+		this.isNonDeleted = true;
+	}
 }

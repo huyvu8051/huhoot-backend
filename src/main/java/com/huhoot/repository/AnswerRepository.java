@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
-    List<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId);
 
     Optional<Answer> findOneByIdAndQuestionChallengeAdminId(int answerId, int id);
 
@@ -16,4 +15,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     List<Answer> findAllByIdIn(List<Integer> ids);
 
     List<Answer> findAllByAnswerContentContainingIgnoreCase(String s);
+
+    List<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId);
 }

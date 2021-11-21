@@ -2,7 +2,6 @@ package com.huhoot.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,8 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,7 +39,7 @@ public class Student extends Auditable implements UserDetails{
 	private boolean isNonLocked;
 
 	@OneToMany(mappedBy = "primaryKey.student")
-	private List<StudentChallenge> studentChallenges = new ArrayList<>();
+	private List<StudentInChallenge> studentChallenges = new ArrayList<>();
 
 	@OneToMany(mappedBy = "primaryKey.student", cascade = CascadeType.ALL)
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();

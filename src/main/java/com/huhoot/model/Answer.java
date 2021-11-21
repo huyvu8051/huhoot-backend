@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,9 +24,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
+@Where(clause="is_non_deleted=1")
 public class Answer extends Auditable{
 
 	@Id
@@ -38,7 +39,7 @@ public class Answer extends Auditable{
 
 	private boolean isCorrect;
 
-	private boolean isDeleted;
+	private boolean isNonDeleted;
 
 	@ManyToOne
 	@JoinColumn(name = "question_id")
@@ -46,5 +47,9 @@ public class Answer extends Auditable{
 
 	@OneToMany(mappedBy = "primaryKey.answer", cascade = CascadeType.ALL)
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();
+
+	public Answer (){
+		this.isNonDeleted = true;
+	}
 
 }

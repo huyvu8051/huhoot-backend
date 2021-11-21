@@ -42,33 +42,27 @@ public class HostManageAnswerController {
     }
 
     @PostMapping("/answer")
-    public ResponseEntity<?> add(@Valid @RequestBody AnswerAddRequest request) throws Exception {
+    public void add(@Valid @RequestBody AnswerAddRequest request) throws Exception {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
         hostService.addOneAnswer(userDetails, request);
 
-        return ResponseEntity.ok(null);
-
     }
 
     @PutMapping("/answer")
-    public ResponseEntity<?> update(@Valid @RequestBody AnswerUpdateRequest request) throws NotFoundException {
+    public void update(@Valid @RequestBody AnswerUpdateRequest request) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneAnswer(userDetails, request);
-
-        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/answer")
-    public ResponseEntity<?> delete(@RequestBody List<Integer> ids) {
+    public void delete(@RequestBody List<Integer> ids) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.deleteManyAnswer(userDetails, ids);
-
-        return ResponseEntity.ok(null);
 
     }
 }
