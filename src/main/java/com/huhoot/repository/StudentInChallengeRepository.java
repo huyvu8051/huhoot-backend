@@ -6,8 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface StudentChallengeRepository extends JpaRepository<StudentInChallenge, Integer> {
+public interface StudentInChallengeRepository extends JpaRepository<StudentInChallenge, Integer> {
 
     Page<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(int challengeId, int id, Pageable pageable);
 
@@ -19,4 +20,8 @@ public interface StudentChallengeRepository extends JpaRepository<StudentInChall
 
 
     List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(int challengeId, int adminId);
+
+    Optional<StudentInChallenge> findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(int challengeId, int id);
+
+    List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsLoginTrue(int challengeId, int id);
 }

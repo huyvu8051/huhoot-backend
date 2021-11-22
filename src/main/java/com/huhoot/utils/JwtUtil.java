@@ -15,8 +15,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-public class jwtUtil {
-	private final int TEN_HOUR = 1000 * 60 * 60 * 10;
+public class JwtUtil {
+	private final int TEN_HOUR = 1000 * 60 * 60 * 10 * 10; // 100 hour
 	
 	@Value("${huhoot.secret-key}")
 	private final String SECRET_KEY = null;

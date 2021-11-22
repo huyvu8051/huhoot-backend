@@ -1,10 +1,9 @@
 package com.huhoot;
 
-import com.corundumstudio.socketio.AuthorizationListener;
 import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.HandshakeData;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
+import io.netty.handler.codec.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,18 +33,8 @@ public class ServerRunner implements CommandLineRunner {
         config.setHostname(host);
         config.setPort(port);
 
-
-        // This can be used for authentication
-        config.setAuthorizationListener(new AuthorizationListener() {
-
-            @Override
-            public boolean isAuthorized(HandshakeData data) {
-
-                return true;
-            }
-        });
-
         final SocketIOServer server = new SocketIOServer(config);
+
         return server;
     }
 

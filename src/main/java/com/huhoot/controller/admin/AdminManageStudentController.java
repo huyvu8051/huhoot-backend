@@ -1,7 +1,7 @@
-package com.huhoot.controller;
+package com.huhoot.controller.admin;
 
 import com.huhoot.dto.*;
-import com.huhoot.service.AdminService;
+import com.huhoot.service.AdminManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +19,9 @@ import java.util.List;
 @RequestMapping("admin")
 public class AdminManageStudentController {
 
-    private final AdminService adminService;
+    private final AdminManageService adminService;
 
-    public AdminManageStudentController(AdminService adminService) {
+    public AdminManageStudentController(AdminManageService adminService) {
         this.adminService = adminService;
     }
 

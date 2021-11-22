@@ -10,7 +10,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 
-public interface AdminService {
+public interface AdminManageService {
     PageResponse<HostResponse> findAllHostAccount(Pageable pageable);
 
     void updateHostAccount(@Valid HostUpdateRequest hostDTO);

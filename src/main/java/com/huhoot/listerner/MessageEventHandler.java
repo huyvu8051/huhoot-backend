@@ -7,31 +7,53 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
+import com.huhoot.dto.RegisterHostRequest;
+import com.huhoot.exception.NotYourOwnException;
+import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
+import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.ChallengeRepository;
+import com.huhoot.service.impl.MyUserDetailsService;
+import com.huhoot.utils.JwtUtil;
+import com.sun.deploy.xml.BadTokenException;
+import javassist.NotFoundException;
+import javassist.tools.web.BadHttpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class MessageEventHandler {
     private final SocketIOServer server;
+    private final ChallengeRepository challengeRepository;
+    private final AdminRepository adminRepository;
+    private final MyUserDetailsService myUserDetailsService;
 
-    public MessageEventHandler(SocketIOServer server) {
+    private final JwtUtil jwtUtil;
+
+    public MessageEventHandler(SocketIOServer server, ChallengeRepository challengeRepository, AdminRepository adminRepository, MyUserDetailsService myUserDetailsService, JwtUtil jwtUtil) {
         this.server = server;
+        this.challengeRepository = challengeRepository;
+        this.adminRepository = adminRepository;
+        this.myUserDetailsService = myUserDetailsService;
+        this.jwtUtil = jwtUtil;
     }
 
     @OnConnect
-    public void onConnect(SocketIOClient client) {
+    public void onConnect(SocketIOClient client) throws NotFoundException {
 
-        String s1 = client.getSessionId().toString();
+        String challengeId = client.getHandshakeData().getSingleUrlParam("challengeId");
 
+        client.joinRoom(challengeId);
 
-
-        String gameId = client.getHandshakeData().getSingleUrlParam("gameId");
-        client.joinRoom(gameId);
-        log.info("connect to GameId = " + gameId);
-        client.sendEvent("connect", "connect success");
-        server.getRoomOperations(gameId).sendEvent("message", "Nguoi theo huong hoa may mu giang loi");
+        log.info("connect to GameId = " + challengeId);
+        client.sendEvent("connected", "connect success");
+        // server.getRoomOperations(challengeId).sendEvent("message", "Nguoi theo huong hoa may mu giang loi");
     }
 
 
@@ -49,15 +71,23 @@ public class MessageEventHandler {
         client.sendEvent("message", "chung ta cua hien tai");
     }
 
-    @OnEvent("registHostSocket")
-    public void registHostSocket(SocketIOClient client, AckRequest request, String data) {
+    @OnEvent("registerHostSocket")
+    public void registerHostSocket(SocketIOClient client, RegisterHostRequest registerRequest) throws Exception {
+        String token = registerRequest.getToken().substring(7);
 
+        String username = jwtUtil.extractUsername(token);
 
-        String authorization = client.getHandshakeData().getHttpHeaders().get("Authorization");
+        Admin userDetails = adminRepository.findOneByUsername(username);
 
+        if(!jwtUtil.validateToken(token, userDetails)){
+            throw new Exception("Bad token");
+        }
 
+        Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(registerRequest.getChallengeId(), userDetails.getId());
+        Challenge challenge = optionalChallenge.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
-        log.info("get data = " + data.toString());
-        client.sendEvent("message", "chung ta cua hien tai");
+        challenge.setAdminSocketId(client.getSessionId());
+        challengeRepository.save(challenge);
+
     }
 }

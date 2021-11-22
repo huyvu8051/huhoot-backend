@@ -13,7 +13,7 @@ import com.huhoot.repository.AdminRepository;
 import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
-import com.huhoot.service.AdminService;
+import com.huhoot.service.AdminManageService;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class AdminServiceImpl implements AdminService {
+public class AdminManageServiceImpl implements AdminManageService {
     private final AdminRepository adminRepository;
     private final AdminConverter adminConverter;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final AnswerRepository answerRepository;
 
-    public AdminServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator, AnswerRepository answerRepository, ChallengeRepository challengeRepository) {
+    public AdminManageServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator, AnswerRepository answerRepository, ChallengeRepository challengeRepository) {
         this.adminRepository = adminRepository;
         this.adminConverter = adminConverter;
         this.passwordEncoder = passwordEncoder;

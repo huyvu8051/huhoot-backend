@@ -1,4 +1,4 @@
-package com.huhoot.controller;
+package com.huhoot.controller.host;
 
 import com.huhoot.dto.ChallengeAddRequest;
 import com.huhoot.dto.ChallengeResponse;
@@ -7,7 +7,7 @@ import com.huhoot.dto.PageResponse;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostService;
+import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
@@ -26,11 +26,11 @@ import java.util.List;
 @RestController
 @RequestMapping("host")
 public class HostManageChallengeController {
-    private final HostService hostService;
+    private final HostManageService hostService;
 
     private final CheckOwnerChallenge checkOwnerChallenge;
 
-    public HostManageChallengeController(HostService hostService, CheckOwnerChallenge checkOwnerChallenge) {
+    public HostManageChallengeController(HostManageService hostService, CheckOwnerChallenge checkOwnerChallenge) {
         this.hostService = hostService;
         this.checkOwnerChallenge = checkOwnerChallenge;
     }

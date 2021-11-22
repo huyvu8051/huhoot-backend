@@ -1,11 +1,5 @@
 package com.huhoot.config;
 
-import com.huhoot.enums.AnswerTime;
-import com.huhoot.enums.ChallengeStatus;
-import com.huhoot.enums.Points;
-import com.huhoot.enums.Role;
-import com.huhoot.exception.AnswerOption;
-import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -31,11 +25,11 @@ public class DataLoader implements ApplicationRunner {
 
     private final QuestionRepository questionRepository;
 
-    private final StudentChallengeRepository studentChallengeRepository;
+    private final StudentInChallengeRepository studentChallengeRepository;
 
     private final AnswerRepository answerRepository;
 
-    public DataLoader(PasswordEncoder passwordEncoder, StudentRepository studentRepository, AdminRepository adminRepository, ChallengeRepository challengeRepository, QuestionRepository questionRepository, StudentChallengeRepository studentChallengeRepository, AnswerRepository answerRepository) {
+    public DataLoader(PasswordEncoder passwordEncoder, StudentRepository studentRepository, AdminRepository adminRepository, ChallengeRepository challengeRepository, QuestionRepository questionRepository, StudentInChallengeRepository studentChallengeRepository, AnswerRepository answerRepository) {
         this.passwordEncoder = passwordEncoder;
         this.studentRepository = studentRepository;
         this.adminRepository = adminRepository;

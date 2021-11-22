@@ -1,9 +1,8 @@
 package com.huhoot.filter;
 
 import com.huhoot.service.impl.MyUserDetailsService;
-import com.huhoot.utils.jwtUtil;
+import com.huhoot.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,9 +24,9 @@ import java.util.List;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final MyUserDetailsService myUserDetailsService;
 
-    private final jwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    public JwtRequestFilter(MyUserDetailsService myUserDetailsService, jwtUtil jwtUtil) {
+    public JwtRequestFilter(MyUserDetailsService myUserDetailsService, JwtUtil jwtUtil) {
         this.myUserDetailsService = myUserDetailsService;
         this.jwtUtil = jwtUtil;
     }
@@ -58,6 +57,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
 
             }
         }

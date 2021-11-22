@@ -8,26 +8,136 @@
 </head>
 <body>
 <h1 id="message">connecting...</h1>
-<button id="btn">sent</button>
+<ul id="challenges"></ul>
+<div id="question"></div>
+<br/>
+<div id="answers"></div>
+<div id="questions"></div>
+<div id="students"></div>
 <script>
-    // const socketurl = "http://159.223.38.181" + ":8082?gameId=" + "concu";
-     var socketurl = "http://localhost" + ":8082?gameId=" + "GAME21";
-    const socket = io.connect(socketurl);
-    const that = this;
-    socket.on("connect", (data) => {
-        $("#message").append("<br/><b> " + data + "</b>");
+    const challengeId = 219;
 
-    });
-    socket.on("message", (data) => {
-        $("#message").append("<br/><b> " + data + "</b>");
+    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJleHAiOjE2Mzc5NjI0OTgsImlhdCI6MTYzNzYwMjQ5OH0.h-rAtJ9w2iZ6VnraXtDG3yHDTuNEyWgAJe3548vCKCU";
 
+    // const socketurl = "http://159.223.38.181:8082";
+    const socketUrl = "http://localhost:8082"
+    const socket = io.connect(socketUrl, {
+        query: "challengeId=" + challengeId
     });
 
-    $("#btn").click(e=>{
-        socket.emit('registHostSocket', "con cu hay cung");
-    })
+    socket.on("connected", (data) => {
+        $("#message").append("<br/><b> " + data + "</b>");
+    }).emit('registerHostSocket', { // event name
+        challengeId: challengeId,
+        token: token
+    });
 
-    // alert("success")
+    // handle publish question event
+    socket.on("publishQuestion", (data) => {
+        const question = data.id + ":" + data.ordinalNumber + "<br/> <img height='200px' src='" + data.questionContent + "'/> <br/>" + data.answerTimeLimit + " " + data.point + " " + data.answerOption;
+        document.getElementById("question").innerHTML = question;
+        let answersText = "";
+        let answers = [];
+        data.publishAnswerResponses.forEach(e => {
+            answersText += "<button class='answer' data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+        });
+        document.getElementById("answers").innerHTML = answersText;
+    });
+
+    socket.on("joinRequest", data => {
+        // $("#message").append("<br/><button onclick='allow(" + data + ")'> allow " + data + "</button>");
+        // $("#message").append("<button onclick='deny(" + data + ")'> deny " + data + "</button>");
+
+        console.log("new student join")
+    });
+
+    function allow(id) {
+        console.log(id);
+    }
+
+    function deny(id) {
+        console.log(id);
+    }
+
+
+    // update student in challenge every 5 second
+
+    var myVar = setInterval(myTimer, 5000);
+
+    var students = "";
+    var studentInChallenges = [];
+
+    var that = this;
+
+    function myTimer() {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/studentOnline?challengeId=" + challengeId,
+            success: function (data) {
+                that.studentInChallenges = data;
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+
+        students = "";
+
+        studentInChallenges.forEach(e => {
+            students += "<button>" + e.studentUsername + "</button>";
+        });
+        document.getElementById("students").innerHTML = students;
+
+    }
+
+    // stop interval
+    function myStopFunction() {
+        clearInterval(myVar);
+    }
+
+
+    // sent question
+
+    function publishQuestion(questionId) {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/publishQuestion?questionId=" + questionId,
+            success: function (data) {
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+    }
+
+    // get all question, start challenge
+
+    $.ajax({
+        type: "GET",
+        beforeSend: function (request) {
+            request.setRequestHeader("Authorization", token);
+        },
+        url: "/host/startChallenge?challengeId=" + challengeId,
+        success: function (data) {
+            let questionsText = "";
+            data.forEach(e => {
+                questionsText += "<button class='question' data-id='" + e.id + "' onclick='publishQuestion(" + e.id + ")'>" + e.id + ":" + e.ordinalNumber + ". " + e.questionContent + "</button>";
+            });
+            document.getElementById("questions").innerHTML = questionsText;
+        },
+        error: data => {
+            console.log(data);
+        }
+    });
+
+
 </script>
 </body>
 </html>

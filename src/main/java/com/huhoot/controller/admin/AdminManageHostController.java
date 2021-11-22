@@ -1,7 +1,7 @@
-package com.huhoot.controller;
+package com.huhoot.controller.admin;
 
 import com.huhoot.dto.*;
-import com.huhoot.service.AdminService;
+import com.huhoot.service.AdminManageService;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("admin")
 public class AdminManageHostController {
 
-    private final AdminService adminService;
+    private final AdminManageService adminService;
 
-    public AdminManageHostController(AdminService adminService) {
+    public AdminManageHostController(AdminManageService adminService) {
         this.adminService = adminService;
     }
 

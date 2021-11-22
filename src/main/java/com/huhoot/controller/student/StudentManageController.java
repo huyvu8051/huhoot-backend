@@ -1,31 +1,23 @@
-package com.huhoot.controller;
+package com.huhoot.controller.student;
 
 import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.dto.PageResponse;
-import com.huhoot.model.Admin;
 import com.huhoot.model.Student;
-import com.huhoot.service.StudentService;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.huhoot.service.StudentManageService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.xml.ws.Action;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("student")
-public class StudentController {
+public class StudentManageController {
 
-    private final StudentService studentService;
+    private final StudentManageService studentService;
 
-    public StudentController(StudentService studentService) {
+    public StudentManageController(StudentManageService studentService) {
         this.studentService = studentService;
     }
 

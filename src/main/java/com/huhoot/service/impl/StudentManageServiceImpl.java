@@ -8,8 +8,8 @@ import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.StudentChallengeRepository;
-import com.huhoot.service.StudentService;
+import com.huhoot.repository.StudentInChallengeRepository;
+import com.huhoot.service.StudentManageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class StudentServiceImpl implements StudentService {
+public class StudentManageServiceImpl implements StudentManageService {
 
     private final ChallengeRepository challengeRepository;
 
-    private final StudentChallengeRepository studentChallengeRepository;
+    private final StudentInChallengeRepository studentChallengeRepository;
 
-    public StudentServiceImpl(ChallengeRepository challengeRepository, StudentChallengeRepository studentChallengeRepository) {
+    public StudentManageServiceImpl(ChallengeRepository challengeRepository, StudentInChallengeRepository studentChallengeRepository) {
         this.challengeRepository = challengeRepository;
         this.studentChallengeRepository = studentChallengeRepository;
     }

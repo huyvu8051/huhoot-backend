@@ -4,7 +4,7 @@ import com.huhoot.dto.StudentInChallengeResponse;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 
-public class StudentChallengeConverter {
+public class StudentInChallengeConverter {
 
     public static StudentInChallengeResponse toStudentChallengeResponse(StudentInChallenge entity){
         StudentInChallengeResponse response = new StudentInChallengeResponse();

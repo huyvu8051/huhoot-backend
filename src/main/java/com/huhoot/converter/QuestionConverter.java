@@ -1,8 +1,14 @@
 package com.huhoot.converter;
 
+import com.huhoot.dto.PublishAnswerResponse;
+import com.huhoot.dto.PublishQuestionResponse;
 import com.huhoot.dto.QuestionAddRequest;
 import com.huhoot.dto.QuestionResponse;
+import com.huhoot.model.Answer;
 import com.huhoot.model.Question;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestionConverter {
     public static QuestionResponse toQuestionResponse(Question question) {
@@ -28,4 +34,26 @@ public class QuestionConverter {
         return question;
     }
 
+    public static PublishQuestionResponse toPublishQuestionResponse(Question question) {
+        PublishQuestionResponse response = new PublishQuestionResponse();
+        response.setId(question.getId());
+        response.setOrdinalNumber(question.getOrdinalNumber());
+        response.setQuestionContent(question.getQuestionContent());
+        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
+        response.setPoint(question.getPoint());
+        response.setAnswerOption(question.getAnswerOption());
+
+        List<Answer> answers = question.getAnswers();
+
+        List<PublishAnswerResponse> publishAnswerResponses = new ArrayList<>();
+
+        for (Answer ans : answers){
+            publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
+        }
+
+        response.setPublishAnswerResponses(publishAnswerResponses);
+
+        return response;
+
+    }
 }

@@ -2,6 +2,7 @@ package com.huhoot.converter;
 
 import com.huhoot.dto.AnswerAddRequest;
 import com.huhoot.dto.AnswerResponse;
+import com.huhoot.dto.PublishAnswerResponse;
 import com.huhoot.model.Answer;
 
 public class AnswerConverter {
@@ -21,5 +22,13 @@ public class AnswerConverter {
         answer.setAnswerContent(request.getAnswerContent());
         answer.setCorrect(request.isCorrect());
         return answer;
+    }
+
+    public static PublishAnswerResponse toPublishAnswerResponse(Answer answer) {
+        PublishAnswerResponse response = new PublishAnswerResponse();
+        response.setId(answer.getId());
+        response.setOrdinalNumber(answer.getOrdinalNumber());
+        response.setAnswerContent(answer.getAnswerContent());
+        return response;
     }
 }

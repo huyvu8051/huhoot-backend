@@ -1,10 +1,10 @@
-package com.huhoot.controller;
+package com.huhoot.controller.host;
 
 import com.huhoot.dto.*;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.service.AdminService;
-import com.huhoot.service.HostService;
+import com.huhoot.service.AdminManageService;
+import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
@@ -21,13 +21,13 @@ import java.util.List;
 @RestController
 @RequestMapping("host")
 public class HostManageStudentChallenge {
-    private final HostService hostService;
+    private final HostManageService hostService;
 
     private final CheckOwnerChallenge checkOwnerChallenge;
 
-    private final AdminService adminService;
+    private final AdminManageService adminService;
 
-    public HostManageStudentChallenge(HostService hostService, CheckOwnerChallenge checkOwnerChallenge, AdminService adminService) {
+    public HostManageStudentChallenge(HostManageService hostService, CheckOwnerChallenge checkOwnerChallenge, AdminManageService adminService) {
         this.hostService = hostService;
         this.checkOwnerChallenge = checkOwnerChallenge;
         this.adminService = adminService;

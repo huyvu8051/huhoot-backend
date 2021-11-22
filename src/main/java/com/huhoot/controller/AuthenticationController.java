@@ -3,7 +3,7 @@ package com.huhoot.controller;
 import com.huhoot.dto.AuthenticationRequest;
 import com.huhoot.dto.AuthenticationResponse;
 import com.huhoot.service.impl.MyUserDetailsService;
-import com.huhoot.utils.jwtUtil;
+import com.huhoot.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,9 +20,9 @@ public class AuthenticationController {
 
     private final MyUserDetailsService myUserDetailsService;
 
-    private final jwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, MyUserDetailsService myUserDetailsService, jwtUtil jwtUtil) {
+    public AuthenticationController(AuthenticationManager authenticationManager, MyUserDetailsService myUserDetailsService, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.myUserDetailsService = myUserDetailsService;
         this.jwtUtil = jwtUtil;

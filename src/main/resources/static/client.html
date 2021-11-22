@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h1 id="message">connecting...</h1>
+<button id="register">register</button>
+<ul id="challenges"></ul>
+<script>
+    // const socketurl = "http://159.223.38.181:8082";
+    const socketurl = "http://localhost:8082"
+    const socket = io.connect(socketurl, {
+        query: "challengeId=219"
+    });
+    const that = this;
+    socket.on("connect", (data) => {
+        $("#message").append("<br/><b> " + data + "</b>");
+
+    });
+    socket.on("publishQuestion", (data) => {
+        $("#message").append("<br/><b> " + data + "</b>");
+
+    });
+
+    socket.on("joinRequest", data => {
+        $("#message").append("<br/><button onclick='allow(" + data + ")'> allow " + data + "</button>");
+        $("#message").append("<button onclick='deny(" + data + ")'> deny " + data + "</button>");
+    });
+
+    function allow(id){
+        console.log(id);
+    }
+
+    function deny(id){
+        console.log(id);
+    }
+
+
+    // gửi event lên host bằng socket
+
+    $("#register").click(e => {
+        socket.emit('registerHostSocket', { // event name
+            challengeId: "219",
+            token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJleHAiOjE2Mzc2Mjg3NTMsImlhdCI6MTYzNzU5Mjc1M30.EKY6UD9hUdgTmGjXX5ziIGITylndfgS-JnPIOoJNU1Q"
+        });
+    })
+
+
+    // alert("success")
+</script>
+</body>
+</html>

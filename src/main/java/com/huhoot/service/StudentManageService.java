@@ -6,6 +6,6 @@ import com.huhoot.model.Admin;
 import com.huhoot.model.Student;
 import org.springframework.data.domain.Pageable;
 
-public interface StudentService {
+public interface StudentManageService {
     PageResponse<ChallengeResponse> findAllChallenge(Student userDetails, Pageable pageable);
 }

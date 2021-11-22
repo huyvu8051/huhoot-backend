@@ -7,7 +7,7 @@ import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.service.HostService;
+import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class HostServiceImpl implements HostService {
+public class HostManageServiceImpl implements HostManageService {
     private final ChallengeRepository challengeRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
-    public HostServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentChallengeRepository studentChallengeRepository, StudentRepository studentRepository) {
+    public HostManageServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentInChallengeRepository studentChallengeRepository, StudentRepository studentRepository) {
         this.challengeRepository = challengeRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
@@ -219,13 +219,13 @@ public class HostServiceImpl implements HostService {
         answerRepository.saveAll(answers);
     }
 
-    private final StudentChallengeRepository studentChallengeRepository;
+    private final StudentInChallengeRepository studentChallengeRepository;
 
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
         Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId(), pageable);
 
-        return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
+        return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
     }
 
     @Override
@@ -233,7 +233,7 @@ public class HostServiceImpl implements HostService {
 
         Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
 
-        return ListConverter.toPageResponse(page, StudentChallengeConverter::toStudentChallengeResponse);
+        return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
     }
 
     private final StudentRepository studentRepository;
@@ -291,7 +291,7 @@ public class HostServiceImpl implements HostService {
 
         List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(id, userDetails.getId());
 
-        return ListConverter.toListResponse(studentsInChallenge, StudentChallengeConverter::toStudentChallengeResponse);
+        return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }
 

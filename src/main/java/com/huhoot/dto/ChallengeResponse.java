@@ -4,6 +4,7 @@ import com.huhoot.enums.ChallengeStatus;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class ChallengeResponse {
@@ -18,4 +19,5 @@ public class ChallengeResponse {
     private String createdBy;
     private Date modifiedDate;
     private String modifiedBy;
+    private UUID adminSocketId;
 }

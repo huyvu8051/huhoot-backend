@@ -1,10 +1,10 @@
-package com.huhoot.controller;
+package com.huhoot.controller.host;
 
 import com.huhoot.dto.AnswerAddRequest;
 import com.huhoot.dto.AnswerResponse;
 import com.huhoot.dto.AnswerUpdateRequest;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostService;
+import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("host")
 public class HostManageAnswerController {
 
-    private final HostService hostService;
+    private final HostManageService hostService;
 
-    public HostManageAnswerController(HostService hostService) {
+    public HostManageAnswerController(HostManageService hostService) {
         this.hostService = hostService;
     }
 

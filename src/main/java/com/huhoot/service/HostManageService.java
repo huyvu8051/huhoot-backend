@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.util.List;
 
-public interface HostService {
+public interface HostManageService {
     PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable);
 
     ChallengeResponse getOneOwnChallengeDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException;
@@ -54,4 +54,6 @@ public interface HostService {
 
 
     List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException;
+
+
 }
