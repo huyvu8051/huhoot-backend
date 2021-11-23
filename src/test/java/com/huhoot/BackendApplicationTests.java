@@ -20,11 +20,11 @@ public class BackendApplicationTests {
     @Test
     public void getTokenWithValidAccount() {
 
-        String token = getToken("admin", "admin");
+        String token = getToken("admin", "password");
 
         assertNotNull(token);
 
-        String token1 = getToken("admin1", "admin");
+        String token1 = getToken("admin1", "password");
 
         assertNotNull(token1);
 
@@ -34,7 +34,7 @@ public class BackendApplicationTests {
     void getTokenWithErrAccount() {
 
         assertThrows(BadCredentialsException.class, () -> {
-            getToken("err", "admin");
+            getToken("err", "password");
         });
 
         assertThrows(BadCredentialsException.class, () -> {
@@ -42,7 +42,7 @@ public class BackendApplicationTests {
         });
 
         assertThrows(BadCredentialsException.class, () -> {
-            getToken("", "admin");
+            getToken("", "password");
         });
 
         assertThrows(BadCredentialsException.class, () -> {
