@@ -19,4 +19,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> findAllByChallengeIdAndChallengeAdminId(int challengeId, int id);
 
     Optional<Question> findOneByIdAndChallengeAdminId(int questionId, int adminId);
+
+    List<Question> findAllByChallengeId(int id);
 }

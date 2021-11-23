@@ -8,19 +8,24 @@ import com.huhoot.dto.PublishQuestionResponse;
 import com.huhoot.dto.QuestionResponse;
 import com.huhoot.dto.StudentInChallengeResponse;
 import com.huhoot.enums.ChallengeStatus;
-import com.huhoot.model.*;
+import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
+import com.huhoot.model.Question;
+import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.QuestionRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeService {
 
     private final QuestionRepository questionRepository;
@@ -29,12 +34,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     private final SocketIOServer socketIOServer;
 
 
-    public HostOrganizeChallengeServiceImpl(QuestionRepository questionRepository, StudentInChallengeRepository studentInChallengeRepository, ChallengeRepository challengeRepository, SocketIOServer socketIOServer) {
-        this.questionRepository = questionRepository;
-        this.studentInChallengeRepository = studentInChallengeRepository;
-        this.challengeRepository = challengeRepository;
-        this.socketIOServer = socketIOServer;
-    }
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
@@ -62,10 +61,14 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         Optional<Question> optional = questionRepository.findOneByIdAndChallengeAdminId(questionId, userDetails.getId());
         Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
         int challengeId = question.getChallenge().getId();
-        question.setAskDate(new Date());
+
+        question.setAskDate(new Timestamp(System.currentTimeMillis()));
 
         PublishQuestionResponse publishQuestionResponse = QuestionConverter.toPublishQuestionResponse(question);
-
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("publishQuestion", publishQuestionResponse);
+
+        questionRepository.save(question);
     }
+
+
 }

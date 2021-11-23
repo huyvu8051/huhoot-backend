@@ -35,25 +35,22 @@ public class QuestionConverter {
     }
 
     public static PublishQuestionResponse toPublishQuestionResponse(Question question) {
-        PublishQuestionResponse response = new PublishQuestionResponse();
-        response.setId(question.getId());
-        response.setOrdinalNumber(question.getOrdinalNumber());
-        response.setQuestionContent(question.getQuestionContent());
-        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
-        response.setPoint(question.getPoint());
-        response.setAnswerOption(question.getAnswerOption());
-
-        List<Answer> answers = question.getAnswers();
 
         List<PublishAnswerResponse> publishAnswerResponses = new ArrayList<>();
 
-        for (Answer ans : answers){
+        for (Answer ans : question.getAnswers()){
             publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
         }
-
-        response.setPublishAnswerResponses(publishAnswerResponses);
-
-        return response;
+        return PublishQuestionResponse.builder()
+                .id(question.getId())
+                .ordinalNumber(question.getOrdinalNumber())
+                .questionContent(question.getQuestionContent())
+                .answerTimeLimit(question.getAnswerTimeLimit().getValue())
+                .point(question.getPoint())
+                .answerOption(question.getAnswerOption())
+                .publishAnswerResponses(publishAnswerResponses)
+                .askDate(question.getAskDate())
+                .build();
 
     }
 }

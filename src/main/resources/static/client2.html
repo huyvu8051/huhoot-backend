@@ -15,14 +15,12 @@
 <hr/>
 <div id="answers"></div>
 <br/>
-<hr/>
-<div id="currentPoint"></div>
 
 
 <script>
     const challengeId = 219;
 
-    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MjE2IiwiZXhwIjoxNjM3OTk3MTA4LCJpYXQiOjE2Mzc2MzcxMDh9.43tZFUhwXaNa6pyULX2TdC7L5e1BuKFUXuFW00_IaDA";
+    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MjE1IiwiZXhwIjoxNjM3OTk3Mjc5LCJpYXQiOjE2Mzc2MzcyNzl9.bCVitCST689Pl5vFfArNC27e36rpnD7963H-Nj4wnMk";
 
     // const socketurl = "http://159.223.38.181:8082";
     const socketUrl = "http://localhost:8082"
@@ -41,7 +39,7 @@
         let answersText = "";
         let answers = [];
         data.publishAnswerResponses.forEach(e => {
-            answersText += "<button class='answer' onclick='sendAnswer(" + e.id + ")'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            answersText += "<button class='answer' data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
         });
         document.getElementById("answers").innerHTML = answersText;
 
@@ -67,24 +65,8 @@
         }, 1000);
     }
 
-    function sendAnswer(answerIds){
-        $.ajax({
-            type: "POST",
-            beforeSend: function (request) {
-                request.setRequestHeader("Authorization", token);
-            },
-            url: "/student/sendAnswer",
-            data:{
-                answerIds:answerIds
-            },
-            success: function (data) {
-                document.getElementById("currentPoint").innerHTML = data + " point";
+    function sendAnswer(answerId){
 
-            },
-            error: data => {
-                console.log(data);
-            }
-        });
     }
 
 

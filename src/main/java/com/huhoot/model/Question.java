@@ -1,5 +1,6 @@
 package com.huhoot.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +45,7 @@ public class Question extends Auditable{
 
 	private AnswerOption answerOption;
 
-	private Date askDate;
+	private Timestamp askDate;
 
 
 	private boolean isNonDeleted;

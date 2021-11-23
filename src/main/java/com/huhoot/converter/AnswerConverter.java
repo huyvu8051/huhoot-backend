@@ -25,10 +25,10 @@ public class AnswerConverter {
     }
 
     public static PublishAnswerResponse toPublishAnswerResponse(Answer answer) {
-        PublishAnswerResponse response = new PublishAnswerResponse();
-        response.setId(answer.getId());
-        response.setOrdinalNumber(answer.getOrdinalNumber());
-        response.setAnswerContent(answer.getAnswerContent());
-        return response;
+        return PublishAnswerResponse.builder()
+                .id(answer.getId())
+                .ordinalNumber(answer.getOrdinalNumber())
+                .answerContent(answer.getAnswerContent())
+                .build();
     }
 }

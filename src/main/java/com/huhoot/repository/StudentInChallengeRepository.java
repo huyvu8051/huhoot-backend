@@ -24,4 +24,6 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
     Optional<StudentInChallenge> findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(int challengeId, int id);
 
     List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsLoginTrue(int challengeId, int id);
+
+    List<StudentInChallenge> findAllByPrimaryKeyChallengeId(int id);
 }

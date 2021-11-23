@@ -17,4 +17,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     List<Answer> findAllByAnswerContentContainingIgnoreCase(String s);
 
     List<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId);
+
+    List<Answer> findAllByIdInAndIsCorrectTrue(List<Integer> answerIds);
 }

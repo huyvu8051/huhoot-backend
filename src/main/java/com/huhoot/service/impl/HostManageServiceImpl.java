@@ -23,12 +23,13 @@ public class HostManageServiceImpl implements HostManageService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
-    public HostManageServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentInChallengeRepository studentChallengeRepository, StudentRepository studentRepository) {
+    public HostManageServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentInChallengeRepository studentChallengeRepository, StudentRepository studentRepository, StudentAnswerRepository studentAnswerRepository) {
         this.challengeRepository = challengeRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.studentChallengeRepository = studentChallengeRepository;
         this.studentRepository = studentRepository;
+        this.studentAnswerRepository = studentAnswerRepository;
     }
 
     @Override
@@ -230,18 +231,14 @@ public class HostManageServiceImpl implements HostManageService {
 
     @Override
     public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, String studentUsername, int challengeId, Pageable pageable) {
-
         Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
-
         return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
     }
 
     private final StudentRepository studentRepository;
 
     /**
-     * @param userDetails
-     * @param request
-     * @throws NotFoundException
+     *
      */
     @Override
     public List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException {
@@ -282,16 +279,45 @@ public class HostManageServiceImpl implements HostManageService {
     @Override
     public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException {
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(id, userDetails.getId());
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
-        Challenge challenge = optional.orElseThrow(()->new NotFoundException("Challenge not found"));
+        this.createAllStudentAnswerInChallenge(challenge);
 
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
-
         challengeRepository.save(challenge);
 
         List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(id, userDetails.getId());
-
         return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
+
+    }
+
+    private final StudentAnswerRepository studentAnswerRepository;
+
+    private void createAllStudentAnswerInChallenge(Challenge challenge) {
+
+
+        List<Student> students = studentRepository.findAllByStudentChallengesPrimaryKeyChallengeId(challenge.getId());
+
+        List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
+
+        for (Question quest : questions) {
+            List<Answer> answers = quest.getAnswers();
+            for (Answer ans : answers) {
+                for (Student stu : students) {
+                    studentAnswerRepository.save(StudentAnswer.builder()
+                            .primaryKey(StudentAnswerId.builder()
+                                    .answer(ans)
+                                    .challenge(challenge)
+                                    .question(quest)
+                                    .student(stu)
+                                    .build())
+                            .score(0)
+                            .isCorrect(false)
+                            .answerDate(null)
+                            .build());
+                }
+            }
+        }
 
     }
 

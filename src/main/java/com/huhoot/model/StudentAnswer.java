@@ -2,10 +2,11 @@ package com.huhoot.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 @Entity
 @AssociationOverrides({
@@ -14,6 +15,7 @@ import java.security.Timestamp;
         @AssociationOverride(name = "primaryKey.answer", joinColumns = @JoinColumn(name = "answer_id")),
         @AssociationOverride(name = "primaryKey.challenge", joinColumns = @JoinColumn(name = "challenge_id"))})
 @EntityListeners({AuditingEntityListener.class})
+@SuperBuilder
 public class StudentAnswer extends Auditable {
     @EmbeddedId
     @Getter
@@ -29,7 +31,12 @@ public class StudentAnswer extends Auditable {
 
     @Getter
     @Setter
-    private Timestamp timeStamp;
+    private Timestamp answerDate;
+
+    public StudentAnswer() {
+        super();
+    }
+
 
     @Transient
     public Student getStudent() {

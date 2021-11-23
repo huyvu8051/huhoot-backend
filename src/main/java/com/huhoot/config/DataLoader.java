@@ -1,5 +1,11 @@
 package com.huhoot.config;
 
+import com.huhoot.enums.AnswerTime;
+import com.huhoot.enums.ChallengeStatus;
+import com.huhoot.enums.Points;
+import com.huhoot.enums.Role;
+import com.huhoot.exception.AnswerOption;
+import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -48,7 +54,7 @@ public class DataLoader implements ApplicationRunner {
         // start time
         long t0 = System.nanoTime();
 /*
-        Admin admin = new Admin("admin", passwordEncoder.encode("admin"));
+        Admin admin = new Admin("admin", passwordEncoder.encode("password"));
         admin.setRole(Role.ADMIN);
         admin.setCreatedDate(date);
         admin.setCreatedBy("BobVu");
@@ -58,7 +64,7 @@ public class DataLoader implements ApplicationRunner {
         adminRepository.save(admin);
 
         for (int i = 0; i < 3; i++) {
-            Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("admin"));
+            Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("password"));
 
             admin1.setRole(Role.ADMIN);
             admin1.setCreatedDate(date);
@@ -87,7 +93,7 @@ public class DataLoader implements ApplicationRunner {
 
 
                 for (int x = 0; x < 7; x++) {
-                    Student student1 = new Student("student" + i + j + x, "student" + i + j, passwordEncoder.encode("student"));
+                    Student student1 = new Student("student" + i + j + x, "student" + i + j, passwordEncoder.encode("password"));
                     student1.setCreatedDate(date);
                     student1.setCreatedBy("BobVu");
                     student1.setModifiedDate(date);
