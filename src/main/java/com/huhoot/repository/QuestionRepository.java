@@ -35,6 +35,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "WHERE n.challenge.id = :challengeId AND n.challenge.admin.id = :adminId")
     List<QuestionResponse> findAllQuestionResponse(int challengeId, int adminId);
 
-    //@Query("SELECT new com.huhoot.dto.PublishQuestionResponse(n.answers) FROM Question n")
+    //@Query("SELECT new com.huhoot.dto.PublishQuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.answerTimeLimit, n.askDate, n.point, n.answerOption ,n.answers) FROM Question n")
     //List<PublishQuestionResponse> findAllPublishQuestionResponse(int questionId);
 }

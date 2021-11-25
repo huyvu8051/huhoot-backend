@@ -1,6 +1,5 @@
 package com.huhoot.config;
 
-import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.enums.Points;
 import com.huhoot.enums.Role;
@@ -46,7 +45,7 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public void run(ApplicationArguments args) throws IOException {
-
+        Random random = new Random();
 
         Date date = new Date();
 
@@ -113,11 +112,14 @@ public class DataLoader implements ApplicationRunner {
 
                         studentChallengeRepository.save(studentChallenge);
 
+
+                        int answerTime = 10 + random.nextInt(25);
+
                         Question question
                                 = new Question();
                         question.setOrdinalNumber(x);
                         question.setQuestionContent(getRandomImgUrl());
-                        question.setAnswerTimeLimit(AnswerTime.TWENTY_SEC);
+                        question.setAnswerTimeLimit(answerTime);
                         question.setPoint(Points.STANDARD);
                         question.setAnswerOption(AnswerOption.SINGLE_SELECT);
 
@@ -133,8 +135,10 @@ public class DataLoader implements ApplicationRunner {
 
                         List<Answer> answers = new ArrayList<>();
 
+                        int randAnswerCorrect = random.nextInt(4);
+
                         for (int a = 0; a < 4; a++) {
-                            boolean corr = (i + j + x + a) % 2 == 0;
+                            boolean corr = a == randAnswerCorrect;
                             Answer answer = new Answer();
                             answer.setOrdinalNumber(a);
                             answer.setAnswerContent("content " + i + j + x + a + corr);

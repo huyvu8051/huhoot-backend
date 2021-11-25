@@ -2,7 +2,6 @@ package com.huhoot.service.impl;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.dto.StudentAnswerRequest;
-import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.Points;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
@@ -60,7 +59,6 @@ public class StudentPlayServiceImpl implements StudentPlayService {
     public int answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException {
 
 
-
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Integer> correctAnswers = answerRepository.findAllCorrectAnswerIds(request.getQuestionId());
 
@@ -77,7 +75,6 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         Question quest = optional.orElseThrow(() -> new NotFoundException("Question not found"));
 
         UUID adminSocketId = challenge.getAdmin().getSocketId();
-
 
 
         List<Answer> answers = answerRepository.findAllByIdIn(request.getAnswerIds());
@@ -102,25 +99,26 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         return totalScore;
     }
 
-    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, AnswerTime answerTimeLimit) {
+    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit) {
 
         long diff = now.getTime() - askDate.getTime();
         long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
-        long timeLeft = answerTimeLimit.getValue() - seconds;
+        long timeLeft = answerTimeLimit - seconds;
 
         if (timeLeft < 0) {
             return 0;
         }
 
-        double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit.getValue();
+        double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit;
 
         return 500 + (500 * timeLeftPercent) * point.getValue();
     }
 
 
     private boolean isAnswerCorrect(List<Integer> answerIds, List<Integer> correctAnswerIds) {
-
-        return answerIds.stream().allMatch(e -> correctAnswerIds.contains(e)) && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
+        final boolean a = answerIds.stream().allMatch(e -> correctAnswerIds.contains(e));
+        // final boolean b = correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
+        return  a && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
 
     }
 }

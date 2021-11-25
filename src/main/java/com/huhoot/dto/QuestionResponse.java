@@ -16,7 +16,7 @@ public class QuestionResponse {
     private int id;
     private int ordinalNumber;
     private String questionContent;
-    private AnswerTime answerTimeLimit;
+    private int answerTimeLimit;
     private Points point;
     private AnswerOption answerOption;
     private Date askDate;

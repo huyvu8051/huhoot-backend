@@ -45,7 +45,7 @@ public class QuestionConverter {
                 .id(question.getId())
                 .ordinalNumber(question.getOrdinalNumber())
                 .questionContent(question.getQuestionContent())
-                .answerTimeLimit(question.getAnswerTimeLimit().getValue())
+                .answerTimeLimit(question.getAnswerTimeLimit())
                 .point(question.getPoint())
                 .answerOption(question.getAnswerOption())
                 .publishAnswerResponses(publishAnswerResponses)

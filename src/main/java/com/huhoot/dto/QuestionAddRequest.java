@@ -1,14 +1,13 @@
 package com.huhoot.dto;
 
-import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.Points;
 import com.huhoot.exception.AnswerOption;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Data
 public class QuestionAddRequest {
@@ -23,7 +22,8 @@ public class QuestionAddRequest {
     private String questionContent;
 
     @NotNull
-    private AnswerTime answerTimeLimit;
+    @Min(5)
+    private int answerTimeLimit;
 
     @NotNull
     private Points point;

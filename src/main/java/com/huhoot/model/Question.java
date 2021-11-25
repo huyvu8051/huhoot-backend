@@ -39,7 +39,7 @@ public class Question extends Auditable{
 
 	private String questionContent;
 
-	private AnswerTime answerTimeLimit;
+	private int answerTimeLimit;
 
 	private Points point;
 

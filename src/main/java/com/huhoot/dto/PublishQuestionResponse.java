@@ -23,4 +23,6 @@ public class PublishQuestionResponse {
     private AnswerOption answerOption;
 
     private List<PublishAnswerResponse> publishAnswerResponses;
+
+    //public PublishQuestionResponse(int id, int ordinalNumber, String questionContent, AnswerTime answerTimeLimit, Timestamp askDate, )
 }

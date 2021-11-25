@@ -59,7 +59,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public void publishQuestion(Admin userDetails, int questionId) throws NotFoundException {
-        //List<PublishQuestionResponse> pubQueRes = questionRepository.findAllPublishQuestionResponse(questionId);
+        // List<PublishQuestionResponse> pubQueRes = questionRepository.findAllPublishQuestionResponse(questionId);
 
         Optional<Question> optional = questionRepository.findOneByIdAndChallengeAdminId(questionId, userDetails.getId());
         Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
