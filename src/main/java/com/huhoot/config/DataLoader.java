@@ -6,6 +6,7 @@ import com.huhoot.enums.Role;
 import com.huhoot.exception.AnswerOption;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,33 +19,19 @@ import java.util.List;
 import java.util.Random;
 
 @Component
+@AllArgsConstructor
 public class DataLoader implements ApplicationRunner {
 
     private final PasswordEncoder passwordEncoder;
-
     private final StudentRepository studentRepository;
-
     private final AdminRepository adminRepository;
-
     private final ChallengeRepository challengeRepository;
-
     private final QuestionRepository questionRepository;
-
     private final StudentInChallengeRepository studentChallengeRepository;
-
     private final AnswerRepository answerRepository;
 
-    public DataLoader(PasswordEncoder passwordEncoder, StudentRepository studentRepository, AdminRepository adminRepository, ChallengeRepository challengeRepository, QuestionRepository questionRepository, StudentInChallengeRepository studentChallengeRepository, AnswerRepository answerRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.studentRepository = studentRepository;
-        this.adminRepository = adminRepository;
-        this.challengeRepository = challengeRepository;
-        this.questionRepository = questionRepository;
-        this.studentChallengeRepository = studentChallengeRepository;
-        this.answerRepository = answerRepository;
-    }
 
-    public void run(ApplicationArguments args) throws IOException {
+    public void run(ApplicationArguments args) {
         Random random = new Random();
 
         Date date = new Date();
@@ -55,6 +42,19 @@ public class DataLoader implements ApplicationRunner {
         Admin admin2 = adminRepository.findOneByUsername("admin");
 
         if (admin2 == null) {
+
+            /*Admin adm = Admin.builder()
+                    .username("admin")
+                    .password(passwordEncoder.encode("password"))
+                    .role(Role.ADMIN)
+                    .createdDate(date)
+                    .createdBy("BobVu")
+                    .modifiedDate(date)
+                    .modifiedBy("BobVu")
+                    .build();
+
+            adminRepository.save(adm);*/
+
 
             Admin admin = new Admin("admin", passwordEncoder.encode("password"));
             admin.setRole(Role.ADMIN);

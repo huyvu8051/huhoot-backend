@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.huhoot.enums.Role;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +26,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })

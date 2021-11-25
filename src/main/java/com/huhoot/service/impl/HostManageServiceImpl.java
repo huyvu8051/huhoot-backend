@@ -9,6 +9,7 @@ import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class HostManageServiceImpl implements HostManageService {
     private final ChallengeRepository challengeRepository;
@@ -277,19 +279,25 @@ public class HostManageServiceImpl implements HostManageService {
     }
 
     @Override
-    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException {
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(id, userDetails.getId());
+    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws NotFoundException {
+        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
+        long t0 = System.nanoTime();
         this.createAllStudentAnswerInChallenge(challenge);
+        long t1 = System.nanoTime();
+        double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
+        log.info("Elapsed time =" + elapsedTimeInSecond + " seconds");
+
 
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
-        challengeRepository.save(challenge);
+        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
 
-        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(id, userDetails.getId());
+        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId());
         return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }
+
 
     private final StudentAnswerRepository studentAnswerRepository;
 
@@ -300,27 +308,33 @@ public class HostManageServiceImpl implements HostManageService {
 
         List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
 
+        List<StudentAnswer> studentAnswers = new ArrayList<>();
+
         for (Question quest : questions) {
             List<Answer> answers = quest.getAnswers();
             for (Answer ans : answers) {
                 for (Student stu : students) {
 
-                    StudentAnswer sa = new StudentAnswer();
-                    sa.setStudent(stu);
-                    sa.setAnswer(ans);
-                    sa.setChallenge(challenge);
-                    sa.setQuestion(quest);
+                    StudentAnswerId id = StudentAnswerId.builder()
+                            .student(stu)
+                            .answer(ans)
+                            .challenge(challenge)
+                            .question(quest)
+                            .build();
+                    
+                    studentAnswers.add(StudentAnswer.builder()
+                            .primaryKey(id)
+                            .score(0)
+                            .isCorrect(false)
+                            .answerDate(null)
+                            .build());
 
-
-                    sa.setScore(0);
-                    sa.setCorrect(false);
-                    sa.setAnswerDate(null);
-
-
-                    studentAnswerRepository.save(sa);
                 }
             }
         }
+
+
+        studentAnswerRepository.saveAll(studentAnswers);
 
     }
 

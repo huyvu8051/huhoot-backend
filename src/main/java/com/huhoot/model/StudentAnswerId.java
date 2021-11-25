@@ -1,6 +1,8 @@
 package com.huhoot.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -10,6 +12,8 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
+@SuperBuilder
+@NoArgsConstructor
 public class StudentAnswerId implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL)
