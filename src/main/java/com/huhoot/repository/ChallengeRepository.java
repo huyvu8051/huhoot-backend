@@ -26,6 +26,11 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     List<Challenge> findAllByAdminIdAndIdIn(int id, List<Integer> ids);
 
+    /**
+     * @param challengeId {@link Challenge} id
+     * @param adminId {@link com.huhoot.model.Admin} id
+     * @return Challenge
+     */
     Optional<Challenge> findOneByIdAndAdminId(int challengeId, int adminId);
 
     /**

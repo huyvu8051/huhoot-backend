@@ -133,23 +133,36 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      */
     @Override
     public List<AnswerStatisticsResponse> getAnswerStatistics(int questionId, int adminId) {
-
         return studentAnswerRepository.findStatisticsByQuestionId(questionId, adminId);
     }
 
+    /**
+     * Set challenge status ENDED and sent endChallenge event to all Client in Room
+     *
+     * @param challengeId {@link Challenge} id
+     * @param adminId     {@link Admin} id
+     * @throws NotFoundException
+     */
     @Override
     public void endChallenge(int challengeId, int adminId) throws NotFoundException {
 
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, adminId);
         optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
+        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.ENDED, challengeId, adminId);
+
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("endChallenge");
     }
 
 
+    /**
+     * @param studentIds List of {@link com.huhoot.model.Student} ids
+     * @param challengeId {@link Challenge} id
+     * @param adminId {@link Admin} id
+     */
     @Override
-    public void kickStudent(List<Integer> studentIds, int challengeId, int hostId) {
-        List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(studentIds, challengeId, hostId);
+    public void kickStudent(List<Integer> studentIds, int challengeId, int adminId) {
+        List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByStudentIdInAndChallengeIdAndChallengeAdminId(studentIds, challengeId, adminId);
 
 
         for (StudentInChallenge sic : studentInChallenges) {

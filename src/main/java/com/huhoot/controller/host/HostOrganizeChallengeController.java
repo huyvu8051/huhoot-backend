@@ -5,6 +5,7 @@ import com.huhoot.model.Admin;
 import com.huhoot.service.HostManageService;
 import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("host")
 public class HostOrganizeChallengeController {
@@ -20,11 +22,6 @@ public class HostOrganizeChallengeController {
     private final HostManageService hostService;
 
     private final HostOrganizeChallengeService hostOrganizeChallengeService;
-
-    public HostOrganizeChallengeController(HostManageService hostService, HostOrganizeChallengeService hostOrganizeChallengeService) {
-        this.hostService = hostService;
-        this.hostOrganizeChallengeService = hostOrganizeChallengeService;
-    }
 
 
     @GetMapping("/openChallenge")
@@ -94,14 +91,24 @@ public class HostOrganizeChallengeController {
         hostOrganizeChallengeService.showCorrectAnswer(questionId, userDetails.getId());
     }
 
+    /**
+     * @param challengeId {@link com.huhoot.model.Challenge} id
+     * @param size        size
+     * @return List of {@link StudentScoreResponse}
+     */
     @GetMapping("/getTopStudent")
-    public ResponseEntity<List<StudentScoreResponse>> getTopStudent(@RequestParam int challengeId, @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<List<StudentScoreResponse>> getTopStudent(@RequestParam int challengeId,
+                                                                    @RequestParam(defaultValue = "20") int size) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Pageable pageable = PageRequest.of(0, size);
         return ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
+    /**
+     * @param questionId {@link com.huhoot.model.Question} id
+     * @return List of {@link AnswerStatisticsResponse}
+     */
     @GetMapping("/getAnswerStatistics")
     public ResponseEntity<List<AnswerStatisticsResponse>> getAnswerStatistics(@RequestParam int questionId) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
@@ -111,8 +118,15 @@ public class HostOrganizeChallengeController {
     }
 
 
+    /**
+     * @param challengeId {@link com.huhoot.model.Challenge} id
+     * @param size        size
+     * @return List of {@link StudentScoreResponse}
+     * @throws NotFoundException not found
+     */
     @GetMapping("/endChallenge")
-    public ResponseEntity<List<StudentScoreResponse>> endChallenge(@RequestParam int challengeId, @RequestParam(defaultValue = "20") int size) throws NotFoundException {
+    public ResponseEntity<List<StudentScoreResponse>> endChallenge(@RequestParam int challengeId,
+                                                                   @RequestParam(defaultValue = "20") int size) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
@@ -121,6 +135,11 @@ public class HostOrganizeChallengeController {
     }
 
 
+    /**
+     * Kick student
+     *
+     * @param req {@link KickRequest}
+     */
     @PostMapping("/kickStudent")
     public void kickStudent(@RequestBody KickRequest req) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
