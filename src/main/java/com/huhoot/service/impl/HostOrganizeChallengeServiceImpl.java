@@ -40,30 +40,27 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     }
 
+
+    /**
+     * Start challenge, update challenge status to IN_PROGRESS
+     *
+     * @param challengeId challenge id
+     * @param adminId     admin id
+     * @return List of QuestionResponse
+     */
     @Override
-    public List<QuestionResponse> startChallenge(Admin userDetails, int challengeId) throws NotFoundException {
+    public List<QuestionResponse> startChallenge(int challengeId, int adminId) {
 
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.IN_PROGRESS, challengeId, adminId);
 
-        challenge.setChallengeStatus(ChallengeStatus.IN_PROGRESS);
-        challengeRepository.save(challenge);
-
-
-
-        //List<Question> questions = questionRepository.findAllByChallengeIdAndChallengeAdminId(challengeId, userDetails.getId());
-        //return ListConverter.toListResponse(questions, QuestionConverter::toQuestionResponse);
-
-
-        log.info("===============================================================");
-        List<QuestionResponse> allQuestionResponse = questionRepository.findAllQuestionResponse(challengeId, userDetails.getId());
-        log.info("===============================================================");
-        return allQuestionResponse;
+        return questionRepository.findAllQuestionResponse(challengeId, adminId);
 
     }
 
     @Override
     public void publishQuestion(Admin userDetails, int questionId) throws NotFoundException {
+        //List<PublishQuestionResponse> pubQueRes = questionRepository.findAllPublishQuestionResponse(questionId);
+
         Optional<Question> optional = questionRepository.findOneByIdAndChallengeAdminId(questionId, userDetails.getId());
         Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
         int challengeId = question.getChallenge().getId();
@@ -139,12 +136,12 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
 
         for (StudentInChallenge sic : studentInChallenges) {
-            try{
+            try {
                 sic.setKicked(true);
                 SocketIOClient client = socketIOServer.getClient(sic.getStudent().getSocketId());
                 client.sendEvent("kickStudent");
                 client.disconnect();
-            }catch (Exception err){
+            } catch (Exception err) {
                 log.error(err.getMessage());
             }
 

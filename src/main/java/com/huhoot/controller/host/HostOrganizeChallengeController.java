@@ -53,11 +53,11 @@ public class HostOrganizeChallengeController {
     }
 
     @GetMapping("/startChallenge")
-    public ResponseEntity<List<QuestionResponse>> startChallenge(@RequestParam int challengeId) throws NotFoundException {
+    public ResponseEntity<List<QuestionResponse>> startChallenge(@RequestParam int challengeId) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostOrganizeChallengeService.startChallenge(userDetails, challengeId));
+        return ResponseEntity.ok(hostOrganizeChallengeService.startChallenge(challengeId, userDetails.getId()));
     }
 
     @GetMapping("/publishQuestion")

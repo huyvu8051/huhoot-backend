@@ -1,10 +1,14 @@
 package com.huhoot.repository;
 
+import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.model.Challenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +28,17 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     Optional<Challenge> findOneByIdAndAdminId(int challengeId, int adminId);
 
+    /**
+     * Update challenge status
+     *
+     * @param challengeStatus challenge status
+     * @param challengeId     challenge id
+     * @param adminId         admin id
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE Challenge c " +
+            "SET c.ChallengeStatus = :challengeStatus " +
+            "WHERE c.id =:challengeId AND c.admin.id = :adminId ")
+    void updateChallengeStatusByIdAndAdminId(ChallengeStatus challengeStatus, int challengeId, int adminId);
 }

@@ -10,7 +10,14 @@ import java.util.List;
 public interface HostOrganizeChallengeService {
     List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId);
 
-    List<QuestionResponse> startChallenge(Admin userDetails, int challengeId) throws NotFoundException;
+    /**
+     * Start challenge, update challenge status to IN_PROGRESS
+     *
+     * @param challengeId challenge id
+     * @param adminId     admin id
+     * @return List of QuestionResponse
+     */
+    List<QuestionResponse> startChallenge(int challengeId, int adminId);
 
     void publishQuestion(Admin userDetails, int questionId) throws NotFoundException;
 
