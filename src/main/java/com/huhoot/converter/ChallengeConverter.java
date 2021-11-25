@@ -22,7 +22,6 @@ public class ChallengeConverter {
         response.setCreatedBy(entity.getCreatedBy());
         response.setModifiedDate(entity.getModifiedDate());
         response.setModifiedBy(entity.getModifiedBy());
-        response.setAdminSocketId(entity.getAdminSocketId());
         return response;
     }
 

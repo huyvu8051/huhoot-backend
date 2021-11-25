@@ -18,8 +18,12 @@
 <div id="numberStudentAnswered"></div>
 <div id="questions"></div>
 <br/> Number of student in challenge:
+<button onclick="endChallenge()">end challenge</button>
+<br/>
 <div id="numberStudentInChallenge"></div>
 <div id="students"></div>
+<button onclick="openChallenge()">update student answer</button>
+<button onclick="startUpdateStudentLogin()">start update student login</button>
 <script>
     const challengeId = 219;
 
@@ -29,33 +33,40 @@
 
     let numberStudentAnswered = 0;
 
-    $.ajax({
-        type: "GET",
-        beforeSend: function (request) {
-            request.setRequestHeader("Authorization", token);
-        },
-        url: "/host/challenge/live?challengeId=" + challengeId,
-        success: function (data) {
-            console.log("student in challenge ",data);
-        },
-        error: data => {
-            console.log(data);
-        }
-    });
+
+    // start challenge
+    function openChallenge() {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/openChallenge?challengeId=" + challengeId,
+            success: function (data) {
+                console.log("student in challenge ", data);
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+    }
+
+    openChallenge();
 
 
-    const socketurl = "http://159.223.38.181:8082";
-    // const socketUrl = "http://localhost:8082"
-    const socket = io.connect(socketUrl, {
-        query: "challengeId=" + challengeId
-    });
+    //const socketUrl = "http://159.223.38.181:8082";
+    const socketUrl = "http://localhost:8082"
+    const socket = io.connect(socketUrl);
 
     socket.on("connected", (data) => {
-        $("#message").append("<br/><b> " + data + "</b>");
+        document.getElementById("message").innerHTML = "<br/><b> " + data + "</b>";
+
     }).emit('registerHostSocket', { // event name
         challengeId: challengeId,
         token: token
     });
+
+    var questionId;
 
     // handle publish question event
     socket.on("publishQuestion", (data) => {
@@ -69,18 +80,30 @@
         document.getElementById("answers").innerHTML = answersText;
 
         this.numberStudentAnswered = 0;
-        document.getElementById("numberStudentAnswered").innerHTML = this.numberStudentAnswered + "/" + this.numberStudentInChallenge;
+        document.getElementById("numberStudentAnswered").innerHTML = "Number of student answered: " + this.numberStudentAnswered + "/" + this.numberStudentInChallenge;
 
         clearInterval(downloadTimer);
 
-        countdown(data.answerTimeLimit)
+        questionId = data.id;
+
+        countdown(data.answerTimeLimit, data.id, data.askDate)
+        console.clear();
     });
 
-    socket.on("studentAnswer", data => {
-        this.numberStudentAnswered ++;
-        document.getElementById("numberStudentAnswered").innerHTML = this.numberStudentAnswered + "/" + this.numberStudentInChallenge;
-    });
 
+    socket.on("studentAnswer", () => {
+        this.numberStudentAnswered++;
+        if (this.numberStudentAnswered == this.numberStudentInChallenge) {
+            showCorrectAnswer(this.questionId);
+            getAnswerStatistics(questionId);
+            getTop20Student(challengeId);
+            document.getElementById("numberStudentAnswered").innerHTML = "Number of student answered: " + this.numberStudentAnswered + "/" + this.numberStudentInChallenge;
+            return;
+        }
+
+        document.getElementById("numberStudentAnswered").innerHTML = "Number of student answered: " + this.numberStudentAnswered + "/" + this.numberStudentInChallenge;
+
+    });
 
 
     socket.on("joinRequest", data => {
@@ -88,6 +111,23 @@
         // $("#message").append("<button onclick='deny(" + data + ")'> deny " + data + "</button>");
 
         console.log("new student join")
+    });
+
+    socket.on("showCorrectAnswer", data => {
+        clearInterval(downloadTimer);
+        document.getElementById("countdown").innerHTML = "Finished";
+        let answersText = "";
+        let answers = [];
+        data.forEach(e => {
+            if (e.correct) {
+                answersText += "<button style='background-color: green; color: aliceblue' data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            } else {
+                answersText += "<button disabled data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            }
+
+
+        });
+        document.getElementById("answers").innerHTML = answersText;
     });
 
     function allow(id) {
@@ -101,7 +141,11 @@
 
     // update student in challenge every 5 second
 
-    var myVar = setInterval(myTimer, 5000);
+    var myVar;
+
+    function startUpdateStudentLogin() {
+        myvar = setInterval(myTimer, 5000);
+    }
 
     var students = "";
     var studentInChallenges = [];
@@ -126,7 +170,7 @@
         students = "";
 
         studentInChallenges.forEach(e => {
-            students += "<button>" + e.studentUsername + "</button>";
+            students += "<button onclick='kick([" + e.studentId + "])'>" + e.studentUsername + "</button>";
         });
         this.numberStudentInChallenge = studentInChallenges.length;
         document.getElementById("numberStudentInChallenge").innerHTML = this.numberStudentInChallenge;
@@ -181,17 +225,127 @@
 
     var downloadTimer;
 
-    function countdown(timeleft) {
+    function countdown(answerTime, questionId, askDate) {
+
 
         downloadTimer = setInterval(function () {
-            if (timeleft <= 0) {
+
+            let now = new Date().getTime();
+            let diff = now - askDate;
+            const second = Math.floor(diff / 1000 % 60);
+
+            let timeLeft = answerTime - second;
+
+            if (timeLeft <= 0) {
                 clearInterval(downloadTimer);
                 document.getElementById("countdown").innerHTML = "Finished";
+                showCorrectAnswer(questionId);
+                getAnswerStatistics(questionId);
+                getTop20Student(challengeId);
             } else {
-                document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+                document.getElementById("countdown").innerHTML = timeLeft + " seconds remaining ";
             }
-            timeleft -= 1;
         }, 1000);
+    }
+
+
+    function showCorrectAnswer(questionId) {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/showCorrectAnswer?questionId=" + questionId + "&challengeId=" + challengeId,
+            success: function (data) {
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+    }
+
+
+    function getTop20Student(challengeId) {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/getTopStudent?challengeId=" + challengeId,
+            success: function (data) {
+                data.forEach(e => {
+                    console.log(e.rank, e.studentId, e.studentFullName, e.score);
+                });
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+
+    }
+
+    function getAnswerStatistics(questionId) {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/getAnswerStatistics?questionId=" + questionId,
+            success: function (data) {
+                data.forEach(e => {
+                    console.log(e);
+                });
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+
+    }
+
+    function endChallenge() {
+        $.ajax({
+            type: "GET",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/endChallenge?challengeId=" + challengeId,
+            success: function (data) {
+                console.clear();
+                data.forEach(e => {
+                    console.log(e.rank, e.studentId, e.studentFullName, e.score);
+                });
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
+    }
+
+
+    function kick(studentIds) {
+        $.ajax({
+            type: "POST",
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", token);
+            },
+            url: "/host/kickStudent",
+            contentType: "application/json",
+            data: JSON.stringify({
+                studentIds: studentIds,
+                challengeId: challengeId
+            }),
+            success: function () {
+
+            },
+            error: data => {
+                console.log(data);
+            }
+        });
     }
 
 

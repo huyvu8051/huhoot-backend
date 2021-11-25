@@ -48,112 +48,115 @@ public class DataLoader implements ApplicationRunner {
     public void run(ApplicationArguments args) throws IOException {
 
 
-
         Date date = new Date();
 
         // start time
         long t0 = System.nanoTime();
-/*
-        Admin admin = new Admin("admin", passwordEncoder.encode("password"));
-        admin.setRole(Role.ADMIN);
-        admin.setCreatedDate(date);
-        admin.setCreatedBy("BobVu");
-        admin.setModifiedDate(date);
-        admin.setModifiedBy("Nobody");
 
-        adminRepository.save(admin);
+        Admin admin2 = adminRepository.findOneByUsername("admin");
 
-        for (int i = 0; i < 3; i++) {
-            Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("password"));
+        if (admin2 == null) {
 
-            admin1.setRole(Role.ADMIN);
-            admin1.setCreatedDate(date);
-            admin1.setCreatedBy("BobVu");
-            admin1.setModifiedDate(date);
-            admin1.setModifiedBy("Nobody");
+            Admin admin = new Admin("admin", passwordEncoder.encode("password"));
+            admin.setRole(Role.ADMIN);
+            admin.setCreatedDate(date);
+            admin.setCreatedBy("BobVu");
+            admin.setModifiedDate(date);
+            admin.setModifiedBy("Nobody");
 
-            Admin host = adminRepository.save(admin1);
+            adminRepository.save(admin);
 
+            for (int i = 0; i < 3; i++) {
+                Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("password"));
 
-            for (int j = 0; j < 3; j++) {
-                Challenge challenge = new Challenge();
-                challenge.setTitle("title " + i + j);
-                challenge.setChallengeStatus(ChallengeStatus.WAITING);
+                admin1.setRole(Role.ADMIN);
+                admin1.setCreatedDate(date);
+                admin1.setCreatedBy("BobVu");
+                admin1.setModifiedDate(date);
+                admin1.setModifiedBy("Nobody");
 
-                challenge.setCoverImage(getRandomImgUrl());
-                challenge.setRandomQuest(true);
-                challenge.setRandomAnswer(true);
-                challenge.setAdmin(host);
-                challenge.setCreatedDate(date);
-                challenge.setCreatedBy("BobVu");
-                challenge.setModifiedDate(date);
-                challenge.setModifiedBy("Nobody");
-
-                Challenge chall = challengeRepository.save(challenge);
+                Admin host = adminRepository.save(admin1);
 
 
-                for (int x = 0; x < 7; x++) {
-                    Student student1 = new Student("student" + i + j + x, "student" + i + j, passwordEncoder.encode("password"));
-                    student1.setCreatedDate(date);
-                    student1.setCreatedBy("BobVu");
-                    student1.setModifiedDate(date);
-                    student1.setModifiedBy("Nobody");
-                    Student student = studentRepository.save(student1);
+                for (int j = 0; j < 3; j++) {
+                    Challenge challenge = new Challenge();
+                    challenge.setTitle("title " + i + j);
+                    challenge.setChallengeStatus(ChallengeStatus.WAITING);
 
-                    StudentInChallenge studentChallenge = new StudentInChallenge();
-                    studentChallenge.setStudent(student);
-                    studentChallenge.setChallenge(chall);
-                    studentChallenge.setCreatedDate(date);
-                    studentChallenge.setCreatedBy("BobVu");
-                    studentChallenge.setModifiedDate(date);
-                    studentChallenge.setModifiedBy("Nobody");
+                    challenge.setCoverImage(getRandomImgUrl());
+                    challenge.setRandomQuest(true);
+                    challenge.setRandomAnswer(true);
+                    challenge.setAdmin(host);
+                    challenge.setCreatedDate(date);
+                    challenge.setCreatedBy("BobVu");
+                    challenge.setModifiedDate(date);
+                    challenge.setModifiedBy("Nobody");
 
-                    studentChallengeRepository.save(studentChallenge);
-
-                    Question question
-                            = new Question();
-                    question.setOrdinalNumber(x);
-                    question.setQuestionContent(getRandomImgUrl());
-                    question.setAnswerTimeLimit(AnswerTime.TWENTY_SEC);
-                    question.setPoint(Points.STANDARD);
-                    question.setAnswerOption(AnswerOption.SINGLE_SELECT);
-
-                    question.setChallenge(chall);
+                    Challenge chall = challengeRepository.save(challenge);
 
 
+                    for (int x = 0; x < 7; x++) {
+                        Student student1 = new Student("student" + i + j + x, "student" + i + j + x, passwordEncoder.encode("password"));
+                        student1.setCreatedDate(date);
+                        student1.setCreatedBy("BobVu");
+                        student1.setModifiedDate(date);
+                        student1.setModifiedBy("Nobody");
+                        Student student = studentRepository.save(student1);
 
-                    question.setCreatedDate(date);
-                    question.setCreatedBy("BobVu");
-                    question.setModifiedDate(date);
-                    question.setModifiedBy("Nobody");
+                        StudentInChallenge studentChallenge = new StudentInChallenge();
+                        studentChallenge.setStudent(student);
+                        studentChallenge.setChallenge(chall);
+                        studentChallenge.setCreatedDate(date);
+                        studentChallenge.setCreatedBy("BobVu");
+                        studentChallenge.setModifiedDate(date);
+                        studentChallenge.setModifiedBy("Nobody");
 
-                    Question quest = questionRepository.save(question);
+                        studentChallengeRepository.save(studentChallenge);
 
-                    List<Answer> answers = new ArrayList<>();
+                        Question question
+                                = new Question();
+                        question.setOrdinalNumber(x);
+                        question.setQuestionContent(getRandomImgUrl());
+                        question.setAnswerTimeLimit(AnswerTime.TWENTY_SEC);
+                        question.setPoint(Points.STANDARD);
+                        question.setAnswerOption(AnswerOption.SINGLE_SELECT);
 
-                    for (int a = 0; a < 4; a++) {
-                        Answer answer = new Answer();
-                        answer.setOrdinalNumber(a);
-                        answer.setAnswerContent("content " + i + j + x + a);
-                        answer.setCorrect((i + j + x + a) % 2 == 0);
-                        answer.setQuestion(quest);
+                        question.setChallenge(chall);
 
-                        answer.setCreatedDate(date);
-                        answer.setCreatedBy("BobVu");
-                        answer.setModifiedDate(date);
-                        answer.setModifiedBy("Nobody");
 
-                        answers.add(answer);
+                        question.setCreatedDate(date);
+                        question.setCreatedBy("BobVu");
+                        question.setModifiedDate(date);
+                        question.setModifiedBy("Nobody");
+
+                        Question quest = questionRepository.save(question);
+
+                        List<Answer> answers = new ArrayList<>();
+
+                        for (int a = 0; a < 4; a++) {
+                            boolean corr = (i + j + x + a) % 2 == 0;
+                            Answer answer = new Answer();
+                            answer.setOrdinalNumber(a);
+                            answer.setAnswerContent("content " + i + j + x + a + corr);
+                            answer.setCorrect(corr);
+                            answer.setQuestion(quest);
+
+                            answer.setCreatedDate(date);
+                            answer.setCreatedBy("BobVu");
+                            answer.setModifiedDate(date);
+                            answer.setModifiedBy("Nobody");
+
+                            answers.add(answer);
+                        }
+                        answerRepository.saveAll(answers);
+
                     }
-                    answerRepository.saveAll(answers);
 
                 }
-
             }
-        }
 
 
-        long t1 = System.nanoTime();
+            long t1 = System.nanoTime();
 
 /*
 
@@ -183,9 +186,10 @@ public class DataLoader implements ApplicationRunner {
 
 
  */
+        }
     }
 
-    private String getRandomImgUrl(){
+    private String getRandomImgUrl() {
         List<String> imgUrls = new ArrayList<>();
 
         imgUrls.add("https://i.imgur.com/BpnU5U9.jpeg");

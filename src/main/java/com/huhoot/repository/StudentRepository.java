@@ -19,4 +19,6 @@ public interface StudentRepository extends JpaRepository<Student, Integer>{
     Page<Student> findAllByUsernameContainingIgnoreCaseAndIsNonLocked(String username, boolean isNonLocked, Pageable pageable);
 
     List<Student> findAllByStudentChallengesPrimaryKeyChallengeId(int id);
+
+    List<Student> findAllByIdIn(List<Integer> studentIds);
 }

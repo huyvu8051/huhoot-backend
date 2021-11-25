@@ -1,4 +1,4 @@
-package com.huhoot.controller.t;
+package com.huhoot.controller.student;
 
 import com.huhoot.dto.StudentAnswerRequest;
 import com.huhoot.model.Student;
@@ -7,10 +7,7 @@ import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,8 +22,8 @@ public class StudentPlayController {
         this.studentPlayService = studentPlayService;
     }
 
-    @PostMapping("/challenge")
-    public void joinRoom(@RequestBody int challengeId) throws NotFoundException {
+    @GetMapping("/joinRoom")
+    public void joinRoom(@RequestParam int challengeId) throws NotFoundException {
 
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -36,7 +33,7 @@ public class StudentPlayController {
     }
 
     @PostMapping("/sendAnswer")
-    public ResponseEntity<Integer> joinRoom(@RequestBody StudentAnswerRequest request) throws NotFoundException {
+    public ResponseEntity<Integer> sendAnswer(@RequestBody StudentAnswerRequest request) throws NotFoundException {
 
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

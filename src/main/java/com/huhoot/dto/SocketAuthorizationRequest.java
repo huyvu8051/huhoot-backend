@@ -3,7 +3,7 @@ package com.huhoot.dto;
 import lombok.Data;
 
 @Data
-public class RegisterHostRequest {
+public class SocketAuthorizationRequest {
     private int challengeId;
     private String token;
 }

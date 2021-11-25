@@ -3,6 +3,7 @@ package com.huhoot.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,8 @@ public class Admin extends Auditable implements UserDetails {
 	private Role role;
 
 	private boolean isNonLocked;
+
+	private UUID socketId;
 
 	@OneToMany(mappedBy = "admin")
 	private List<Challenge> challenges = new ArrayList<>();

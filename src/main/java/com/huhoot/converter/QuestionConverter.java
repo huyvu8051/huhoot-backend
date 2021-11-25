@@ -20,7 +20,7 @@ public class QuestionConverter {
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
         response.setAskDate(question.getAskDate());
-        response.setDeleted(question.isNonDeleted());
+        response.setNonDeleted(question.isNonDeleted());
         return response;
     }
 

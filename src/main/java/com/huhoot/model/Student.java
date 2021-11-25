@@ -3,6 +3,7 @@ package com.huhoot.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,10 +39,12 @@ public class Student extends Auditable implements UserDetails{
 
 	private boolean isNonLocked;
 
+	private UUID socketId;
+
 	@OneToMany(mappedBy = "primaryKey.student")
 	private List<StudentInChallenge> studentChallenges = new ArrayList<>();
 
-	@OneToMany(mappedBy = "primaryKey.student", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "primaryKey.student")
 	private List<StudentAnswer> studentAnswers = new ArrayList<>();
 
 	public Student(String formattedUsername, String fullName, String hashedPassword) {

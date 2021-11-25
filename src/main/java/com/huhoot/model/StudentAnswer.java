@@ -23,7 +23,7 @@ public class StudentAnswer extends Auditable {
 
     @Getter
     @Setter
-    private float score;
+    private double score;
 
     @Getter
     @Setter
@@ -47,6 +47,14 @@ public class StudentAnswer extends Auditable {
         getPrimaryKey().setStudent(student);
     }
 
+    public void setAnswer(Answer ans) {
+        primaryKey.setAnswer(ans);
+    }
+
+    public void setChallenge(Challenge chal) {
+        primaryKey.setChallenge(chal);
+    }
+
     @Transient
     public Question getQuestion() {
         return getPrimaryKey().getQuestion();
@@ -55,5 +63,17 @@ public class StudentAnswer extends Auditable {
     public void setQuestion(Question question) {
         getPrimaryKey().setQuestion(question);
     }
+
+
+    @Transient
+    public Answer getAnswer() {
+        return primaryKey.getAnswer();
+    }
+
+    @Transient
+    public Challenge getChallenge(){
+        return primaryKey.getChallenge();
+    }
+
 
 }

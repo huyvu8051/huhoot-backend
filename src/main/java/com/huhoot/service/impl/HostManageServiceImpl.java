@@ -304,17 +304,20 @@ public class HostManageServiceImpl implements HostManageService {
             List<Answer> answers = quest.getAnswers();
             for (Answer ans : answers) {
                 for (Student stu : students) {
-                    studentAnswerRepository.save(StudentAnswer.builder()
-                            .primaryKey(StudentAnswerId.builder()
-                                    .answer(ans)
-                                    .challenge(challenge)
-                                    .question(quest)
-                                    .student(stu)
-                                    .build())
-                            .score(0)
-                            .isCorrect(false)
-                            .answerDate(null)
-                            .build());
+
+                    StudentAnswer sa = new StudentAnswer();
+                    sa.setStudent(stu);
+                    sa.setAnswer(ans);
+                    sa.setChallenge(challenge);
+                    sa.setQuestion(quest);
+
+
+                    sa.setScore(0);
+                    sa.setCorrect(false);
+                    sa.setAnswerDate(null);
+
+
+                    studentAnswerRepository.save(sa);
                 }
             }
         }

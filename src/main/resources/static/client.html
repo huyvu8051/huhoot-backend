@@ -16,22 +16,41 @@
 <div id="answers"></div>
 <br/>
 <hr/>
-<div id="currentPoint"></div>
+<h2 id="currentPoint"></h2>
 
 
 <script>
     const challengeId = 219;
 
-    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MjE2IiwiZXhwIjoxNjM3OTk3MTA4LCJpYXQiOjE2Mzc2MzcxMDh9.43tZFUhwXaNa6pyULX2TdC7L5e1BuKFUXuFW00_IaDA";
+    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MTI2IiwiZXhwIjoxNjM4MDE4NjAzLCJpYXQiOjE2Mzc2NTg2MDN9.qWLwh_90ocsKVe155kinX7C5EwxWtguQPt9V8qkVRhs";
 
-    // const socketurl = "http://159.223.38.181:8082";
-    const socketUrl = "http://localhost:8082"
-    const socket = io.connect(socketUrl, {
-        query: "challengeId=" + challengeId
+    $.ajax({
+        type: "GET",
+        beforeSend: function (request) {
+            request.setRequestHeader("Authorization", token);
+        },
+        url: "/student/joinRoom?challengeId=" + challengeId,
+        success: function (data) {
+            console.log("student in challenge ", data);
+        },
+        error: data => {
+            console.log(data);
+        }
     });
 
+    // const socketUrl = "http://159.223.38.181:8082";
+    const socketUrl = "http://localhost:8082"
+    const socket = io.connect(socketUrl);
+
     socket.on("connected", (data) => {
-        $("#message").append("<br/><b> " + data + "</b>");
+        document.getElementById("message").innerHTML = "<br/><b> " + data + "</b>";
+    }).emit('clientConnectRequest', { // event name
+        challengeId: challengeId,
+        token: token
+    });
+
+    socket.on("joinError", (data) => {
+        document.getElementById("message").innerHTML = "<br/><b> " + data + "</b>";
     });
 
     // handle publish question event
@@ -41,42 +60,88 @@
         let answersText = "";
         let answers = [];
         data.publishAnswerResponses.forEach(e => {
-            answersText += "<button class='answer' onclick='sendAnswer(" + e.id + ")'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            answersText += "<button class='answer' onclick='sendAnswer([" + e.id + "], " + data.id + ")'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
         });
         document.getElementById("answers").innerHTML = answersText;
 
-
         clearInterval(downloadTimer);
 
-        countdown(data.answerTimeLimit)
+        //setTimeout(()=>{
+        countdown(data.answerTimeLimit, data.askDate);
+        //}, 3000)
+    });
+
+    socket.on("showCorrectAnswer", data => {
+        clearInterval(downloadTimer);
+        document.getElementById("countdown").innerHTML = "Finished";
+        let answersText = "";
+        let answers = [];
+        data.forEach(e => {
+            if (e.correct) {
+                answersText += "<button style='background-color: green; color: aliceblue' data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            } else {
+                answersText += "<button disabled data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
+            }
+
+
+        });
+        document.getElementById("answers").innerHTML = answersText;
+    });
+
+    socket.on("endChallenge", data => {
+        document.getElementById("question").innerHTML = "<h2>Challenge finish</h2>";
+
+        document.getElementById("answers").innerHTML = "";
+
+    });
+
+
+    socket.on("kickStudent", data => {
+        document.getElementById("question").innerHTML = "<h2>Student kicked</h2>";
+
+        document.getElementById("answers").innerHTML = "";
+
     });
 
 
     var downloadTimer;
 
-    function countdown(timeleft) {
+    function countdown(answerTime, askDate) {
+
 
         downloadTimer = setInterval(function () {
-            if (timeleft <= 0) {
+
+            let now = new Date().getTime();
+            let diff = now - askDate;
+            const second = Math.floor(diff / 1000 % 60);
+
+            let timeLeft = answerTime - second;
+
+            if (timeLeft <= 0) {
                 clearInterval(downloadTimer);
                 document.getElementById("countdown").innerHTML = "Finished";
             } else {
-                document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+                document.getElementById("countdown").innerHTML = timeLeft + " seconds remaining ";
             }
-            timeleft -= 1;
         }, 1000);
     }
 
-    function sendAnswer(answerIds){
+    function sendAnswer(answerIds, questionId) {
+        document.getElementById("answers").innerHTML = "";
         $.ajax({
             type: "POST",
             beforeSend: function (request) {
                 request.setRequestHeader("Authorization", token);
             },
             url: "/student/sendAnswer",
-            data:{
-                answerIds:answerIds
-            },
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify({
+                answerIds: answerIds,
+                challengeId: challengeId,
+                questionId: questionId
+            }),
             success: function (data) {
                 document.getElementById("currentPoint").innerHTML = data + " point";
 

@@ -8,5 +8,5 @@ public interface StudentPlayService {
 
     void join(int challengeId, Student userDetails) throws NotFoundException;
 
-    Integer answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException;
+    int answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException;
 }
