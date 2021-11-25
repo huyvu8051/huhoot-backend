@@ -41,16 +41,21 @@ public class QuestionConverter {
         for (Answer ans : question.getAnswers()){
             publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
         }
-        return PublishQuestionResponse.builder()
-                .id(question.getId())
-                .ordinalNumber(question.getOrdinalNumber())
-                .questionContent(question.getQuestionContent())
-                .answerTimeLimit(question.getAnswerTimeLimit())
-                .point(question.getPoint())
-                .answerOption(question.getAnswerOption())
-                .publishAnswerResponses(publishAnswerResponses)
-                .askDate(question.getAskDate())
-                .build();
+
+        PublishQuestionResponse response = new PublishQuestionResponse();
+
+        response.setId(question.getId());
+        response.setOrdinalNumber(question.getOrdinalNumber());
+        response.setQuestionContent(question.getQuestionContent());
+        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
+        response.setPoint(question.getPoint());
+        response.setAnswerOption(question.getAnswerOption());
+        response.setPublishAnswerResponses(publishAnswerResponses);
+        response.setAskDate(question.getAskDate());
+
+        return response;
+
+
 
     }
 }

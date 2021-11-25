@@ -2,13 +2,13 @@ package com.huhoot.service.impl;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.huhoot.converter.AnswerConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.converter.QuestionConverter;
 import com.huhoot.converter.StudentInChallengeConverter;
 import com.huhoot.dto.*;
 import com.huhoot.enums.ChallengeStatus;
-import com.huhoot.model.*;
+import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
+import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
@@ -57,20 +57,30 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     }
 
+
+    /**
+     * Publish a question and answers to all clients in Room.
+     * Set publish time to question and update at db
+     *
+     * @param questionId {@link com.huhoot.model.Question} id
+     * @param adminId    {@link Admin} id
+     * @throws NotFoundException {@link PublishQuestionResponse} not found
+     */
     @Override
-    public void publishQuestion(Admin userDetails, int questionId) throws NotFoundException {
-        // List<PublishQuestionResponse> pubQueRes = questionRepository.findAllPublishQuestionResponse(questionId);
+    public void publishQuestion(int questionId, int adminId) throws NotFoundException {
 
-        Optional<Question> optional = questionRepository.findOneByIdAndChallengeAdminId(questionId, userDetails.getId());
-        Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
-        int challengeId = question.getChallenge().getId();
+        Optional<PublishQuestionResponse> optional = questionRepository.findAllPublishQuestionResponse(questionId, adminId);
+        PublishQuestionResponse question = optional.orElseThrow(() -> new NotFoundException("PublishQuestionResponse not found"));
 
-        question.setAskDate(new Timestamp(System.currentTimeMillis()));
+        List<PublishAnswerResponse> publishAnswerResponses = answerRepository.findAllPublishAnswerResponseByQuestionId(questionId);
+        question.setPublishAnswerResponses(publishAnswerResponses);
 
-        PublishQuestionResponse publishQuestionResponse = QuestionConverter.toPublishQuestionResponse(question);
-        socketIOServer.getRoomOperations(challengeId + "").sendEvent("publishQuestion", publishQuestionResponse);
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        question.setAskDate(now);
 
-        questionRepository.save(question);
+        socketIOServer.getRoomOperations(question.getChallengeId() + "").sendEvent("publishQuestion", question);
+
+        questionRepository.updateAskDateByQuestionId(now, questionId);
     }
 
 
@@ -78,27 +88,35 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     private final StudentAnswerRepository studentAnswerRepository;
 
+    /**
+     * Sent all {@link AnswerResponse} to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
+     *
+     * @param questionId {@link com.huhoot.model.Question} id
+     * @param adminId    {@link Admin} id
+     * @throws NotFoundException not found exception
+     */
     @Override
-    public void showCorrectAnswer(Admin userDetails, int questionId, String challengeId) {
+    public void showCorrectAnswer(int questionId, int adminId) throws NotFoundException {
 
-        List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
+        Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
+        Integer challengeId = optional.orElseThrow(() -> new NotFoundException("Question not found"));
 
-        List<AnswerResponse> answerResponses = ListConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+        List<AnswerResponse> answerResponses = answerRepository.findAllAnswerByQuestionIdAndAdminId(questionId);
 
-        socketIOServer.getRoomOperations(challengeId).sendEvent("showCorrectAnswer", answerResponses);
+        socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", answerResponses);
     }
 
 
     /**
-     * @param userDetails student
-     * @param challengeId challenge id
-     * @param pageable    pageable
+     * @param challengeId {@link Challenge} id
+     * @param adminId     {@link Admin} id
+     * @param pageable    {@link Pageable}
      * @return List of top 20 student have best total challenge score
      */
     @Override
-    public List<StudentScoreResponse> getTopStudent(Admin userDetails, int challengeId, Pageable pageable) {
+    public List<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable) {
 
-        List<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, userDetails.getId(), pageable);
+        List<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, adminId, pageable);
 
         int rankNum = 1;
         for (StudentScoreResponse studentScoreResponse : response) {
@@ -109,22 +127,21 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     }
 
     /**
-     * @param questionId question id
-     * @param hostId     host id
+     * @param questionId {@link com.huhoot.model.Question} id
+     * @param adminId    {@link Admin} id
      * @return list of answer contain number of student select
      */
     @Override
-    public List<AnswerStatisticsResponse> getAnswerStatistics(int questionId, int hostId) {
+    public List<AnswerStatisticsResponse> getAnswerStatistics(int questionId, int adminId) {
 
-        return studentAnswerRepository.findStatisticsByQuestionId(questionId, hostId);
+        return studentAnswerRepository.findStatisticsByQuestionId(questionId, adminId);
     }
 
     @Override
     public void endChallenge(int challengeId, int adminId) throws NotFoundException {
 
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, adminId);
-
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("endChallenge");
     }

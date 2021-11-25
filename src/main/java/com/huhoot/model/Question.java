@@ -1,67 +1,56 @@
 package com.huhoot.model;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.Points;
 import com.huhoot.exception.AnswerOption;
+import lombok.Data;
 import org.hibernate.annotations.Where;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
-@EntityListeners({ AuditingEntityListener.class })
-@Where(clause="is_non_deleted=1")
-public class Question extends Auditable{
+@EntityListeners({AuditingEntityListener.class})
+@Where(clause = "is_non_deleted=1")
+public class Question extends Auditable {
 
-	@Id
-	@GeneratedValue
-	private int id;
-	
-	private int ordinalNumber;
+    @Id
+    @GeneratedValue
+    private int id;
 
-	private String questionContent;
+    private int ordinalNumber;
 
-	private int answerTimeLimit;
+    private String questionContent;
 
-	private Points point;
+    private int answerTimeLimit;
 
-	private AnswerOption answerOption;
+    private Points point;
 
-	private Timestamp askDate;
+    private AnswerOption answerOption;
 
+    private Timestamp askDate;
 
-	private boolean isNonDeleted;
+    private boolean isNonDeleted;
 
-	@ManyToOne
-	@JoinColumn(name = "challenge_id")
-	private Challenge challenge;
+    @ManyToOne
+    @JoinColumn(name = "challenge_id")
+    private Challenge challenge;
 
-	@OneToMany(mappedBy = "question")
-	private List<Answer> answers = new ArrayList<>();
+    @OneToMany(mappedBy = "question")
+    private List<Answer> answers = new ArrayList<>();
 
-	@OneToMany(mappedBy = "primaryKey.question", cascade = CascadeType.ALL)
-	private List<StudentAnswer> studentAnswers = new ArrayList<>();
+    @OneToMany(mappedBy = "primaryKey.question", cascade = CascadeType.ALL)
+    private List<StudentAnswer> studentAnswers = new ArrayList<>();
 
-	public Question(){
-		this.isNonDeleted = true;
-	}
+    public Question() {
+        this.isNonDeleted = true;
+    }
+
+    public Question(int id){
+        this.id = id;
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.huhoot.service;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.huhoot.dto.*;
 import com.huhoot.model.Admin;
 import javassist.NotFoundException;
@@ -19,11 +20,26 @@ public interface HostOrganizeChallengeService {
      */
     List<QuestionResponse> startChallenge(int challengeId, int adminId);
 
-    void publishQuestion(Admin userDetails, int questionId) throws NotFoundException;
+    /**
+     * Publish a question and answers to all clients in Room.
+     * Set publish time to question and update at db
+     *
+     * @param questionId question id
+     * @param adminId    admin id
+     * @throws NotFoundException challenge not found
+     */
+    void publishQuestion(int questionId, int adminId) throws NotFoundException;
 
-    void showCorrectAnswer(Admin userDetails, int questionId, String challengeId);
+    /**
+     * Sent all {@link AnswerResponse} to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
+     *
+     * @param questionId {@link com.huhoot.model.Question} id
+     * @param adminId    {@link Admin} id
+     * @throws NotFoundException not found exception
+     */
+    void showCorrectAnswer(int questionId, int adminId) throws NotFoundException;
 
-    List<StudentScoreResponse> getTopStudent(Admin userDetails, int challengeId, Pageable pageable);
+    List<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable);
 
     List<AnswerStatisticsResponse> getAnswerStatistics(int hostId, int questionId);
 

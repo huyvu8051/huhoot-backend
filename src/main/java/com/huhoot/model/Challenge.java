@@ -51,5 +51,9 @@ public class Challenge extends Auditable {
         this.isNonDeleted = true;
     }
 
+    public Challenge(int id){
+        this.id = id;
+    }
+
 
 }

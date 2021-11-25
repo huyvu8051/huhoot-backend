@@ -41,4 +41,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "SET c.ChallengeStatus = :challengeStatus " +
             "WHERE c.id =:challengeId AND c.admin.id = :adminId ")
     void updateChallengeStatusByIdAndAdminId(ChallengeStatus challengeStatus, int challengeId, int adminId);
+
+
+    /**
+     * @param questionId question id
+     * @param adminId admin id
+     * @return challenge id
+     */
+    @Query("SELECT n.challenge.id " +
+            "FROM Question n " +
+            "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
+    Optional<Integer> findOneByQuestionIdAndAdminId(int questionId, int adminId);
 }
