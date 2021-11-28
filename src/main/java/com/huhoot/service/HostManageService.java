@@ -34,9 +34,9 @@ public interface HostManageService {
 
     void deleteManyQuestion(Admin userDetails, List<Integer> ids);
 
-    List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId);
+    List<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId);
 
-    AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException;
+    PublishAnswer getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException;
 
     void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws Exception;
 

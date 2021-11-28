@@ -1,7 +1,6 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.AnswerResponse;
-import com.huhoot.dto.PublishAnswerResponse;
+import com.huhoot.dto.PublishAnswer;
 import com.huhoot.model.Answer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,17 +29,17 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
-     * @return List of {@link PublishAnswerResponse}
+     * @return List of {@link PublishAnswer}
      */
-    @Query("SELECT new com.huhoot.dto.PublishAnswerResponse(n.id,n.ordinalNumber, n.answerContent) " +
+    @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id,n.ordinalNumber, n.answerContent) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
-    List<PublishAnswerResponse> findAllPublishAnswerResponseByQuestionId(int questionId);
+    List<PublishAnswer> findAllPublishAnswerByQuestionId(int questionId);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
-     * @return List of {@link AnswerResponse}
+     * @return List of {@link PublishAnswer}
      */
-    @Query("SELECT new com.huhoot.dto.AnswerResponse(n.id, n.ordinalNumber, n.answerContent,n.isCorrect) FROM Answer n WHERE n.question.id = :questionId")
-    List<AnswerResponse> findAllAnswerByQuestionIdAndAdminId(int questionId);
+    @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id, n.ordinalNumber, n.answerContent,n.isCorrect) FROM Answer n WHERE n.question.id = :questionId")
+    List<PublishAnswer> findAllAnswerByQuestionIdAndAdminId(int questionId);
 }

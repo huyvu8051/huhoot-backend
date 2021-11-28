@@ -58,6 +58,9 @@ public class StudentPlayServiceImpl implements StudentPlayService {
     @Override
     public int answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException {
 
+        // check is answered by query is any student answer have answer date not null
+        // not check yet
+
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Integer> correctAnswers = answerRepository.findAllCorrectAnswerIds(request.getQuestionId());

@@ -28,7 +28,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     /**
      * @param challengeId {@link Challenge} id
-     * @param adminId {@link com.huhoot.model.Admin} id
+     * @param adminId     {@link com.huhoot.model.Admin} id
      * @return Challenge
      */
     Optional<Challenge> findOneByIdAndAdminId(int challengeId, int adminId);
@@ -50,11 +50,16 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     /**
      * @param questionId question id
-     * @param adminId admin id
+     * @param adminId    admin id
      * @return challenge id
      */
     @Query("SELECT n.challenge.id " +
             "FROM Question n " +
             "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
     Optional<Integer> findOneByQuestionIdAndAdminId(int questionId, int adminId);
+
+    @Query("SELECT n.questions.size " +
+            "FROM Challenge n " +
+            "WHERE  n.id = :challengeId")
+    int findCountQuestion(int challengeId);
 }

@@ -3,6 +3,7 @@ package com.huhoot.dto;
 import com.huhoot.enums.ChallengeStatus;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,9 +16,9 @@ public class ChallengeResponse {
     private boolean randomQuest;
     private ChallengeStatus ChallengeStatus;
     private String owner;
-    private Date createdDate;
+    private Timestamp createdDate;
     private String createdBy;
-    private Date modifiedDate;
+    private Timestamp modifiedDate;
     private String modifiedBy;
     private UUID adminSocketId;
 }

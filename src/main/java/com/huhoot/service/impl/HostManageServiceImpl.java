@@ -167,13 +167,13 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
+    public List<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
         List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
         return ListConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
     }
 
     @Override
-    public AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException {
+    public PublishAnswer getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException {
         Optional<Answer> optional = answerRepository.findOneByIdAndQuestionChallengeAdminId(answerId, userDetails.getId());
 
         Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));

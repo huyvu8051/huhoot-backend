@@ -1,13 +1,12 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.AnswerAddRequest;
-import com.huhoot.dto.AnswerResponse;
-import com.huhoot.dto.PublishAnswerResponse;
+import com.huhoot.dto.PublishAnswer;
 import com.huhoot.model.Answer;
 
 public class AnswerConverter {
-    public static AnswerResponse toAnswerResponse(Answer entity) {
-        AnswerResponse response = new AnswerResponse();
+    public static PublishAnswer toAnswerResponse(Answer entity) {
+        PublishAnswer response = new PublishAnswer();
         response.setId(entity.getId());
         response.setOrdinalNumber(entity.getOrdinalNumber());
         response.setAnswerContent(entity.getAnswerContent());
@@ -24,8 +23,8 @@ public class AnswerConverter {
         return answer;
     }
 
-    public static PublishAnswerResponse toPublishAnswerResponse(Answer answer) {
-        return PublishAnswerResponse.builder()
+    public static PublishAnswer toPublishAnswerResponse(Answer answer) {
+        return PublishAnswer.builder()
                 .id(answer.getId())
                 .ordinalNumber(answer.getOrdinalNumber())
                 .answerContent(answer.getAnswerContent())

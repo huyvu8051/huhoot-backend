@@ -19,7 +19,7 @@ public interface HostOrganizeChallengeService {
      * @param adminId     admin id
      * @return List of QuestionResponse
      */
-    List<QuestionResponse> startChallenge(int challengeId, int adminId);
+    void startChallenge(int challengeId, int adminId);
 
     /**
      * Publish a question and answers to all clients in Room.
@@ -32,7 +32,7 @@ public interface HostOrganizeChallengeService {
     void publishQuestion(int questionId, int adminId) throws NotFoundException;
 
     /**
-     * Sent all {@link AnswerResponse} to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
+     * Sent all Answer to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
      * @param questionId {@link com.huhoot.model.Question} id
      * @param adminId    {@link Admin} id
@@ -74,4 +74,6 @@ public interface HostOrganizeChallengeService {
     void kickStudent(List<Integer> studentIds, int challengeId, int adminId);
 
     PrepareStudentAnswerResponse prepareStudentAnswer(int challengeId, int id);
+
+    void publishNextQuestion(int challengeId, int id) throws Exception;
 }

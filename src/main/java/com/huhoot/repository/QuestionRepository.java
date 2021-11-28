@@ -1,8 +1,7 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.PublishQuestionResponse;
+import com.huhoot.dto.PublishQuestion;
 import com.huhoot.dto.QuestionResponse;
-import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,10 +41,10 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
      * @param adminId    admin id
      * @return List of PublishQuestionResponse
      */
-    @Query("SELECT new com.huhoot.dto.PublishQuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id) " +
+    @Query("SELECT new com.huhoot.dto.PublishQuestion(n.id, n.ordinalNumber, n.questionContent, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id, n.challenge.questions.size) " +
             "FROM Question n " +
             "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
-    Optional<PublishQuestionResponse> findAllPublishQuestionResponse(int questionId, int adminId);
+    Optional<PublishQuestion> findAllPublishQuestion(int questionId, int adminId);
 
 
     /**
@@ -60,5 +59,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     void updateAskDateByQuestionId(Timestamp askDate, int questionId);
 
 
+    @Query("SELECT n.id FROM Question n WHERE n.challenge.id = :challengeId")
+    List<Integer> findAllIdsByChallengeId(int challengeId);
 
+
+    Optional<Question> findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId, int adminId);
 }

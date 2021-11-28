@@ -56,11 +56,11 @@ public class HostOrganizeChallengeController {
      * @return List of QuestionResponse
      */
     @GetMapping("/startChallenge")
-    public ResponseEntity<List<QuestionResponse>> startChallenge(@RequestParam int challengeId) {
+    public void startChallenge(@RequestParam int challengeId) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostOrganizeChallengeService.startChallenge(challengeId, userDetails.getId()));
+        hostOrganizeChallengeService.startChallenge(challengeId, userDetails.getId());
     }
 
     /**
@@ -84,10 +84,10 @@ public class HostOrganizeChallengeController {
      * @throws NotFoundException not found
      */
     @GetMapping("/showCorrectAnswer")
-    public void showCorrectAnswer(@RequestParam int questionId) throws NotFoundException {
+    public void showCorrectAnswer(@RequestParam int questionId,
+                                  @RequestParam(defaultValue = "20") int size) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-
         hostOrganizeChallengeService.showCorrectAnswer(questionId, userDetails.getId());
     }
 
@@ -145,6 +145,17 @@ public class HostOrganizeChallengeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostOrganizeChallengeService.kickStudent(req.getStudentIds(), req.getChallengeId(), userDetails.getId());
+    }
+
+    @GetMapping("/publishNextQuestion")
+    public void publishNextQuestion(@RequestParam int challengeId) throws Exception {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        try{
+            hostOrganizeChallengeService.publishNextQuestion(challengeId, userDetails.getId());
+        }catch (Exception e){
+            hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
+        }
     }
 
 

@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class PublishQuestionResponse {
-    private PublishQuestion question;
+public class CorrectAnswerResponse {
     private List<PublishAnswer> answers;
+    private List<AnswerStatisticsResponse> answerStatistics;
+
 }

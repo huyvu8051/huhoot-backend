@@ -38,8 +38,8 @@
         }
     });
 
-    const socketUrl = "http://159.223.38.181:8082";
-    //const socketUrl = "http://localhost:8082"
+    // const socketUrl = "http://159.223.38.181:8082";
+    const socketUrl = "http://localhost:8082"
     const socket = io.connect(socketUrl);
 
     socket.on("connected", (data) => {

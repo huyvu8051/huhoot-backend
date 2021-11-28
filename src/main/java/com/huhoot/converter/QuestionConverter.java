@@ -1,7 +1,7 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.PublishAnswerResponse;
-import com.huhoot.dto.PublishQuestionResponse;
+import com.huhoot.dto.PublishAnswer;
+import com.huhoot.dto.PublishQuestion;
 import com.huhoot.dto.QuestionAddRequest;
 import com.huhoot.dto.QuestionResponse;
 import com.huhoot.model.Answer;
@@ -34,15 +34,15 @@ public class QuestionConverter {
         return question;
     }
 
-    public static PublishQuestionResponse toPublishQuestionResponse(Question question) {
+    public static PublishQuestion toPublishQuestionResponse(Question question) {
 
-        List<PublishAnswerResponse> publishAnswerResponses = new ArrayList<>();
+        List<PublishAnswer> publishAnswerResponses = new ArrayList<>();
 
         for (Answer ans : question.getAnswers()){
             publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
         }
 
-        PublishQuestionResponse response = new PublishQuestionResponse();
+        PublishQuestion response = new PublishQuestion();
 
         response.setId(question.getId());
         response.setOrdinalNumber(question.getOrdinalNumber());
@@ -50,7 +50,6 @@ public class QuestionConverter {
         response.setAnswerTimeLimit(question.getAnswerTimeLimit());
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
-        response.setPublishAnswerResponses(publishAnswerResponses);
         response.setAskDate(question.getAskDate());
 
         return response;

@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +35,7 @@ public class DataLoader implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         Random random = new Random();
 
-        Date date = new Date();
+        Timestamp date = new Timestamp(System.currentTimeMillis());
 
         // start time
         long t0 = System.nanoTime();
@@ -68,7 +69,7 @@ public class DataLoader implements ApplicationRunner {
             for (int i = 0; i < 3; i++) {
                 Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("password"));
 
-                admin1.setRole(Role.ADMIN);
+                admin1.setRole(Role.HOST);
                 admin1.setCreatedDate(date);
                 admin1.setCreatedBy("BobVu");
                 admin1.setModifiedDate(date);

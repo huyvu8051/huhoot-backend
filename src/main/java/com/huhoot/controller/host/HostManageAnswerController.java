@@ -1,8 +1,8 @@
 package com.huhoot.controller.host;
 
 import com.huhoot.dto.AnswerAddRequest;
-import com.huhoot.dto.AnswerResponse;
 import com.huhoot.dto.AnswerUpdateRequest;
+import com.huhoot.dto.PublishAnswer;
 import com.huhoot.model.Admin;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
@@ -24,7 +24,7 @@ public class HostManageAnswerController {
     }
 
     @GetMapping("/answer")
-    public ResponseEntity<List<AnswerResponse>> findAll(@RequestParam int questionId) {
+    public ResponseEntity<List<PublishAnswer>> findAll(@RequestParam int questionId) {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -34,7 +34,7 @@ public class HostManageAnswerController {
     }
 
     @GetMapping("/answer/details")
-    public ResponseEntity<AnswerResponse> getDetails(@RequestParam int answerId) throws NotFoundException {
+    public ResponseEntity<PublishAnswer> getDetails(@RequestParam int answerId) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return ResponseEntity.ok(hostService.getOneAnswerDetailsById(userDetails, answerId));

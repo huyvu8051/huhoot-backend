@@ -9,8 +9,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublishAnswerResponse {
+public class PublishAnswer {
     private int id;
     private int ordinalNumber;
     private String answerContent;
+    private boolean isCorrect;
+
+    public PublishAnswer(int id, int ordinalNumber, String answerContent){
+        this.id = id;
+        this.ordinalNumber = ordinalNumber;
+        this.answerContent = answerContent;
+    }
 }
