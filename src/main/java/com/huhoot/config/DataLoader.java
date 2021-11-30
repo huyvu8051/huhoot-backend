@@ -110,6 +110,7 @@ public class DataLoader implements ApplicationRunner {
                         studentChallenge.setCreatedBy("BobVu");
                         studentChallenge.setModifiedDate(date);
                         studentChallenge.setModifiedBy("Nobody");
+                        studentChallenge.setNonDeleted(true);
 
                         studentChallengeRepository.save(studentChallenge);
 

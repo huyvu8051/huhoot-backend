@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface StudentInChallengeRepository extends JpaRepository<StudentInChallenge, Integer> {
 
-    Page<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(int challengeId, int id, Pageable pageable);
+    Page<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int challengeId, int id, Pageable pageable);
 
     List<StudentInChallenge> findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(List<Integer> studentIds, int challengeId);
 
@@ -20,7 +20,7 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
     List<StudentInChallenge> findAllByPrimaryKeyStudentIdAndIsNonDeletedFalse(int id, Pageable pageable);
 
 
-    List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(int challengeId, int adminId);
+    List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int challengeId, int adminId);
 
     Optional<StudentInChallenge> findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(int challengeId, int id);
 

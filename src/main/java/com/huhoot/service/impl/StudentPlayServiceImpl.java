@@ -65,6 +65,10 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         // the question answer option not match. if single select but multi answer @@
 
+        // multi correct answer, point may / for num of correct answer
+
+        // open challenge must validate num of correct answer > 0
+
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Integer> correctAnswers = answerRepository.findAllCorrectAnswerIds(request.getQuestionId());

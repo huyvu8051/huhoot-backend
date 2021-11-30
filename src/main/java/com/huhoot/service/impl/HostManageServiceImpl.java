@@ -8,6 +8,7 @@ import com.huhoot.functional.CheckedFunction;
 import com.huhoot.mapper.AnswerMapper;
 import com.huhoot.mapper.ChallengeMapper;
 import com.huhoot.mapper.QuestionMapper;
+import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostManageService;
@@ -218,11 +219,12 @@ public class HostManageServiceImpl implements HostManageService {
 
     private final StudentInChallengeRepository studentChallengeRepository;
 
+    private final StudentInChallengeMapper studentInChallengeMapper;
+
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId(), pageable);
-
-        return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
+        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId(), pageable);
+        return ListConverter.toPageResponse(page, e -> studentInChallengeMapper.toDto(e));
     }
 
     @Override
@@ -287,7 +289,7 @@ public class HostManageServiceImpl implements HostManageService {
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
         challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
 
-        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId());
+        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
         return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }

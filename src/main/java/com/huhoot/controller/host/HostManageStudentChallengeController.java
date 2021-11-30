@@ -97,6 +97,7 @@ public class HostManageStudentChallengeController {
 
     }
 
+
     @DeleteMapping("/studentChallenge")
     public void delete(@RequestBody StudentInChallengeDeleteRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()

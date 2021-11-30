@@ -9,8 +9,8 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface QuestionMapper {
 
-    @Mapping(target = "nonDeleted", source = "isNonDeleted")
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    //@Mapping(target = "nonDeleted", source = "isNonDeleted")
+    //@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(QuestionUpdateRequest dto, @MappingTarget Question entity);
 
 
