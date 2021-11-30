@@ -6,7 +6,6 @@ import lombok.Data;
 public class StudentInChallengeResponse {
     private int studentId;
     private int challengeId;
-
     private String studentUsername;
     private String studentFullName;
     private boolean isLogin;

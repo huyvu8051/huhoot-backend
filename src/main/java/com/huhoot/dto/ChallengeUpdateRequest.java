@@ -7,15 +7,10 @@ import lombok.Data;
 public class ChallengeUpdateRequest {
     private int id;
     private String title;
-
     private String coverImage;
-
     private Boolean randomAnswer;
-
     private Boolean randomQuest;
-
     private Boolean isNonDeleted;
-
     private ChallengeStatus challengeStatus;
 
 }
