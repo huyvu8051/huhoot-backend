@@ -209,6 +209,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         PublishQuestion publishQuestion = new PublishQuestion(question.getId(),
                 question.getOrdinalNumber(),
                 question.getQuestionContent(),
+                question.getQuestionImage(),
                 question.getAnswerTimeLimit(),
                 question.getPoint(),
                 question.getAnswerOption(),
@@ -227,7 +228,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .answers(publishAnswers)
                         .build());
 
-        questionRepository.updateAskDateByQuestionId(now, question.getId());
+        // questionRepository.updateAskDateByQuestionId(now, question.getId());
 
 
     }

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +17,7 @@ public class PublishQuestion {
     private int id;
     private int ordinalNumber;
     private String questionContent;
+    private String questionImage;
     private int answerTimeLimit;
 
     private Timestamp askDate;
@@ -30,12 +30,13 @@ public class PublishQuestion {
 
     private int totalQuestion;
 
-    public PublishQuestion(int id, int ordinalNumber, String questionContent, int answerTimeLimit, Points point, AnswerOption answerOption, int challengeId,int totalQuestion) {
+    public PublishQuestion(int id, int ordinalNumber, String questionContent, String questionImage, int answerTimeLimit, Points point, AnswerOption answerOption, int challengeId,int totalQuestion) {
         this.id = id;
         this.ordinalNumber = ordinalNumber;
         this.questionContent = questionContent;
         this.answerTimeLimit = answerTimeLimit;
 
+        this.questionImage = questionImage;
         this.point = point;
         this.answerOption = answerOption;
         this.challengeId = challengeId;

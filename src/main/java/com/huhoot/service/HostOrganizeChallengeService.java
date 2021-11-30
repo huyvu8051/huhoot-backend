@@ -1,7 +1,10 @@
 package com.huhoot.service;
 
 import com.corundumstudio.socketio.SocketIOClient;
-import com.huhoot.dto.*;
+import com.huhoot.dto.AnswerStatisticsResponse;
+import com.huhoot.dto.PrepareStudentAnswerResponse;
+import com.huhoot.dto.StudentInChallengeResponse;
+import com.huhoot.dto.StudentScoreResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import javassist.NotFoundException;

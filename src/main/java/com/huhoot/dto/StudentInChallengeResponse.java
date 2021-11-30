@@ -8,7 +8,7 @@ public class StudentInChallengeResponse {
     private int challengeId;
 
     private String studentUsername;
-    private String studentFullname;
+    private String studentFullName;
     private boolean isLogin;
     private boolean isKicked;
     private boolean isOnline;

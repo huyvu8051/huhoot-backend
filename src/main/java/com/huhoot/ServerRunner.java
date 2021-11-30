@@ -3,7 +3,6 @@ package com.huhoot;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
-import io.netty.handler.codec.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -13,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "159.223.38.181";
-    // private String host = "localhost";
+    // private String host = "159.223.38.181";
+    private String host = "localhost";
     private Integer port = 8082;
 
     @Bean

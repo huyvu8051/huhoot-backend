@@ -2,7 +2,6 @@ package com.huhoot.service;
 
 import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.dto.PageResponse;
-import com.huhoot.model.Admin;
 import com.huhoot.model.Student;
 import org.springframework.data.domain.Pageable;
 

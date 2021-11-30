@@ -20,14 +20,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("host")
-public class HostManageStudentChallenge {
+public class HostManageStudentChallengeController {
     private final HostManageService hostService;
 
     private final CheckOwnerChallenge checkOwnerChallenge;
 
     private final AdminManageService adminService;
 
-    public HostManageStudentChallenge(HostManageService hostService, CheckOwnerChallenge checkOwnerChallenge, AdminManageService adminService) {
+    public HostManageStudentChallengeController(HostManageService hostService, CheckOwnerChallenge checkOwnerChallenge, AdminManageService adminService) {
         this.hostService = hostService;
         this.checkOwnerChallenge = checkOwnerChallenge;
         this.adminService = adminService;
@@ -60,12 +60,12 @@ public class HostManageStudentChallenge {
     @GetMapping("/studentChallenge")
     public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestParam int challengeId,
                                                                             @RequestParam(defaultValue = "0") int page,
-                                                                            @RequestParam(defaultValue = "12") int size,
+                                                                            @RequestParam(defaultValue = "12") int itemsPerPage,
                                                                             @RequestParam(defaultValue = "createdDate") String sortBy,
                                                                             @RequestParam(defaultValue = "DESC") String direction) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
 
         return ResponseEntity.ok(hostService.findAllStudentInChallenge(userDetails, pageable, challengeId));
     }

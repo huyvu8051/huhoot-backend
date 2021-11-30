@@ -10,7 +10,7 @@ public class AnswerConverter {
         response.setId(entity.getId());
         response.setOrdinalNumber(entity.getOrdinalNumber());
         response.setAnswerContent(entity.getAnswerContent());
-        response.setCorrect(entity.isCorrect());
+        response.setIsCorrect(entity.isCorrect());
 
         return response;
     }
@@ -28,6 +28,8 @@ public class AnswerConverter {
                 .id(answer.getId())
                 .ordinalNumber(answer.getOrdinalNumber())
                 .answerContent(answer.getAnswerContent())
+                .createdDate(answer.getCreatedDate())
+                .isCorrect(answer.isCorrect())
                 .build();
     }
 }

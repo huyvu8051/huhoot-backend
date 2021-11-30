@@ -90,34 +90,36 @@ public class MessageEventHandler {
 
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
-        String token = request.getToken().substring(7);
 
-        String username = jwtUtil.extractUsername(token);
+        try {
 
-        Student student = studentRepository.findOneByUsername(username);
+            String token = request.getToken().substring(7);
 
-        if (!jwtUtil.validateToken(token, student)) {
-            throw new Exception("Bad token");
-        }
+            String username = jwtUtil.extractUsername(token);
 
-        Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(request.getChallengeId(), student.getId());
+            Student student = studentRepository.findOneByUsername(username);
 
-        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> {
-            client.sendEvent("joinError", "Challenge not found");
+            if (!jwtUtil.validateToken(token, student)) {
+                throw new Exception("Bad token");
+            }
+
+            Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(request.getChallengeId(), student.getId());
+
+            StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+            studentInChallenge.setLogin(true);
+
+            client.joinRoom(request.getChallengeId() + "");
+
+            student.setSocketId(client.getSessionId());
+
+            studentInChallengeRepository.save(studentInChallenge);
+
+            studentRepository.save(student);
+        } catch (Exception e) {
+            client.sendEvent("joinError", "joinError");
             client.disconnect();
-            return new NotFoundException("Challenge not found");
-        });
-
-        studentInChallenge.setLogin(true);
-
-        client.joinRoom(request.getChallengeId() + "");
-
-        student.setSocketId(client.getSessionId());
-
-        studentInChallengeRepository.save(studentInChallenge);
-
-        studentRepository.save(student);
-
+        }
 
     }
 

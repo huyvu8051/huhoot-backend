@@ -61,6 +61,10 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         // check is answered by query is any student answer have answer date not null
         // not check yet
 
+        // check after skip question, student can send answer ... not checked
+
+        // the question answer option not match. if single select but multi answer @@
+
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Integer> correctAnswers = answerRepository.findAllCorrectAnswerIds(request.getQuestionId());

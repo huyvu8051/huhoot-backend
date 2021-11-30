@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class AnswerUpdateRequest {
+
     private int id;
-    private int ordinalNumber;
-
+    private Integer ordinalNumber;
     private String answerContent;
-
-    private boolean isCorrect;
+    private Boolean isCorrect;
+    private Boolean isNonDeleted;
 }

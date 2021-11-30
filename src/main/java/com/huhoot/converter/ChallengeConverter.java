@@ -1,9 +1,9 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.*;
+import com.huhoot.dto.ChallengeAddRequest;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.model.Challenge;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component

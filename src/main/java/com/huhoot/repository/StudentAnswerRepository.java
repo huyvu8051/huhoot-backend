@@ -51,7 +51,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
-            "GROUP BY m.id, m.ordinalNumber, m.answerContent ")
+            "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.question.id ")
     List<AnswerStatisticsResponse> findStatisticsByQuestionId(int questionId, int hostId);
 
     /**

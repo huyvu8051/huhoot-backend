@@ -23,7 +23,11 @@ public class Question extends Auditable {
 
     private int ordinalNumber;
 
+
+    @Column(columnDefinition = "nvarchar(255)")
     private String questionContent;
+
+    private String questionImage;
 
     private int answerTimeLimit;
 

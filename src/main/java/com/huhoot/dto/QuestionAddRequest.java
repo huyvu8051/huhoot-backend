@@ -21,6 +21,8 @@ public class QuestionAddRequest {
     @NotBlank
     private String questionContent;
 
+    private String questionImage;
+
     @NotNull
     @Min(5)
     private int answerTimeLimit;

@@ -12,12 +12,12 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+
 
 @Component
 @AllArgsConstructor
@@ -119,7 +119,8 @@ public class DataLoader implements ApplicationRunner {
                         Question question
                                 = new Question();
                         question.setOrdinalNumber(x);
-                        question.setQuestionContent(getRandomImgUrl());
+                        question.setQuestionContent(getRandomImgUrl() + " Question content");
+                        question.setQuestionImage(getRandomImgUrl());
                         question.setAnswerTimeLimit(answerTime);
                         question.setPoint(Points.STANDARD);
                         question.setAnswerOption(AnswerOption.SINGLE_SELECT);
@@ -197,12 +198,18 @@ public class DataLoader implements ApplicationRunner {
     private String getRandomImgUrl() {
         List<String> imgUrls = new ArrayList<>();
 
-        imgUrls.add("https://i.imgur.com/BpnU5U9.jpeg");
-        imgUrls.add("https://i.imgur.com/ZMovdZu.jpg");
-        imgUrls.add("https://i.imgur.com/e03sCWa.jpg");
-        imgUrls.add("https://i.imgur.com/nI5UWV8.jpg");
-        imgUrls.add("https://i.imgur.com/o9CI562.jpg");
-        imgUrls.add("https://i.imgur.com/9bjVfKI.jpg");
+        imgUrls.add("1da20102-db0f-4820-bb19-ed7d07e54cdb.jpg");
+        imgUrls.add("5d2500ce-8c22-4b43-a3c9-842bb866204a.jpg");
+        imgUrls.add("7b6f4ba8-347e-4452-b66f-1a00b99b5c8a.jpg");
+        imgUrls.add("26e49ab7-0752-44b8-9aba-915937064e00.jpg");
+        imgUrls.add("285a4e82-2ad4-462a-bfe3-e9b9ab846e7f.png");
+        imgUrls.add("9795ce36-e07b-438a-ba88-428d11588398.jpg");
+        imgUrls.add("68820dbd-b439-45cc-bb2a-5a50a758b725.jpg");
+        imgUrls.add("a22a4558-039e-4522-bb15-af863e95eab1.jpg");
+        imgUrls.add("ab804242-d08e-4f9d-9ec0-42c9082e945f.jpeg");
+        imgUrls.add("b9759822-f86a-4fae-a06d-aaef15a162a0.jpg");
+        imgUrls.add("ce84e707-af4f-40d1-920f-e17d26a39ce7.png");
+        imgUrls.add("f57f24e9-69d2-4d26-9ac7-e05ee9dcdae3.svg");
 
         Random random = new Random();
         int rand = random.nextInt(6);

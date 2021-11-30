@@ -2,6 +2,8 @@ package com.huhoot.repository;
 
 import com.huhoot.dto.PublishAnswer;
 import com.huhoot.model.Answer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,7 +18,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     List<Answer> findAllByIdIn(List<Integer> ids);
 
-    List<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId);
+    Page<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId, Pageable pageable);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id

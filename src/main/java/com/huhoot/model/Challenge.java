@@ -3,12 +3,10 @@ package com.huhoot.model;
 import com.huhoot.enums.ChallengeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ public class Challenge extends Auditable {
     @GeneratedValue
     private int id;
 
+    @Column(columnDefinition = "nvarchar(255)")
     private String title;
 
     private String coverImage;
@@ -51,7 +50,7 @@ public class Challenge extends Auditable {
         this.isNonDeleted = true;
     }
 
-    public Challenge(int id){
+    public Challenge(int id) {
         this.id = id;
     }
 

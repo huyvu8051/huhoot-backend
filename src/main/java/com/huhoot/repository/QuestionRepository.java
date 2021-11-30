@@ -31,7 +31,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
      * @param adminId     admin id
      * @return List of QuestionResponse(id, ordinalNumber, questionContent, answerTimeLimit, point, answerOption, askDate, isNonDeleted)
      */
-    @Query("SELECT new com.huhoot.dto.QuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.answerTimeLimit, n.point, n.answerOption, n.askDate, n.isNonDeleted) " +
+    @Query("SELECT new com.huhoot.dto.QuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.askDate, n.isNonDeleted) " +
             "FROM Question n " +
             "WHERE n.challenge.id = :challengeId AND n.challenge.admin.id = :adminId")
     List<QuestionResponse> findAllQuestionResponse(int challengeId, int adminId);
@@ -41,7 +41,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
      * @param adminId    admin id
      * @return List of PublishQuestionResponse
      */
-    @Query("SELECT new com.huhoot.dto.PublishQuestion(n.id, n.ordinalNumber, n.questionContent, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id, n.challenge.questions.size) " +
+    @Query("SELECT new com.huhoot.dto.PublishQuestion(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id, n.challenge.questions.size) " +
             "FROM Question n " +
             "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
     Optional<PublishQuestion> findAllPublishQuestion(int questionId, int adminId);

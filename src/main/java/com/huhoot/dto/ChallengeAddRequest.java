@@ -1,5 +1,6 @@
 package com.huhoot.dto;
 
+import com.huhoot.enums.ChallengeStatus;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +14,15 @@ public class ChallengeAddRequest {
     @NotNull
     @NotEmpty
     private String title;
-    private String originalFileName;
-    private String base64Image;
+
+    private String coverImage;
+
     private boolean randomAnswer;
+
     private boolean randomQuest;
+
+    private ChallengeStatus challengeStatus;
+
+    private MultipartFile multipartFile;
 
 }

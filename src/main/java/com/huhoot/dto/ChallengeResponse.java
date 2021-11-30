@@ -4,7 +4,6 @@ import com.huhoot.enums.ChallengeStatus;
 import lombok.Data;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.UUID;
 
 @Data

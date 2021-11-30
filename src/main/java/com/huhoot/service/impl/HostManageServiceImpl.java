@@ -5,10 +5,14 @@ import com.huhoot.dto.*;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
+import com.huhoot.mapper.AnswerMapper;
+import com.huhoot.mapper.ChallengeMapper;
+import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,19 +24,11 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class HostManageServiceImpl implements HostManageService {
     private final ChallengeRepository challengeRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-
-    public HostManageServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentInChallengeRepository studentChallengeRepository, StudentRepository studentRepository, StudentAnswerRepository studentAnswerRepository) {
-        this.challengeRepository = challengeRepository;
-        this.questionRepository = questionRepository;
-        this.answerRepository = answerRepository;
-        this.studentChallengeRepository = studentChallengeRepository;
-        this.studentRepository = studentRepository;
-        this.studentAnswerRepository = studentAnswerRepository;
-    }
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
@@ -60,30 +56,25 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public void addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
+    public ChallengeResponse addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
 
-        Challenge challenge = ChallengeConverter.toEntity(request);
+        Challenge challenge = challengeMapper.toEntity(request);
         challenge.setAdmin(userDetails);
-        challenge.setCoverImage(request.getOriginalFileName());
-        challengeRepository.save(challenge);
+
+        Challenge saved = challengeRepository.save(challenge);
+
+        return challengeMapper.toDto(saved);
+
     }
 
+    private final ChallengeMapper challengeMapper;
 
     @Override
     public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Challenge> optional = challengeRepository.findOneById(request.getId());
-
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
-
         checker.accept(userDetails, challenge);
-
-        challenge.setTitle(request.getTitle());
-        challenge.setCoverImage(request.getOriginalFileName());
-        challenge.setRandomAnswer(request.isRandomAnswer());
-        challenge.setRandomQuest(request.isRandomQuest());
-        challenge.setChallengeStatus(request.getChallengeStatus());
-        challenge.setNonDeleted(request.isDeleted());
-
+        challengeMapper.update(request, challenge);
         challengeRepository.save(challenge);
 
     }
@@ -108,7 +99,7 @@ public class HostManageServiceImpl implements HostManageService {
     }
 
     @Override
-    public void addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+    public QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Challenge> optional = challengeRepository.findOneById(request.getChallengeId());
 
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
@@ -119,7 +110,9 @@ public class HostManageServiceImpl implements HostManageService {
 
         question.setChallenge(challenge);
 
-        questionRepository.save(question);
+        Question save = questionRepository.save(question);
+
+        return questionMapper.toDto(save);
 
     }
 
@@ -135,20 +128,17 @@ public class HostManageServiceImpl implements HostManageService {
 
     }
 
+    private final QuestionMapper questionMapper;
 
     @Override
     public void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Question> optional = questionRepository.findOneById(request.getId());
 
-        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
 
         checker.accept(userDetails, question.getChallenge());
 
-        question.setOrdinalNumber(request.getOrdinalNumber());
-        question.setQuestionContent(request.getQuestionContent());
-        question.setAnswerTimeLimit(request.getAnswerTimeLimit());
-        question.setPoint(request.getPoint());
-        question.setAnswerOption(request.getAnswerOption());
+        questionMapper.update(request, question);
 
         questionRepository.save(question);
 
@@ -167,9 +157,10 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public List<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
-        List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
-        return ListConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+    public PageResponse<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId, Pageable pageable) {
+        Page<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId, pageable);
+
+        return ListConverter.toPageResponse(answers, AnswerConverter::toPublishAnswerResponse);
     }
 
     @Override
@@ -187,9 +178,12 @@ public class HostManageServiceImpl implements HostManageService {
 
         Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
+        /*
         if (question.getAnswers().size() >= 4) {
             throw new Exception("Reach maximum answer");
         }
+        */
+
 
         Answer answer = AnswerConverter.toEntity(request);
 
@@ -199,15 +193,15 @@ public class HostManageServiceImpl implements HostManageService {
 
     }
 
+    private final AnswerMapper answerMapper;
+
     @Override
     public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException {
         Optional<Answer> optional = answerRepository.findOneById(request.getId());
 
         Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
-        answer.setOrdinalNumber(request.getOrdinalNumber());
-        answer.setAnswerContent(request.getAnswerContent());
-        answer.setCorrect(request.isCorrect());
+        answerMapper.updateAnswer(request, answer);
 
         answerRepository.save(answer);
     }
@@ -321,7 +315,7 @@ public class HostManageServiceImpl implements HostManageService {
                             .challenge(challenge)
                             .question(quest)
                             .build();
-                    
+
                     studentAnswers.add(StudentAnswer.builder()
                             .primaryKey(id)
                             .score(0)

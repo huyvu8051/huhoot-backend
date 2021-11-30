@@ -1,11 +1,10 @@
 package com.huhoot.dto;
 
-import java.util.Collection;
-
-import org.springframework.security.core.GrantedAuthority;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 @AllArgsConstructor
 public class AuthenticationResponse {

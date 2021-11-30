@@ -1,13 +1,12 @@
 package com.huhoot.service.impl;
 
+import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.huhoot.repository.AdminRepository;
-import com.huhoot.repository.StudentRepository;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {

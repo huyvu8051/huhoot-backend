@@ -16,11 +16,13 @@ public class QuestionConverter {
         response.setId(question.getId());
         response.setOrdinalNumber(question.getOrdinalNumber());
         response.setQuestionContent(question.getQuestionContent());
+        response.setQuestionImage(question.getQuestionImage());
         response.setAnswerTimeLimit(question.getAnswerTimeLimit());
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
         response.setAskDate(question.getAskDate());
         response.setNonDeleted(question.isNonDeleted());
+        response.setCreatedDate(question.getCreatedDate());
         return response;
     }
 
@@ -28,6 +30,7 @@ public class QuestionConverter {
         Question question = new Question();
         question.setOrdinalNumber(request.getOrdinalNumber());
         question.setQuestionContent(request.getQuestionContent());
+        question.setQuestionImage(request.getQuestionImage());
         question.setAnswerTimeLimit(request.getAnswerTimeLimit());
         question.setPoint(request.getPoint());
         question.setAnswerOption(request.getAnswerOption());
