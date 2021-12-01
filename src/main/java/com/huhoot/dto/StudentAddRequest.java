@@ -8,6 +8,9 @@ import javax.validation.constraints.*;
 @Data
 @NoArgsConstructor
 public class StudentAddRequest {
+
+    private int id;
+
     @NotNull
     @NotEmpty
     @NotBlank
@@ -22,14 +25,8 @@ public class StudentAddRequest {
     private String fullName;
 
     @NotNull
-    @NotEmpty
-    @NotBlank
-    @Size(min = 5, max = 15)
-    private String password;
+    private Boolean isNonLocked;
 
-    public StudentAddRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
 
-    }
+
 }

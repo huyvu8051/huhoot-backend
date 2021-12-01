@@ -9,6 +9,6 @@ public class StudentAddErrorResponse extends StudentAddRequest {
     private String errorMessage;
 
     public StudentAddErrorResponse(StudentAddRequest studentAddRequest) {
-        super(studentAddRequest.getUsername(), studentAddRequest.getPassword());
+
     }
 }

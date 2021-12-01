@@ -8,6 +8,7 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.huhoot.dto.SocketAuthorizationRequest;
+import com.huhoot.exception.StudentAddException;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
@@ -64,7 +65,9 @@ public class MessageEventHandler {
 
         String username = jwtUtil.extractUsername(token);
 
-        Admin admin = adminRepository.findOneByUsername(username);
+        Optional<Admin> optional = adminRepository.findOneByUsername(username);
+
+        Admin admin = optional.orElseThrow(()->new NotFoundException("Admin not found"));
 
         if (!jwtUtil.validateToken(token, admin)) {
             throw new Exception("Bad token");
@@ -97,7 +100,9 @@ public class MessageEventHandler {
 
             String username = jwtUtil.extractUsername(token);
 
-            Student student = studentRepository.findOneByUsername(username);
+            Optional<Student> optionalStudent = studentRepository.findOneByUsername(username);
+
+            Student student = optionalStudent.orElseThrow(()->new StudentAddException("Student not found"));
 
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");

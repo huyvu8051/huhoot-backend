@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -40,7 +41,7 @@ public class DataLoader implements ApplicationRunner {
         // start time
         long t0 = System.nanoTime();
 
-        Admin admin2 = adminRepository.findOneByUsername("admin");
+        Admin admin2 = adminRepository.findOneByUsername("admin").get();
 
         if (admin2 == null) {
 

@@ -5,6 +5,7 @@ import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
+import com.huhoot.exception.StudentAddException;
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Admin;
@@ -44,8 +45,6 @@ public class AdminManageServiceImpl implements AdminManageService {
     private final Validator validator;
 
     private final AnswerRepository answerRepository;
-
-
 
 
     @Override
@@ -117,9 +116,9 @@ public class AdminManageServiceImpl implements AdminManageService {
         /**Because of sqlite can't check the unique, so we need check it manually
          */
 
-        Admin duplicate = adminRepository.findOneByUsername(formattedUsername);
+        Optional<Admin> duplicate = adminRepository.findOneByUsername(formattedUsername);
 
-        if (duplicate != null) {
+        if (duplicate.isPresent()) {
             throw new UsernameExistedException("Username existed!");
         }
 
@@ -154,7 +153,7 @@ public class AdminManageServiceImpl implements AdminManageService {
 
         Page<Student> all = studentRepository.findAll(pageable);
 
-        return ListConverter.toPageResponse(all, e->studentMapper.toDto(e));
+        return ListConverter.toPageResponse(all, e -> studentMapper.toDto(e));
 
     }
 
@@ -162,7 +161,7 @@ public class AdminManageServiceImpl implements AdminManageService {
     public StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException {
         Optional<Student> optional = studentRepository.findOneById(id);
 
-        Student student = optional.orElseThrow(()->new AccountNotFoundException("Account not found"));
+        Student student = optional.orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         return StudentConverter.toStudentResponse(student);
     }
@@ -190,13 +189,13 @@ public class AdminManageServiceImpl implements AdminManageService {
         }
 
 
-        Student duplicate = studentRepository.findOneByUsername(addRequest.getUsername());
+        Optional<Student> duplicate = studentRepository.findOneByUsername(addRequest.getUsername());
 
-        if (duplicate != null) {
+        if (duplicate.isPresent()) {
             throw new UsernameExistedException("Username existed!");
         }
 
-        String hashedPassword = passwordEncoder.encode(addRequest.getPassword());
+        String hashedPassword = passwordEncoder.encode("password");
         Student student = new Student(addRequest.getUsername(), addRequest.getFullName(), hashedPassword);
         studentRepository.save(student);
     }
@@ -223,16 +222,21 @@ public class AdminManageServiceImpl implements AdminManageService {
 
 
     @Override
-    public void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException {
+    public void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException, UsernameExistedException {
+
+        Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
+
+        if (duplicate.isPresent()) {
+            throw new UsernameExistedException("Username existed!");
+        }
+
         Optional<Student> optional = studentRepository.findOneById(request.getId());
 
-        Student student = optional.orElseThrow(()->new NotFoundException("Student not found"));
+        Student entity = optional.orElseThrow(() -> new NotFoundException("Student not found"));
 
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
-        student.setPassword(hashedPassword);
-        student.setFullName(request.getFullName());
-        student.setNonLocked(request.isNonLocked());
-        studentRepository.save(student);
+       studentMapper.update(request, entity);
+
+        studentRepository.save(entity);
     }
 
     @Override
@@ -258,6 +262,25 @@ public class AdminManageServiceImpl implements AdminManageService {
     public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
         return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+    }
+
+    @Override
+    public void addStudentAccount(StudentAddRequest request) throws Exception {
+
+        Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
+
+        if (duplicate.isPresent()) {
+            throw new UsernameExistedException("Username existed!");
+        }
+
+        Student student = studentMapper.toEntity(request);
+
+        student.setPassword(passwordEncoder.encode("password"));
+
+        studentRepository.save(student);
+
+
+
     }
 
 }

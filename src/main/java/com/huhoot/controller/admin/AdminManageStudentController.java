@@ -1,6 +1,7 @@
 package com.huhoot.controller.admin;
 
 import com.huhoot.dto.*;
+import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.service.AdminManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
@@ -52,13 +53,20 @@ public class AdminManageStudentController {
 
     }
 
-    @PostMapping("/student")
+
+    @PostMapping("/manyStudent")
     public ResponseEntity<List<StudentAddErrorResponse>> addMany(@Size(min = 1) @RequestBody List<StudentAddRequest> request) {
         return ResponseEntity.ok(adminService.addManyStudentAccount(request));
     }
 
-    @PutMapping("/student")
-    public void update(@Valid @RequestBody StudentUpdateRequest request) throws NotFoundException {
+    @PostMapping("/student")
+    public void add(@Valid @RequestBody StudentAddRequest request) throws Exception {
+
+        adminService.addStudentAccount(request);
+    }
+
+    @PatchMapping("/student")
+    public void update(@RequestBody StudentUpdateRequest request) throws NotFoundException, UsernameExistedException {
         adminService.updateStudentAccount(request);
     }
 

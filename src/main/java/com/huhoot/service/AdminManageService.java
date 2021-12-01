@@ -86,7 +86,7 @@ public interface AdminManageService {
     /**
      * @param request
      */
-    void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException;
+    void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException, UsernameExistedException;
 
     /**
      * @param hostIds
@@ -96,4 +96,6 @@ public interface AdminManageService {
     PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable);
 
     PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable);
+
+    void addStudentAccount(StudentAddRequest request) throws Exception;
 }
