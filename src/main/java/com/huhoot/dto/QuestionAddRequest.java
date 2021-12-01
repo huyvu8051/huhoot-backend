@@ -1,7 +1,7 @@
 package com.huhoot.dto;
 
 import com.huhoot.enums.Points;
-import com.huhoot.exception.AnswerOption;
+import com.huhoot.enums.AnswerOption;
 import lombok.Data;
 
 import javax.validation.constraints.Min;

@@ -6,6 +6,7 @@ import com.huhoot.model.Admin;
 import com.huhoot.service.AdminManageService;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("host")
+@AllArgsConstructor
 public class HostManageStudentChallengeController {
     private final HostManageService hostService;
 
@@ -27,31 +29,26 @@ public class HostManageStudentChallengeController {
 
     private final AdminManageService adminService;
 
-    public HostManageStudentChallengeController(HostManageService hostService, CheckOwnerChallenge checkOwnerChallenge, AdminManageService adminService) {
-        this.hostService = hostService;
-        this.checkOwnerChallenge = checkOwnerChallenge;
-        this.adminService = adminService;
-    }
 
 
     @GetMapping("/student")
-    public ResponseEntity<PageResponse<StudentResponse>> findALlStudent(@RequestParam(defaultValue = "0") int page,
-                                                                        @RequestParam(defaultValue = "12") int size,
+    public ResponseEntity<PageResponse<StudentResponse>> findALlStudent(@RequestParam(defaultValue = "1") int page,
+                                                                        @RequestParam(defaultValue = "12") int itemsPerPage,
                                                                         @RequestParam(defaultValue = "createdDate") String sortBy,
                                                                         @RequestParam(defaultValue = "DESC") String direction) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.findAllStudentAccount(true, pageable));
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
+        return ResponseEntity.ok(adminService.findAllStudentAccount(pageable));
     }
 
     @GetMapping("/student/search")
     public ResponseEntity<PageResponse<StudentResponse>> search(@Length(min = 1, max = 10)
                                                                 @RequestParam String username,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "12") int size,
+                                                                @RequestParam(defaultValue = "1") int page,
+                                                                @RequestParam(defaultValue = "12") int itemsPerPage,
                                                                 @RequestParam(defaultValue = "createdDate") String sortBy,
                                                                 @RequestParam(defaultValue = "DESC") String direction,
                                                                 @RequestParam(defaultValue = "true") boolean isNonLocked) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
         return ResponseEntity.ok(adminService.searchStudentAccountByUsername(username, isNonLocked, pageable));
 
     }
@@ -59,7 +56,7 @@ public class HostManageStudentChallengeController {
 
     @GetMapping("/studentChallenge")
     public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestParam int challengeId,
-                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                            @RequestParam(defaultValue = "1") int page,
                                                                             @RequestParam(defaultValue = "12") int itemsPerPage,
                                                                             @RequestParam(defaultValue = "createdDate") String sortBy,
                                                                             @RequestParam(defaultValue = "DESC") String direction) {
@@ -98,11 +95,11 @@ public class HostManageStudentChallengeController {
     }
 
 
-    @DeleteMapping("/studentChallenge")
-    public void delete(@RequestBody StudentInChallengeDeleteRequest request) {
+    @PatchMapping("/studentChallenge")
+    public void update(@RequestBody StudentInChallengeUpdateRequest request) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        hostService.deleteManyStudentInChallenge(userDetails, request);
+        hostService.updateStudentInChallenge(userDetails, request);
 
     }
 

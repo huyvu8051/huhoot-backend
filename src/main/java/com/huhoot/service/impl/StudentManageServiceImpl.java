@@ -33,7 +33,7 @@ public class StudentManageServiceImpl implements StudentManageService {
 
     @Override
     public PageResponse<ChallengeResponse> findAllChallenge(Student userDetails, Pageable pageable) {
-        List<StudentInChallenge> studentChallenges = studentChallengeRepository.findAllByPrimaryKeyStudentIdAndIsNonDeletedFalse(userDetails.getId(), pageable);
+        List<StudentInChallenge> studentChallenges = studentChallengeRepository.findAllByPrimaryKeyStudentIdAndIsNonDeletedTrue(userDetails.getId(), pageable);
 
         List<Challenge> challenges = new ArrayList<>();
 

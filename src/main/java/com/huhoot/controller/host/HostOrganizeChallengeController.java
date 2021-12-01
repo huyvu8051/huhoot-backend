@@ -6,8 +6,10 @@ import com.huhoot.service.HostManageService;
 import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -24,21 +26,18 @@ public class HostOrganizeChallengeController {
     private final HostOrganizeChallengeService hostOrganizeChallengeService;
 
 
+    @GetMapping("/joinChallenge")
+    public void joinChallenge(@RequestParam int challengeId) {
+        // validate challenge
+    }
+
+
     @GetMapping("/openChallenge")
-    public ResponseEntity<List<StudentInChallengeResponse>> openChallenge(@RequestParam int challengeId) throws NotFoundException {
+    public ResponseEntity<List<StudentInChallengeResponse>> openChallenge(@RequestParam int challengeId) throws Exception {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
         return ResponseEntity.ok(hostService.openChallenge(userDetails, challengeId));
-    }
-
-    @GetMapping("/prepareStudentAnswer")
-    public ResponseEntity<PrepareStudentAnswerResponse> prepareStudentAnswer(@RequestParam int challengeId) {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-
-        return ResponseEntity.ok(hostOrganizeChallengeService.prepareStudentAnswer(challengeId, userDetails.getId()));
-
     }
 
     @GetMapping("/studentOnline")
@@ -92,17 +91,18 @@ public class HostOrganizeChallengeController {
     }
 
     /**
-     * @param challengeId {@link com.huhoot.model.Challenge} id
-     * @param size        size
+     * @param challengeId  {@link com.huhoot.model.Challenge} id
+     * @param itemsPerPage size
      * @return List of {@link StudentScoreResponse}
      */
     @GetMapping("/getTopStudent")
-    public ResponseEntity<List<StudentScoreResponse>> getTopStudent(@RequestParam int challengeId,
-                                                                    @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<PageResponse<StudentScoreResponse>> getTopStudent(@RequestParam int challengeId,
+                                                                            @RequestParam(defaultValue = "1") int page,
+                                                                            @RequestParam(defaultValue = "20") int itemsPerPage) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        Pageable pageable = PageRequest.of(0, size);
-        return ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
+        return  ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
     /**
@@ -125,7 +125,7 @@ public class HostOrganizeChallengeController {
      * @throws NotFoundException not found
      */
     @GetMapping("/endChallenge")
-    public ResponseEntity<List<StudentScoreResponse>> endChallenge(@RequestParam int challengeId,
+    public ResponseEntity<PageResponse<StudentScoreResponse>> endChallenge(@RequestParam int challengeId,
                                                                    @RequestParam(defaultValue = "20") int size) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -151,9 +151,9 @@ public class HostOrganizeChallengeController {
     public void publishNextQuestion(@RequestParam int challengeId) throws Exception {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        try{
+        try {
             hostOrganizeChallengeService.publishNextQuestion(challengeId, userDetails.getId());
-        }catch (Exception e){
+        } catch (Exception e) {
             hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
         }
     }

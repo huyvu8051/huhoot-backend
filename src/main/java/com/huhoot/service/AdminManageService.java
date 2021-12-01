@@ -57,11 +57,10 @@ public interface AdminManageService {
      * Find all Student account
      *
      *
-     * @param isNonLocked
      * @param pageable
      * @return
      */
-    PageResponse<StudentResponse> findAllStudentAccount(boolean isNonLocked, Pageable pageable);
+    PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable);
 
     /**
      * @param id

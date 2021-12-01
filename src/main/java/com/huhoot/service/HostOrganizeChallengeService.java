@@ -1,10 +1,7 @@
 package com.huhoot.service;
 
 import com.corundumstudio.socketio.SocketIOClient;
-import com.huhoot.dto.AnswerStatisticsResponse;
-import com.huhoot.dto.PrepareStudentAnswerResponse;
-import com.huhoot.dto.StudentInChallengeResponse;
-import com.huhoot.dto.StudentScoreResponse;
+import com.huhoot.dto.*;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import javassist.NotFoundException;
@@ -49,7 +46,7 @@ public interface HostOrganizeChallengeService {
      * @param pageable    {@link Pageable}
      * @return List of top 20 student have best total challenge score
      */
-    List<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable);
+    PageResponse<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable);
 
     /**
      * @param adminId    {@link Admin} id
@@ -75,8 +72,6 @@ public interface HostOrganizeChallengeService {
      * @param adminId     {@link Admin} id
      */
     void kickStudent(List<Integer> studentIds, int challengeId, int adminId);
-
-    PrepareStudentAnswerResponse prepareStudentAnswer(int challengeId, int id);
 
     void publishNextQuestion(int challengeId, int id) throws Exception;
 }

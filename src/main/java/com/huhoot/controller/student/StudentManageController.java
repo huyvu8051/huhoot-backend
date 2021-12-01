@@ -27,10 +27,10 @@ public class StudentManageController {
     @GetMapping("/challenge")
     public ResponseEntity<PageResponse<ChallengeResponse>> getAllChallenge(
                                         @RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "12") int size,
+                                        @RequestParam(defaultValue = "12") int itemsPerPage,
                                         @RequestParam(defaultValue = "createdDate") String sortBy,
                                         @RequestParam(defaultValue = "DESC") String direction) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
 
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

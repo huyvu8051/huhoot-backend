@@ -2,7 +2,9 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.*;
 import com.huhoot.dto.*;
+import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
+import com.huhoot.exception.ChallengeException;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
 import com.huhoot.mapper.AnswerMapper;
@@ -263,19 +265,20 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request) {
-        List<StudentInChallenge> list = studentChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(request.getStudentIds(), request.getChallengeId());
+    public void updateStudentInChallenge(Admin userDetails, StudentInChallengeUpdateRequest request) throws NotFoundException {
 
-        for (StudentInChallenge studentChallenge : list) {
-            studentChallenge.setNonDeleted(false);
-        }
+        Optional<StudentInChallenge> optional = studentChallengeRepository.findOneByPrimaryKeyStudentIdAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(request.getStudentId(), request.getChallengeId(), userDetails.getId());
 
-        studentChallengeRepository.saveAll(list);
+        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new NotFoundException("Student in challenge not found"));
+
+        studentInChallengeMapper.update(request, studentInChallenge);
+
+        studentChallengeRepository.save(studentInChallenge);
 
     }
 
     @Override
-    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws NotFoundException {
+    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
@@ -297,17 +300,22 @@ public class HostManageServiceImpl implements HostManageService {
 
     private final StudentAnswerRepository studentAnswerRepository;
 
-    private void createAllStudentAnswerInChallenge(Challenge challenge) {
+    private void createAllStudentAnswerInChallenge(Challenge challenge) throws Exception {
 
 
-        List<Student> students = studentRepository.findAllByStudentChallengesPrimaryKeyChallengeId(challenge.getId());
+        List<Student> students = studentRepository.findAllStudentInChallenge(challenge.getId());
 
         List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
+
+        if(students.size() == 0 || questions.size() == 0) throw new ChallengeException("No student or question found in challenge id = " + challenge.getId());
 
         List<StudentAnswer> studentAnswers = new ArrayList<>();
 
         for (Question quest : questions) {
             List<Answer> answers = quest.getAnswers();
+
+            validateQuestion(quest, answers);
+
             for (Answer ans : answers) {
                 for (Student stu : students) {
 
@@ -332,6 +340,22 @@ public class HostManageServiceImpl implements HostManageService {
 
         studentAnswerRepository.saveAll(studentAnswers);
 
+    }
+
+    private void validateQuestion(Question quest, List<Answer> answers) throws ChallengeException {
+        if(answers.size() == 0) throw new ChallengeException("No answer found for question id = " + quest.getId());
+
+        boolean noAnswerCorrect = answers.stream().noneMatch(e -> e.isCorrect());
+
+        if(noAnswerCorrect){
+            throw new ChallengeException("No any answer correct for question id = " + quest.getId());
+        }
+
+        if(quest.getAnswerOption().equals(AnswerOption.SINGLE_SELECT)){
+            long answerCount = answers.stream().filter(e -> e.isCorrect()).count();
+            if(answerCount > 1) throw new ChallengeException("SINGLE_SELECT: Ony one answer is correct for question id = " + quest.getId());
+
+        }
     }
 
 

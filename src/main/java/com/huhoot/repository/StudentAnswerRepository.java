@@ -3,6 +3,7 @@ package com.huhoot.repository;
 import com.huhoot.dto.AnswerStatisticsResponse;
 import com.huhoot.dto.StudentScoreResponse;
 import com.huhoot.model.StudentAnswer;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,10 +34,11 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * Not contain <b>rank</b>
      */
     @Query("SELECT new com.huhoot.dto.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName)  " +
-            "FROM StudentAnswer m WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
+            "FROM StudentAnswer m " +
+            "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
             "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName " +
             "ORDER BY SUM(m.score) DESC")
-    List<StudentScoreResponse> findTopStudent(int challengeId, int adminId, Pageable pageable);
+    Page<StudentScoreResponse> findTopStudent(int challengeId, int adminId, Pageable pageable);
 
 
     /**

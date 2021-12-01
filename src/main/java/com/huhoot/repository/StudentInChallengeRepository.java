@@ -17,7 +17,7 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
 
     Page<StudentInChallenge> findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(String studentUsername, int challengeId, Pageable pageable);
 
-    List<StudentInChallenge> findAllByPrimaryKeyStudentIdAndIsNonDeletedFalse(int id, Pageable pageable);
+    List<StudentInChallenge> findAllByPrimaryKeyStudentIdAndIsNonDeletedTrue(int id, Pageable pageable);
 
 
     List<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int challengeId, int adminId);
@@ -36,4 +36,6 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
             "FROM StudentInChallenge n " +
             "WHERE n.primaryKey.student.id IN :studentIds AND n.primaryKey.challenge.id = :challengeId AND n.primaryKey.challenge.admin.id = :adminId")
     List<StudentInChallenge> findAllByStudentIdInAndChallengeIdAndChallengeAdminId(List<Integer> studentIds, int challengeId, int adminId);
+
+    Optional<StudentInChallenge> findOneByPrimaryKeyStudentIdAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int studentId, int challengeId, int adminId);
 }

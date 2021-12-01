@@ -15,6 +15,7 @@ import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -125,16 +126,16 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      * @return List of top 20 student have best total challenge score
      */
     @Override
-    public List<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable) {
+    public PageResponse<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable) {
 
-        List<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, adminId, pageable);
+        Page<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, adminId, pageable);
 
         int rankNum = 1;
         for (StudentScoreResponse studentScoreResponse : response) {
             studentScoreResponse.setRank(rankNum++);
         }
 
-        return response;
+        return ListConverter.toPageResponse(response);
     }
 
     /**
@@ -191,13 +192,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         studentInChallengeRepository.saveAll(studentInChallenges);
 
-    }
-
-    @Override
-    public PrepareStudentAnswerResponse prepareStudentAnswer(int challengeId, int id) {
-
-
-        return null;
     }
 
     @Override

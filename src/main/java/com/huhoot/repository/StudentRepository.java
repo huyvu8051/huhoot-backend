@@ -4,6 +4,7 @@ import com.huhoot.model.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,8 @@ public interface StudentRepository extends JpaRepository<Student, Integer>{
 
     Page<Student> findAllByUsernameContainingIgnoreCaseAndIsNonLocked(String username, boolean isNonLocked, Pageable pageable);
 
-    List<Student> findAllByStudentChallengesPrimaryKeyChallengeId(int id);
+    @Query("SELECT n.primaryKey.student FROM StudentInChallenge n WHERE n.primaryKey.challenge.id = :challengeId")
+    List<Student> findAllStudentInChallenge(int challengeId);
 
     List<Student> findAllByIdIn(List<Integer> studentIds);
 }

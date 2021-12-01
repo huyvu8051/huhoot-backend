@@ -6,6 +6,7 @@ import com.huhoot.enums.Points;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.StudentPlayService;
+import io.netty.channel.ChannelException;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(challengeId, userDetails.getId());
 
-        StudentInChallenge studentInChallenge = optional.get();
+        StudentInChallenge studentInChallenge = optional.orElseThrow(()->new ChannelException("Challenge not available!"));
 
         studentInChallenge.setLogin(true);
 
@@ -90,7 +91,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         List<Answer> answers = answerRepository.findAllByIdIn(request.getAnswerIds());
 
-        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit()) : 0;
+        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit(),correctAnswers.size()) : 0;
 
         for (Answer ans : answers) {
             try {
@@ -110,7 +111,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         return totalScore;
     }
 
-    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit) {
+    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit, int numOfCorrectAnswer) {
 
         long diff = now.getTime() - askDate.getTime();
         long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
@@ -122,7 +123,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit;
 
-        return 500 + (500 * timeLeftPercent) * point.getValue();
+        return (500 + (500 * timeLeftPercent) * point.getValue()) / numOfCorrectAnswer;
     }
 
 

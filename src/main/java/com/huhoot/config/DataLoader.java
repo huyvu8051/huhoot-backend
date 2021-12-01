@@ -3,7 +3,7 @@ package com.huhoot.config;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.enums.Points;
 import com.huhoot.enums.Role;
-import com.huhoot.exception.AnswerOption;
+import com.huhoot.enums.AnswerOption;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;

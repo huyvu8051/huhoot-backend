@@ -13,6 +13,5 @@ public interface QuestionMapper {
     //@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(QuestionUpdateRequest dto, @MappingTarget Question entity);
 
-
     QuestionResponse toDto(Question entity);
 }

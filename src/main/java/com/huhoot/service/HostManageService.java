@@ -50,10 +50,10 @@ public interface HostManageService {
 
     List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException;
 
-    void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request);
+    void updateStudentInChallenge(Admin userDetails, StudentInChallengeUpdateRequest request) throws NotFoundException;
 
 
-    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException;
+    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws Exception;
 
 
 }

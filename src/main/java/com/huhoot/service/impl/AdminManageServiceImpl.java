@@ -6,6 +6,7 @@ import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
@@ -15,6 +16,7 @@ import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.AdminManageService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class AdminManageServiceImpl implements AdminManageService {
     private final AdminRepository adminRepository;
     private final AdminConverter adminConverter;
@@ -42,15 +45,7 @@ public class AdminManageServiceImpl implements AdminManageService {
 
     private final AnswerRepository answerRepository;
 
-    public AdminManageServiceImpl(AdminRepository adminRepository, AdminConverter adminConverter, PasswordEncoder passwordEncoder, StudentRepository studentRepository, Validator validator, AnswerRepository answerRepository, ChallengeRepository challengeRepository) {
-        this.adminRepository = adminRepository;
-        this.adminConverter = adminConverter;
-        this.passwordEncoder = passwordEncoder;
-        this.studentRepository = studentRepository;
-        this.validator = validator;
-        this.answerRepository = answerRepository;
-        this.challengeRepository = challengeRepository;
-    }
+
 
 
     @Override
@@ -152,12 +147,14 @@ public class AdminManageServiceImpl implements AdminManageService {
 
     }
 
+    private final StudentMapper studentMapper;
+
     @Override
-    public PageResponse<StudentResponse> findAllStudentAccount(boolean isNonLocked, Pageable pageable) {
+    public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
 
-        Page<Student> all = studentRepository.findAllByIsNonLocked(isNonLocked, pageable);
+        Page<Student> all = studentRepository.findAll(pageable);
 
-        return ListConverter.toPageResponse(all, StudentConverter::toStudentResponse);
+        return ListConverter.toPageResponse(all, e->studentMapper.toDto(e));
 
     }
 
