@@ -1,7 +1,7 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.PublishAnswerResponse;
-import com.huhoot.dto.PublishQuestionResponse;
+import com.huhoot.dto.PublishAnswer;
+import com.huhoot.dto.PublishQuestion;
 import com.huhoot.dto.QuestionAddRequest;
 import com.huhoot.dto.QuestionResponse;
 import com.huhoot.model.Answer;
@@ -16,11 +16,13 @@ public class QuestionConverter {
         response.setId(question.getId());
         response.setOrdinalNumber(question.getOrdinalNumber());
         response.setQuestionContent(question.getQuestionContent());
+        response.setQuestionImage(question.getQuestionImage());
         response.setAnswerTimeLimit(question.getAnswerTimeLimit());
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
         response.setAskDate(question.getAskDate());
         response.setNonDeleted(question.isNonDeleted());
+        response.setCreatedDate(question.getCreatedDate());
         return response;
     }
 
@@ -28,29 +30,34 @@ public class QuestionConverter {
         Question question = new Question();
         question.setOrdinalNumber(request.getOrdinalNumber());
         question.setQuestionContent(request.getQuestionContent());
+        question.setQuestionImage(request.getQuestionImage());
         question.setAnswerTimeLimit(request.getAnswerTimeLimit());
         question.setPoint(request.getPoint());
         question.setAnswerOption(request.getAnswerOption());
         return question;
     }
 
-    public static PublishQuestionResponse toPublishQuestionResponse(Question question) {
+    public static PublishQuestion toPublishQuestionResponse(Question question) {
 
-        List<PublishAnswerResponse> publishAnswerResponses = new ArrayList<>();
+        List<PublishAnswer> publishAnswerResponses = new ArrayList<>();
 
         for (Answer ans : question.getAnswers()){
             publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
         }
-        return PublishQuestionResponse.builder()
-                .id(question.getId())
-                .ordinalNumber(question.getOrdinalNumber())
-                .questionContent(question.getQuestionContent())
-                .answerTimeLimit(question.getAnswerTimeLimit().getValue())
-                .point(question.getPoint())
-                .answerOption(question.getAnswerOption())
-                .publishAnswerResponses(publishAnswerResponses)
-                .askDate(question.getAskDate())
-                .build();
+
+        PublishQuestion response = new PublishQuestion();
+
+        response.setId(question.getId());
+        response.setOrdinalNumber(question.getOrdinalNumber());
+        response.setQuestionContent(question.getQuestionContent());
+        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
+        response.setPoint(question.getPoint());
+        response.setAnswerOption(question.getAnswerOption());
+        response.setAskDate(question.getAskDate());
+
+        return response;
+
+
 
     }
 }

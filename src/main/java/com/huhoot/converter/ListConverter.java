@@ -1,6 +1,8 @@
 package com.huhoot.converter;
 
 import com.huhoot.dto.PageResponse;
+import com.huhoot.dto.StudentResponse;
+import com.huhoot.dto.StudentScoreResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class ListConverter {
         return result;
     }
 
+
     public static <T, R> List<R> toListResponse(List<T> list, Function<T, R> function) {
         List<R> result = new ArrayList<>();
         for (T entity : list) {
@@ -30,4 +33,11 @@ public class ListConverter {
     }
 
 
+    public static <R> PageResponse<R> toPageResponse(Page<R> page) {
+        PageResponse<R> result = new PageResponse<>();
+        result.setList(page.toList());
+        result.setTotalElements(page.getTotalElements());
+        return result;
+
+    }
 }

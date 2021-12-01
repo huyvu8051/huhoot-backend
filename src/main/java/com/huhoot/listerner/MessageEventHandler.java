@@ -12,20 +12,20 @@ import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
-import com.huhoot.repository.AdminRepository;
-import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.StudentInChallengeRepository;
-import com.huhoot.repository.StudentRepository;
+import com.huhoot.repository.*;
 import com.huhoot.service.impl.MyUserDetailsService;
 import com.huhoot.utils.JwtUtil;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class MessageEventHandler {
     private final SocketIOServer server;
     private final ChallengeRepository challengeRepository;
@@ -36,15 +36,7 @@ public class MessageEventHandler {
 
     private final JwtUtil jwtUtil;
 
-    public MessageEventHandler(SocketIOServer server, ChallengeRepository challengeRepository, AdminRepository adminRepository, MyUserDetailsService myUserDetailsService, StudentRepository studentRepository, StudentInChallengeRepository studentInChallengeRepository, JwtUtil jwtUtil) {
-        this.server = server;
-        this.challengeRepository = challengeRepository;
-        this.adminRepository = adminRepository;
-        this.myUserDetailsService = myUserDetailsService;
-        this.studentRepository = studentRepository;
-        this.studentInChallengeRepository = studentInChallengeRepository;
-        this.jwtUtil = jwtUtil;
-    }
+    private final QuestionRepository questionRepository;
 
     @OnConnect
     public void onConnect(SocketIOClient client) throws NotFoundException {
@@ -83,6 +75,11 @@ public class MessageEventHandler {
 
 
         client.joinRoom(challenge.getId() + "");
+
+        List<Integer> questionIds = questionRepository.findAllIdsByChallengeId(request.getChallengeId());
+
+        client.sendEvent("registerSuccess", questionIds);
+
         challengeRepository.save(challenge);
 
         admin.setSocketId(client.getSessionId());
@@ -93,30 +90,36 @@ public class MessageEventHandler {
 
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
-        String token = request.getToken().substring(7);
 
-        String username = jwtUtil.extractUsername(token);
+        try {
 
-        Student student = studentRepository.findOneByUsername(username);
+            String token = request.getToken().substring(7);
 
-        if (!jwtUtil.validateToken(token, student)) {
-            throw new Exception("Bad token");
-        }
+            String username = jwtUtil.extractUsername(token);
 
-        Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(request.getChallengeId(), student.getId());
+            Student student = studentRepository.findOneByUsername(username);
 
-        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> {
-            client.sendEvent("joinError", "Challenge not found");
+            if (!jwtUtil.validateToken(token, student)) {
+                throw new Exception("Bad token");
+            }
+
+            Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(request.getChallengeId(), student.getId());
+
+            StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+            studentInChallenge.setLogin(true);
+
+            client.joinRoom(request.getChallengeId() + "");
+
+            student.setSocketId(client.getSessionId());
+
+            studentInChallengeRepository.save(studentInChallenge);
+
+            studentRepository.save(student);
+        } catch (Exception e) {
+            client.sendEvent("joinError", "joinError");
             client.disconnect();
-            return new NotFoundException("Challenge not found");
-        });
-
-        client.joinRoom(request.getChallengeId() + "");
-
-        student.setSocketId(client.getSessionId());
-
-        studentRepository.save(student);
-
+        }
 
     }
 

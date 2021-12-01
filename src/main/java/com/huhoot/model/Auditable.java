@@ -1,6 +1,5 @@
 package com.huhoot.model;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -13,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Data
 @MappedSuperclass
@@ -28,11 +27,11 @@ public abstract class Auditable {
 
     @CreatedDate
     @Column(updatable = false)
-    private Date createdDate;
+    private Timestamp createdDate;
 
     @LastModifiedBy
     private String modifiedBy;
 
     @LastModifiedDate
-    private Date modifiedDate;
+    private Timestamp modifiedDate;
 }

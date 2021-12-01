@@ -1,4 +1,4 @@
-package com.huhoot.exception;
+package com.huhoot.enums;
 
 public enum AnswerOption {
 	SINGLE_SELECT, MULTI_SELECT;

@@ -2,11 +2,11 @@ package com.huhoot.service.impl;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.dto.StudentAnswerRequest;
-import com.huhoot.enums.AnswerTime;
 import com.huhoot.enums.Points;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.StudentPlayService;
+import io.netty.channel.ChannelException;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(challengeId, userDetails.getId());
 
-        StudentInChallenge studentInChallenge = optional.get();
+        StudentInChallenge studentInChallenge = optional.orElseThrow(()->new ChannelException("Challenge not available!"));
 
         studentInChallenge.setLogin(true);
 
@@ -59,6 +59,16 @@ public class StudentPlayServiceImpl implements StudentPlayService {
     @Override
     public int answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException {
 
+        // check is answered by query is any student answer have answer date not null
+        // not check yet
+
+        // check after skip question, student can send answer ... not checked
+
+        // the question answer option not match. if single select but multi answer @@
+
+        // multi correct answer, point may / for num of correct answer
+
+        // open challenge must validate num of correct answer > 0
 
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -79,10 +89,9 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         UUID adminSocketId = challenge.getAdmin().getSocketId();
 
 
-
         List<Answer> answers = answerRepository.findAllByIdIn(request.getAnswerIds());
 
-        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit()) : 0;
+        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit(),correctAnswers.size()) : 0;
 
         for (Answer ans : answers) {
             try {
@@ -102,25 +111,26 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         return totalScore;
     }
 
-    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, AnswerTime answerTimeLimit) {
+    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit, int numOfCorrectAnswer) {
 
         long diff = now.getTime() - askDate.getTime();
         long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
-        long timeLeft = answerTimeLimit.getValue() - seconds;
+        long timeLeft = answerTimeLimit - seconds;
 
         if (timeLeft < 0) {
             return 0;
         }
 
-        double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit.getValue();
+        double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit;
 
-        return 500 + (500 * timeLeftPercent) * point.getValue();
+        return (500 + (500 * timeLeftPercent) * point.getValue()) / numOfCorrectAnswer;
     }
 
 
     private boolean isAnswerCorrect(List<Integer> answerIds, List<Integer> correctAnswerIds) {
-
-        return answerIds.stream().allMatch(e -> correctAnswerIds.contains(e)) && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
+        final boolean a = answerIds.stream().allMatch(e -> correctAnswerIds.contains(e));
+        // final boolean b = correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
+        return  a && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
 
     }
 }

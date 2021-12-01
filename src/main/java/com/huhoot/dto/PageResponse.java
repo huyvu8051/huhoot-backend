@@ -10,6 +10,9 @@ public class PageResponse<T> {
     private List<T> list;
     private long totalElements;
 
+    public <T> PageResponse(List<T> list, long totalElements) {
+
+    }
 
     public PageResponse() {
         this.list = new ArrayList<>();

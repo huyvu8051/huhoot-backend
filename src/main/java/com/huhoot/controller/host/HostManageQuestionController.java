@@ -35,23 +35,24 @@ public class HostManageQuestionController {
     @GetMapping("/question")
     public ResponseEntity<PageResponse<QuestionResponse>> findAll(@RequestParam int challengeId,
                                                                   @RequestParam(defaultValue = "0") int page,
-                                                                  @RequestParam(defaultValue = "12") int size,
-                                                                  @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                                  @RequestParam(defaultValue = "DESC") String direction) {
+                                                                  @RequestParam(defaultValue = "12") int itemsPerPage,
+                                                                  @RequestParam(defaultValue = "ordinalNumber") String sortBy,
+                                                                  @RequestParam(defaultValue = "ASC") String direction) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
         PageResponse<QuestionResponse> response = hostService.findAllQuestionInChallenge(userDetails, challengeId, pageable);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/question")
-    public void add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NotFoundException, NotYourOwnException {
+    public ResponseEntity<QuestionResponse> add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NotFoundException, NotYourOwnException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        hostService.addOneQuestion(userDetails, request, checkOwnerChallenge);
+        return ResponseEntity.ok(hostService.addOneQuestion(userDetails, request, checkOwnerChallenge));
 
     }
 
@@ -63,8 +64,8 @@ public class HostManageQuestionController {
 
     }
 
-    @PutMapping("/question")
-    public void update(@Valid @RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    @PatchMapping("/question")
+    public void update(@RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateOneQuestion(userDetails, request, checkOwnerChallenge);

@@ -2,13 +2,21 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.*;
 import com.huhoot.dto.*;
+import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
+import com.huhoot.exception.ChallengeException;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
+import com.huhoot.mapper.AnswerMapper;
+import com.huhoot.mapper.ChallengeMapper;
+import com.huhoot.mapper.QuestionMapper;
+import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,20 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
+@AllArgsConstructor
 public class HostManageServiceImpl implements HostManageService {
     private final ChallengeRepository challengeRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-
-    public HostManageServiceImpl(ChallengeRepository challengeRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, StudentInChallengeRepository studentChallengeRepository, StudentRepository studentRepository, StudentAnswerRepository studentAnswerRepository) {
-        this.challengeRepository = challengeRepository;
-        this.questionRepository = questionRepository;
-        this.answerRepository = answerRepository;
-        this.studentChallengeRepository = studentChallengeRepository;
-        this.studentRepository = studentRepository;
-        this.studentAnswerRepository = studentAnswerRepository;
-    }
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
@@ -58,30 +59,25 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public void addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
+    public ChallengeResponse addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
 
-        Challenge challenge = ChallengeConverter.toEntity(request);
+        Challenge challenge = challengeMapper.toEntity(request);
         challenge.setAdmin(userDetails);
-        challenge.setCoverImage(request.getOriginalFileName());
-        challengeRepository.save(challenge);
+
+        Challenge saved = challengeRepository.save(challenge);
+
+        return challengeMapper.toDto(saved);
+
     }
 
+    private final ChallengeMapper challengeMapper;
 
     @Override
     public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Challenge> optional = challengeRepository.findOneById(request.getId());
-
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
-
         checker.accept(userDetails, challenge);
-
-        challenge.setTitle(request.getTitle());
-        challenge.setCoverImage(request.getOriginalFileName());
-        challenge.setRandomAnswer(request.isRandomAnswer());
-        challenge.setRandomQuest(request.isRandomQuest());
-        challenge.setChallengeStatus(request.getChallengeStatus());
-        challenge.setNonDeleted(request.isDeleted());
-
+        challengeMapper.update(request, challenge);
         challengeRepository.save(challenge);
 
     }
@@ -106,7 +102,7 @@ public class HostManageServiceImpl implements HostManageService {
     }
 
     @Override
-    public void addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+    public QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Challenge> optional = challengeRepository.findOneById(request.getChallengeId());
 
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
@@ -117,7 +113,9 @@ public class HostManageServiceImpl implements HostManageService {
 
         question.setChallenge(challenge);
 
-        questionRepository.save(question);
+        Question save = questionRepository.save(question);
+
+        return questionMapper.toDto(save);
 
     }
 
@@ -133,20 +131,17 @@ public class HostManageServiceImpl implements HostManageService {
 
     }
 
+    private final QuestionMapper questionMapper;
 
     @Override
     public void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
         Optional<Question> optional = questionRepository.findOneById(request.getId());
 
-        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
 
         checker.accept(userDetails, question.getChallenge());
 
-        question.setOrdinalNumber(request.getOrdinalNumber());
-        question.setQuestionContent(request.getQuestionContent());
-        question.setAnswerTimeLimit(request.getAnswerTimeLimit());
-        question.setPoint(request.getPoint());
-        question.setAnswerOption(request.getAnswerOption());
+        questionMapper.update(request, question);
 
         questionRepository.save(question);
 
@@ -165,13 +160,14 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId) {
-        List<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId);
-        return ListConverter.toListResponse(answers, AnswerConverter::toAnswerResponse);
+    public PageResponse<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId, Pageable pageable) {
+        Page<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId, pageable);
+
+        return ListConverter.toPageResponse(answers, AnswerConverter::toPublishAnswerResponse);
     }
 
     @Override
-    public AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException {
+    public PublishAnswer getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException {
         Optional<Answer> optional = answerRepository.findOneByIdAndQuestionChallengeAdminId(answerId, userDetails.getId());
 
         Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
@@ -185,9 +181,12 @@ public class HostManageServiceImpl implements HostManageService {
 
         Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
+        /*
         if (question.getAnswers().size() >= 4) {
             throw new Exception("Reach maximum answer");
         }
+        */
+
 
         Answer answer = AnswerConverter.toEntity(request);
 
@@ -197,15 +196,15 @@ public class HostManageServiceImpl implements HostManageService {
 
     }
 
+    private final AnswerMapper answerMapper;
+
     @Override
     public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException {
         Optional<Answer> optional = answerRepository.findOneById(request.getId());
 
         Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
-        answer.setOrdinalNumber(request.getOrdinalNumber());
-        answer.setAnswerContent(request.getAnswerContent());
-        answer.setCorrect(request.isCorrect());
+        answerMapper.updateAnswer(request, answer);
 
         answerRepository.save(answer);
     }
@@ -222,11 +221,12 @@ public class HostManageServiceImpl implements HostManageService {
 
     private final StudentInChallengeRepository studentChallengeRepository;
 
+    private final StudentInChallengeMapper studentInChallengeMapper;
+
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(challengeId, userDetails.getId(), pageable);
-
-        return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
+        Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId(), pageable);
+        return ListConverter.toPageResponse(page, e -> studentInChallengeMapper.toDto(e));
     }
 
     @Override
@@ -265,63 +265,97 @@ public class HostManageServiceImpl implements HostManageService {
 
 
     @Override
-    public void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request) {
-        List<StudentInChallenge> list = studentChallengeRepository.findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(request.getStudentIds(), request.getChallengeId());
+    public void updateStudentInChallenge(Admin userDetails, StudentInChallengeUpdateRequest request) throws NotFoundException {
 
-        for (StudentInChallenge studentChallenge : list) {
-            studentChallenge.setNonDeleted(false);
-        }
+        Optional<StudentInChallenge> optional = studentChallengeRepository.findOneByPrimaryKeyStudentIdAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(request.getStudentId(), request.getChallengeId(), userDetails.getId());
 
-        studentChallengeRepository.saveAll(list);
+        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new NotFoundException("Student in challenge not found"));
+
+        studentInChallengeMapper.update(request, studentInChallenge);
+
+        studentChallengeRepository.save(studentInChallenge);
 
     }
 
     @Override
-    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException {
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(id, userDetails.getId());
+    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
+        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
         Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
+        long t0 = System.nanoTime();
         this.createAllStudentAnswerInChallenge(challenge);
+        long t1 = System.nanoTime();
+        double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
+        log.info("Elapsed time =" + elapsedTimeInSecond + " seconds");
+
 
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
-        challengeRepository.save(challenge);
+        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
 
-        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsNonDeletedFalse(id, userDetails.getId());
+        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
         return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }
 
+
     private final StudentAnswerRepository studentAnswerRepository;
 
-    private void createAllStudentAnswerInChallenge(Challenge challenge) {
+    private void createAllStudentAnswerInChallenge(Challenge challenge) throws Exception {
 
 
-        List<Student> students = studentRepository.findAllByStudentChallengesPrimaryKeyChallengeId(challenge.getId());
+        List<Student> students = studentRepository.findAllStudentInChallenge(challenge.getId());
 
         List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
 
+        if(students.size() == 0 || questions.size() == 0) throw new ChallengeException("No student or question found in challenge id = " + challenge.getId());
+
+        List<StudentAnswer> studentAnswers = new ArrayList<>();
+
         for (Question quest : questions) {
             List<Answer> answers = quest.getAnswers();
+
+            validateQuestion(quest, answers);
+
             for (Answer ans : answers) {
                 for (Student stu : students) {
 
-                    StudentAnswer sa = new StudentAnswer();
-                    sa.setStudent(stu);
-                    sa.setAnswer(ans);
-                    sa.setChallenge(challenge);
-                    sa.setQuestion(quest);
+                    StudentAnswerId id = StudentAnswerId.builder()
+                            .student(stu)
+                            .answer(ans)
+                            .challenge(challenge)
+                            .question(quest)
+                            .build();
 
+                    studentAnswers.add(StudentAnswer.builder()
+                            .primaryKey(id)
+                            .score(0)
+                            .isCorrect(false)
+                            .answerDate(null)
+                            .build());
 
-                    sa.setScore(0);
-                    sa.setCorrect(false);
-                    sa.setAnswerDate(null);
-
-
-                    studentAnswerRepository.save(sa);
                 }
             }
         }
 
+
+        studentAnswerRepository.saveAll(studentAnswers);
+
+    }
+
+    private void validateQuestion(Question quest, List<Answer> answers) throws ChallengeException {
+        if(answers.size() == 0) throw new ChallengeException("No answer found for question id = " + quest.getId());
+
+        boolean noAnswerCorrect = answers.stream().noneMatch(e -> e.isCorrect());
+
+        if(noAnswerCorrect){
+            throw new ChallengeException("No any answer correct for question id = " + quest.getId());
+        }
+
+        if(quest.getAnswerOption().equals(AnswerOption.SINGLE_SELECT)){
+            long answerCount = answers.stream().filter(e -> e.isCorrect()).count();
+            if(answerCount > 1) throw new ChallengeException("SINGLE_SELECT: Ony one answer is correct for question id = " + quest.getId());
+
+        }
     }
 
 

@@ -1,6 +1,5 @@
 package com.huhoot.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data

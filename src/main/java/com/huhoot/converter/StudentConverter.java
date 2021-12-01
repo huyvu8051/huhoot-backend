@@ -15,9 +15,7 @@ public class StudentConverter {
         result.setId(entity.getId());
         result.setUsername(entity.getUsername());
         result.setFullName(entity.getFullName());
-        result.setNonLocked(entity.isNonLocked());
         result.setCreatedDate(entity.getCreatedDate());
-        result.setModifiedDate(entity.getModifiedDate());
         return result;
     }
 

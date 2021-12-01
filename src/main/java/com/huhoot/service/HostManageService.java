@@ -18,7 +18,7 @@ public interface HostManageService {
 
     PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable);
 
-    void addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException;
+    ChallengeResponse addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException;
 
     void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> biPredicate) throws NotYourOwnException, NotFoundException;
 
@@ -26,7 +26,7 @@ public interface HostManageService {
 
     PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable);
 
-    void addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotFoundException, NotYourOwnException;
+    QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotFoundException, NotYourOwnException;
 
     QuestionResponse getOneOwnQuestionDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException;
 
@@ -34,9 +34,9 @@ public interface HostManageService {
 
     void deleteManyQuestion(Admin userDetails, List<Integer> ids);
 
-    List<AnswerResponse> findAllAnswerByQuestionId(Admin userDetails, int questionId);
+    PageResponse<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId, Pageable pageable);
 
-    AnswerResponse getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException;
+    PublishAnswer getOneAnswerDetailsById(Admin userDetails, int answerId) throws NotFoundException;
 
     void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws Exception;
 
@@ -50,10 +50,10 @@ public interface HostManageService {
 
     List<StudentChallengeAddError> addManyStudentInChallenge(Admin userDetails, StudentInChallengeAddRequest request) throws NotFoundException;
 
-    void deleteManyStudentInChallenge(Admin userDetails, StudentInChallengeDeleteRequest request);
+    void updateStudentInChallenge(Admin userDetails, StudentInChallengeUpdateRequest request) throws NotFoundException;
 
 
-    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws NotFoundException;
+    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws Exception;
 
 
 }

@@ -12,12 +12,11 @@ public class StudentInChallengeConverter {
         Student student = entity.getStudent();
 
         response.setStudentId(student.getId());
-        response.setChallengeId(entity.getChallenge().getId());
         response.setStudentUsername(student.getUsername());
-        response.setStudentFullname(student.getFullName());
-        response.setLogin(entity.isLogin());
-        response.setKicked(entity.isKicked());
-        response.setOnline(entity.isOnline());
+        response.setStudentFullName(student.getFullName());
+        response.setIsLogin(entity.isLogin());
+        response.setIsKicked(entity.isKicked());
+        response.setIsOnline(entity.isOnline());
         return response;
     }
 }

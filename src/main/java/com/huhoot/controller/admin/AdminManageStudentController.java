@@ -27,12 +27,11 @@ public class AdminManageStudentController {
 
     @GetMapping("/student")
     public ResponseEntity<PageResponse<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "12") int size,
+                                                                @RequestParam(defaultValue = "12") int itemsPerPage,
                                                                 @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                                @RequestParam(defaultValue = "DESC") String direction,
-                                                                @RequestParam(defaultValue = "true") boolean isNonLocked) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.findAllStudentAccount(isNonLocked, pageable));
+                                                                @RequestParam(defaultValue = "DESC") String direction) {
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
+        return ResponseEntity.ok(adminService.findAllStudentAccount(pageable));
     }
 
     @GetMapping("/student/details")

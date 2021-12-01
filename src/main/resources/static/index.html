@@ -27,7 +27,7 @@
 <script>
     const challengeId = 219;
 
-    const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJleHAiOjE2Mzc5NjI0OTgsImlhdCI6MTYzNzYwMjQ5OH0.h-rAtJ9w2iZ6VnraXtDG3yHDTuNEyWgAJe3548vCKCU";
+    const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEiLCJleHAiOjE2MzgzNDM0MTksImlhdCI6MTYzNzk4MzQxOX0.-yozFoew_kEyF5xADfOVbZwiCs4_9qlfF5hc7QNWuWs";
 
     let numberStudentInChallenge = 0;
 
@@ -70,11 +70,11 @@
 
     // handle publish question event
     socket.on("publishQuestion", (data) => {
-        const question = data.id + ":" + data.ordinalNumber + " Ask date: " + data.askDate + "<br/> <img height='200px' src='" + data.questionContent + "'/> <br/>" + data.answerTimeLimit + " " + data.point + " " + data.answerOption;
+        const question = data.question.id + ":" + data.question.ordinalNumber + " Ask date: " + data.question.askDate + "<br/> <img height='200px' src='" + data.question.questionContent + "'/> <br/>" + data.question.answerTimeLimit + " " + data.question.point + " " + data.question.answerOption;
         document.getElementById("question").innerHTML = question;
         let answersText = "";
         let answers = [];
-        data.publishAnswerResponses.forEach(e => {
+        data.answers.forEach(e => {
             answersText += "<button class='answer' data-id='" + e.id + "'>" + e.id + ":" + e.ordinalNumber + ". " + e.answerContent + "</button>";
         });
         document.getElementById("answers").innerHTML = answersText;
@@ -86,7 +86,7 @@
 
         questionId = data.id;
 
-        countdown(data.answerTimeLimit, data.id, data.askDate)
+        countdown(data.question.answerTimeLimit, data.question.id, data.question.askDate)
         console.clear();
     });
 
@@ -181,7 +181,7 @@
 
     // stop interval
     function myStopFunction() {
-        clearInterval(myVar);
+
     }
 
 

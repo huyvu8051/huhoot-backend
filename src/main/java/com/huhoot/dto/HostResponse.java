@@ -2,7 +2,6 @@ package com.huhoot.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.*;
 import java.util.Date;
 
 @Data
