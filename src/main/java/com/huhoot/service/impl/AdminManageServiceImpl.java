@@ -5,8 +5,9 @@ import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
-import com.huhoot.exception.StudentAddException;
+import com.huhoot.enums.Role;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.mapper.AdminMapper;
 import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
@@ -21,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,14 +48,18 @@ public class AdminManageServiceImpl implements AdminManageService {
 
     private final AnswerRepository answerRepository;
 
+    private final AdminMapper adminMapper;
+
 
     @Override
     public PageResponse<HostResponse> findAllHostAccount(Pageable pageable) {
 
         Page<Admin> admins = adminRepository.findAll(pageable);
 
-        return ListConverter.toPageResponse(admins, AdminConverter::toHostResponse);
+        return listConverter.toPageResponse(admins, e -> adminMapper.toDto(e));
     }
+
+    private final ListConverter listConverter;
 
     @Override
     public HostResponse getOneHostAccountDetailsById(int id) {
@@ -66,17 +72,25 @@ public class AdminManageServiceImpl implements AdminManageService {
 
         Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
 
-        return ListConverter.toPageResponse(entities, AdminConverter::toHostResponse);
+        return listConverter.toPageResponse(entities, AdminConverter::toHostResponse);
     }
 
 
     @Override
-    public void updateHostAccount(@Valid HostUpdateRequest hostDTO) {
-        Optional<Admin> optional = adminRepository.findOneById(hostDTO.getId());
-        Admin host = optional.get();
-        String hashedPassword = passwordEncoder.encode(hostDTO.getPassword());
-        host.setPassword(hashedPassword);
-        host.setNonLocked(hostDTO.isNonLocked());
+    public void updateHostAccount(@Valid HostUpdateRequest request) throws UsernameExistedException {
+
+        Optional<Admin> optional = adminRepository.findOneById(request.getId());
+
+        Admin host = optional.orElseThrow(() -> new UsernameNotFoundException("Username with id: " + request.getId() + " not found"));
+
+        if (!request.getUsername().equals(host.getUsername())) {
+            Optional<Admin> duplicate = adminRepository.findOneByUsername(request.getUsername());
+            if (duplicate.isPresent() && duplicate.get().getId() != request.getId())
+                throw new UsernameExistedException("Username existed!");
+        }
+
+        adminMapper.update(request, host);
+
         adminRepository.save(host);
 
     }
@@ -122,7 +136,7 @@ public class AdminManageServiceImpl implements AdminManageService {
             throw new UsernameExistedException("Username existed!");
         }
 
-        String hashedPassword = passwordEncoder.encode(addRequest.getPassword());
+        String hashedPassword = passwordEncoder.encode("password");
         Admin host = new Admin(formattedUsername, hashedPassword);
         adminRepository.save(host);
     }
@@ -153,7 +167,7 @@ public class AdminManageServiceImpl implements AdminManageService {
 
         Page<Student> all = studentRepository.findAll(pageable);
 
-        return ListConverter.toPageResponse(all, e -> studentMapper.toDto(e));
+        return listConverter.toPageResponse(all, e -> studentMapper.toDto(e));
 
     }
 
@@ -169,7 +183,7 @@ public class AdminManageServiceImpl implements AdminManageService {
     @Override
     public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, boolean isNonLocked, Pageable pageable) {
         Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCaseAndIsNonLocked(username, isNonLocked, pageable);
-        return ListConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
+        return listConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
     }
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
@@ -226,7 +240,7 @@ public class AdminManageServiceImpl implements AdminManageService {
 
         Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
 
-        if (duplicate.isPresent()) {
+        if (duplicate.isPresent() && !duplicate.get().getUsername().equals(request.getUsername())) {
             throw new UsernameExistedException("Username existed!");
         }
 
@@ -234,7 +248,7 @@ public class AdminManageServiceImpl implements AdminManageService {
 
         Student entity = optional.orElseThrow(() -> new NotFoundException("Student not found"));
 
-       studentMapper.update(request, entity);
+        studentMapper.update(request, entity);
 
         studentRepository.save(entity);
     }
@@ -255,17 +269,19 @@ public class AdminManageServiceImpl implements AdminManageService {
     @Override
     public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAll(pageable);
-        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
     public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
-        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
     public void addStudentAccount(StudentAddRequest request) throws Exception {
+
+        request.setUsername(request.getUsername().trim());
 
         Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
 
@@ -280,7 +296,23 @@ public class AdminManageServiceImpl implements AdminManageService {
         studentRepository.save(student);
 
 
+    }
 
+    @Override
+    public void addHostAccount(HostAddRequest request) throws UsernameExistedException {
+        request.setUsername(request.getUsername().trim());
+
+        Optional<Admin> duplicate = adminRepository.findOneByUsername(request.getUsername());
+        if (duplicate.isPresent()) throw new UsernameExistedException("Username existed!");
+
+
+        Admin host = adminMapper.toEntity(request);
+
+        host.setPassword(passwordEncoder.encode("password"));
+
+        host.setRole(Role.HOST);
+
+        adminRepository.save(host);
     }
 
 }

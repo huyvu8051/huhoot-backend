@@ -14,7 +14,6 @@ public class StudentAddRequest {
     @NotNull
     @NotEmpty
     @NotBlank
-    @Size(min = 5, max = 10)
     @Pattern(regexp = "^\\d{10}$")
     private String username;
 

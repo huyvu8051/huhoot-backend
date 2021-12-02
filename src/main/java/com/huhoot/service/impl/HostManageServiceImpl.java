@@ -33,11 +33,13 @@ public class HostManageServiceImpl implements HostManageService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
+    private final ListConverter listConverter;
+
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByAdminId(userDetails.getId(), pageable);
 
-        return ListConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
+        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class HostManageServiceImpl implements HostManageService {
     @Override
     public PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> result = challengeRepository.findAllByTitleContainingIgnoreCaseAndAdminId(title, userDetails.getId(), pageable);
-        return ListConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
+        return listConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
     }
 
 
@@ -98,7 +100,7 @@ public class HostManageServiceImpl implements HostManageService {
     @Override
     public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
         Page<Question> questions = questionRepository.findAllByChallengeIdAndChallengeAdminId(challengeId, userDetails.getId(), pageable);
-        return ListConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
+        return listConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
     }
 
     @Override
@@ -163,7 +165,7 @@ public class HostManageServiceImpl implements HostManageService {
     public PageResponse<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId, Pageable pageable) {
         Page<Answer> answers = answerRepository.findAllByQuestionChallengeAdminIdAndQuestionId(userDetails.getId(), questionId, pageable);
 
-        return ListConverter.toPageResponse(answers, AnswerConverter::toPublishAnswerResponse);
+        return listConverter.toPageResponse(answers, AnswerConverter::toPublishAnswerResponse);
     }
 
     @Override
@@ -180,12 +182,6 @@ public class HostManageServiceImpl implements HostManageService {
         Optional<Question> optional = questionRepository.findOneById(request.getQuestionId());
 
         Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
-
-        /*
-        if (question.getAnswers().size() >= 4) {
-            throw new Exception("Reach maximum answer");
-        }
-        */
 
 
         Answer answer = AnswerConverter.toEntity(request);
@@ -226,13 +222,13 @@ public class HostManageServiceImpl implements HostManageService {
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
         Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId(), pageable);
-        return ListConverter.toPageResponse(page, e -> studentInChallengeMapper.toDto(e));
+        return listConverter.toPageResponse(page, e -> studentInChallengeMapper.toDto(e));
     }
 
     @Override
     public PageResponse<StudentInChallengeResponse> searchStudentInChallengeByTitle(Admin userDetails, String studentUsername, int challengeId, Pageable pageable) {
         Page<StudentInChallenge> page = studentChallengeRepository.findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(studentUsername, challengeId, pageable);
-        return ListConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
+        return listConverter.toPageResponse(page, StudentInChallengeConverter::toStudentChallengeResponse);
     }
 
     private final StudentRepository studentRepository;
@@ -293,10 +289,9 @@ public class HostManageServiceImpl implements HostManageService {
         challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
 
         List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
-        return ListConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
+        return listConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }
-
 
     private final StudentAnswerRepository studentAnswerRepository;
 

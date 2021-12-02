@@ -10,7 +10,7 @@ public class AdminConverter {
         HostResponse dto = new HostResponse();
         dto.setId(entity.getId());
         dto.setUsername(entity.getUsername());
-        dto.setNonLocked(entity.isNonLocked());
+        dto.setIsNonLocked(entity.isNonLocked());
         dto.setCreatedDate(entity.getCreatedDate());
         dto.setModifiedDate(entity.getModifiedDate());
         return dto;

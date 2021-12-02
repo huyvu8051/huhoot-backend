@@ -8,8 +8,11 @@ import java.util.Date;
 public class HostResponse {
     private int id;
     private String username;
-    private boolean isNonLocked;
+    private Boolean isNonLocked;
+
     private Date createdDate;
+    private String createdBy;
     private Date modifiedDate;
+    private String modifiedBy;
 
 }

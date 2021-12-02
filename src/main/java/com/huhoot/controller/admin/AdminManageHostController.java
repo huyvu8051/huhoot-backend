@@ -1,7 +1,9 @@
 package com.huhoot.controller.admin;
 
 import com.huhoot.dto.*;
+import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.service.AdminManageService;
+import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,21 +16,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("admin")
+@AllArgsConstructor
 public class AdminManageHostController {
 
     private final AdminManageService adminService;
 
-    public AdminManageHostController(AdminManageService adminService) {
-        this.adminService = adminService;
-    }
 
     @GetMapping("/host")
-    public ResponseEntity<PageResponse<HostResponse>> getAll(@RequestParam(defaultValue = "0") int page,
-                                                             @RequestParam(defaultValue = "12") int size,
+    public ResponseEntity<PageResponse<HostResponse>> getAll(@RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "12") int itemsPerPage,
                                                              @RequestParam(defaultValue = "createdDate") String sortBy,
                                                              @RequestParam(defaultValue = "DESC") String direction) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
 
         return ResponseEntity.ok(adminService.findAllHostAccount(pageable));
 
@@ -54,15 +54,21 @@ public class AdminManageHostController {
 
     }
 
-    @PostMapping("/host")
+    @PostMapping("/host2")
     public ResponseEntity<List<HostAddErrorResponse>> addMany(@RequestBody List<HostAddRequest> request) {
 
         return ResponseEntity.ok(adminService.addManyHostAccount(request));
 
     }
+ @PostMapping("/host")
+    public void add(@Valid @RequestBody HostAddRequest request) throws UsernameExistedException {
 
-    @PutMapping("/host")
-    public void update(@Valid @RequestBody HostUpdateRequest request) {
+       adminService.addHostAccount(request);
+
+    }
+
+    @PatchMapping("/host")
+    public void update(@Valid @RequestBody HostUpdateRequest request) throws UsernameExistedException {
 
         adminService.updateHostAccount(request);
     }

@@ -3,6 +3,7 @@ package com.huhoot.service.impl;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.converter.ListConverter;
+import com.huhoot.converter.ListConverterImpl;
 import com.huhoot.converter.StudentInChallengeConverter;
 import com.huhoot.dto.*;
 import com.huhoot.enums.ChallengeStatus;
@@ -32,13 +33,13 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     private final StudentInChallengeRepository studentInChallengeRepository;
     private final ChallengeRepository challengeRepository;
     private final SocketIOServer socketIOServer;
-
+    private final ListConverter listConverter;
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
         List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsLoginTrue(challengeId, userDetails.getId());
 
-        return ListConverter.toListResponse(studentInChallenges, StudentInChallengeConverter::toStudentChallengeResponse);
+        return listConverter.toListResponse(studentInChallenges, StudentInChallengeConverter::toStudentChallengeResponse);
 
     }
 
@@ -118,7 +119,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                 .build());
     }
 
-
     /**
      * @param challengeId {@link Challenge} id
      * @param adminId     {@link Admin} id
@@ -135,7 +135,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
             studentScoreResponse.setRank(rankNum++);
         }
 
-        return ListConverter.toPageResponse(response);
+        return listConverter.toPageResponse(response);
     }
 
     /**

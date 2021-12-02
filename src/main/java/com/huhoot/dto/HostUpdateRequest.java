@@ -10,10 +10,6 @@ import javax.validation.constraints.Size;
 @Data
 public class HostUpdateRequest {
     private int id;
-    @NotNull
-    @NotEmpty
-    @NotBlank
-    @Size(min = 5, max = 15)
-    private String password;
-    private boolean isNonLocked;
+    private String username;
+    private Boolean isNonLocked;
 }

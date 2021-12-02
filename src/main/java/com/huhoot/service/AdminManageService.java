@@ -13,7 +13,7 @@ import java.util.List;
 public interface AdminManageService {
     PageResponse<HostResponse> findAllHostAccount(Pageable pageable);
 
-    void updateHostAccount(@Valid HostUpdateRequest hostDTO);
+    void updateHostAccount(@Valid HostUpdateRequest hostDTO) throws UsernameExistedException;
 
     /**
      * Lock account, account cannot log in.
@@ -98,4 +98,6 @@ public interface AdminManageService {
     PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable);
 
     void addStudentAccount(StudentAddRequest request) throws Exception;
+
+    void addHostAccount(HostAddRequest request) throws UsernameExistedException;
 }

@@ -41,9 +41,10 @@ public class DataLoader implements ApplicationRunner {
         // start time
         long t0 = System.nanoTime();
 
-        Admin admin2 = adminRepository.findOneByUsername("admin").get();
+        Optional<Admin> op = adminRepository.findOneByUsername("admin");
 
-        if (admin2 == null) {
+        if (!op.isPresent()) {
+
 
             /*Admin adm = Admin.builder()
                     .username("admin")
