@@ -1,11 +1,13 @@
 package com.huhoot.service.impl;
 
 import com.corundumstudio.socketio.SocketIOServer;
+import com.huhoot.dto.SendAnswerResponse;
 import com.huhoot.dto.StudentAnswerRequest;
 import com.huhoot.enums.Points;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.StudentPlayService;
+import com.huhoot.utils.EncryptUtil;
 import io.netty.channel.ChannelException;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +41,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(challengeId, userDetails.getId());
 
-        StudentInChallenge studentInChallenge = optional.orElseThrow(()->new ChannelException("Challenge not available!"));
+        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new ChannelException("Challenge not available!"));
 
         studentInChallenge.setLogin(true);
 
@@ -57,7 +59,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
     private final ChallengeRepository challengeRepository;
 
     @Override
-    public int answer(StudentAnswerRequest request, Student userDetails) throws NotFoundException {
+    public SendAnswerResponse answer(StudentAnswerRequest request, Student userDetails) throws Exception {
 
         // check is answered by query is any student answer have answer date not null
         // not check yet
@@ -83,6 +85,8 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         // find question with askDate not null help prevent hacker try to get correct answer
         // they only can get question if it has been published
+
+
         Optional<Question> optional = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId());
         Question quest = optional.orElseThrow(() -> new NotFoundException("Question not found"));
 
@@ -91,7 +95,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         List<Answer> answers = answerRepository.findAllByIdIn(request.getAnswerIds());
 
-        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit(),correctAnswers.size()) : 0;
+        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit(), correctAnswers.size()) : 0;
 
         for (Answer ans : answers) {
             try {
@@ -106,9 +110,22 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
 
-        int totalScore = studentAnswerRepository.getTotalPointInChallenge(request.getChallengeId(), userDetails.getId());
+        int totalPoint = studentAnswerRepository.getTotalPointInChallenge(request.getChallengeId(), userDetails.getId());
 
-        return totalScore;
+
+
+        // response encrypt message
+
+        byte[] byteKey = quest.getByteKey();
+
+        String isAnswerCorrectEncrypted = EncryptUtil.encrypt(isAnswersCorrect + "", byteKey);
+        String totalPointEncrypted = EncryptUtil.encrypt(totalPoint + "", byteKey);
+
+        return SendAnswerResponse.builder()
+                .isCorrect(isAnswerCorrectEncrypted)
+                .totalPoint(totalPointEncrypted)
+                .build();
+
     }
 
     private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit, int numOfCorrectAnswer) {
@@ -130,7 +147,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
     private boolean isAnswerCorrect(List<Integer> answerIds, List<Integer> correctAnswerIds) {
         final boolean a = answerIds.stream().allMatch(e -> correctAnswerIds.contains(e));
         // final boolean b = correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
-        return  a && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
+        return a && correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
 
     }
 }

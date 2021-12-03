@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body("Not found");
     }
 
-    @ExceptionHandler({AccountNotFoundException.class, NotYourOwnException.class, ChallengeException.class, StudentAddException.class, UsernameExistedException.class})
+    @ExceptionHandler({AccountNotFoundException.class, NotYourOwnException.class, ChallengeException.class, StudentAddException.class, UsernameExistedException.class, AccountException.class})
     public ResponseEntity<String> handleServiceException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }

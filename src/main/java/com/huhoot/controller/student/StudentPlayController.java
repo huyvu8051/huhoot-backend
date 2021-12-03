@@ -1,5 +1,6 @@
 package com.huhoot.controller.student;
 
+import com.huhoot.dto.SendAnswerResponse;
 import com.huhoot.dto.StudentAnswerRequest;
 import com.huhoot.model.Student;
 import com.huhoot.service.StudentPlayService;
@@ -31,7 +32,7 @@ public class StudentPlayController {
     }
 
     @PostMapping("/sendAnswer")
-    public ResponseEntity<Integer> sendAnswer(@RequestBody StudentAnswerRequest request) throws NotFoundException {
+    public ResponseEntity<SendAnswerResponse> sendAnswer(@RequestBody StudentAnswerRequest request) throws Exception {
 
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

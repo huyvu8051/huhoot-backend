@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
@@ -23,7 +24,8 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
     @Query("SELECT SUM(m.score) " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId and m.primaryKey.student.id = :studentId")
-    int getTotalPointInChallenge(int challengeId, int studentId);
+    int getTotalPointInChallenge(@Param("challengeId")int challengeId,
+                                 @Param("studentId") int studentId);
 
 
     /**
@@ -38,7 +40,9 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
             "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
             "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName " +
             "ORDER BY SUM(m.score) DESC")
-    Page<StudentScoreResponse> findTopStudent(int challengeId, int adminId, Pageable pageable);
+    Page<StudentScoreResponse> findTopStudent(@Param("challengeId")int challengeId,
+                                              @Param("adminId")int adminId,
+                                              Pageable pageable);
 
 
     /**
@@ -54,7 +58,8 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
             "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.question.id ")
-    List<AnswerStatisticsResponse> findStatisticsByQuestionId(int questionId, int hostId);
+    List<AnswerStatisticsResponse> findStatisticsByQuestionId(@Param("questionId")int questionId,
+                                                              @Param("hostId") int hostId);
 
     /**
      * A method for update student answer
@@ -71,6 +76,10 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
     @Query("UPDATE StudentAnswer s " +
             "SET s.score = :point, s.isCorrect = :isAnswersCorrect, s.answerDate = :now " +
             "WHERE s.primaryKey.answer.id = :answerId AND s.primaryKey.student.id = :studentId")
-    void updateAnswer(double point, boolean isAnswersCorrect, Timestamp now, int answerId, int studentId);
+    void updateAnswer(@Param("point")double point,
+                      @Param("isAnswersCorrect") boolean isAnswersCorrect,
+                      @Param("now") Timestamp now,
+                      @Param("answerId")int answerId,
+                      @Param("studentId") int studentId);
 }
 //

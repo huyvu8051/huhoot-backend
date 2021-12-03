@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     @Query("SELECT a.id " +
             "FROM Answer a " +
             "WHERE a.question.id = :questionId AND a.isCorrect = TRUE")
-    List<Integer> findAllCorrectAnswerIds(int questionId);
+    List<Integer> findAllCorrectAnswerIds(@Param("questionId") int questionId);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
@@ -36,12 +37,12 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id,n.ordinalNumber, n.answerContent) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
-    List<PublishAnswer> findAllPublishAnswerByQuestionId(int questionId);
+    List<PublishAnswer> findAllPublishAnswerByQuestionId(@Param("questionId") int questionId);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
      * @return List of {@link PublishAnswer}
      */
     @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id, n.ordinalNumber, n.answerContent,n.isCorrect) FROM Answer n WHERE n.question.id = :questionId")
-    List<PublishAnswer> findAllAnswerByQuestionIdAndAdminId(int questionId);
+    List<PublishAnswer> findAllAnswerByQuestionIdAndAdminId(@Param("questionId") int questionId);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
@@ -34,7 +35,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT new com.huhoot.dto.QuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.askDate, n.isNonDeleted) " +
             "FROM Question n " +
             "WHERE n.challenge.id = :challengeId AND n.challenge.admin.id = :adminId")
-    List<QuestionResponse> findAllQuestionResponse(int challengeId, int adminId);
+    List<QuestionResponse> findAllQuestionResponse(@Param("challengeId") int challengeId, @Param("adminId") int adminId);
 
     /**
      * @param questionId question id
@@ -44,7 +45,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT new com.huhoot.dto.PublishQuestion(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id, n.challenge.questions.size) " +
             "FROM Question n " +
             "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
-    Optional<PublishQuestion> findAllPublishQuestion(int questionId, int adminId);
+    Optional<PublishQuestion> findAllPublishQuestion(@Param("questionId") int questionId, @Param("adminId") int adminId);
 
 
     /**
@@ -54,13 +55,15 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Question q " +
-            "SET q.askDate = :askDate " +
+            "SET q.askDate = :askDate, q.byteKey = :byteKey " +
             "WHERE q.id = :questionId")
-    void updateAskDateByQuestionId(Timestamp askDate, int questionId);
+    void updateAskDateAndEncryptKeyByQuestionId(@Param("askDate") Timestamp askDate,
+                                                @Param("byteKey") byte[] byteKey,
+                                                @Param("questionId") int questionId);
 
 
     @Query("SELECT n.id FROM Question n WHERE n.challenge.id = :challengeId")
-    List<Integer> findAllIdsByChallengeId(int challengeId);
+    List<Integer> findAllIdsByChallengeId(@Param("challengeId") int challengeId);
 
 
     Optional<Question> findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId, int adminId);

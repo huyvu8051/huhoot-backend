@@ -3,7 +3,6 @@ package com.huhoot.service.impl;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.converter.ListConverterImpl;
 import com.huhoot.converter.StudentInChallengeConverter;
 import com.huhoot.dto.*;
 import com.huhoot.enums.ChallengeStatus;
@@ -13,9 +12,11 @@ import com.huhoot.model.Question;
 import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostOrganizeChallengeService;
+import com.huhoot.utils.EncryptUtil;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -61,36 +62,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     }
 
 
-    /**
-     * Publish a question and answers to all clients in Room.
-     * Set publish time to question and update at db
-     *
-     * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
-     * @throws NotFoundException {@link PublishQuestion} not found
-     */
-    @Override
-    public void publishQuestion(int questionId, int adminId) throws NotFoundException {
-
-        Optional<PublishQuestion> optional = questionRepository.findAllPublishQuestion(questionId, adminId);
-        PublishQuestion question = optional.orElseThrow(() -> new NotFoundException("PublishQuestionResponse not found"));
-
-        List<PublishAnswer> publishAnswers = answerRepository.findAllPublishAnswerByQuestionId(questionId);
-
-
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        question.setAskDate(now);
-
-        socketIOServer.getRoomOperations(question.getChallengeId() + "")
-                .sendEvent("publishQuestion", PublishQuestionResponse.builder()
-                        .question(question)
-                        .answers(publishAnswers)
-                        .build());
-
-        questionRepository.updateAskDateByQuestionId(now, questionId);
-    }
-
-
     private final AnswerRepository answerRepository;
 
     private final StudentAnswerRepository studentAnswerRepository;
@@ -106,16 +77,27 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     public void showCorrectAnswer(int questionId, int adminId) throws NotFoundException {
 
         Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
-        Integer challengeId = optional.orElseThrow(() -> new NotFoundException("Question not found"));
+        Integer challengeId = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+        Optional<Question> optionalQuestion = questionRepository.findOneById(questionId);
+
+        Question question = optionalQuestion.orElseThrow(() -> new NotFoundException("Question not found"));
 
         List<PublishAnswer> answerResponses = answerRepository.findAllAnswerByQuestionIdAndAdminId(questionId);
 
         List<AnswerStatisticsResponse> answerStatistics = this.getAnswerStatistics(questionId, adminId);
 
+       // question.setAskDate(null);
+        // questionRepository.save(question);
+
+        // gen key for js size
+        byte[] byteKey = question.getByteKey();
+        String keyForJS = EncryptUtil.genKeyForJsSide(byteKey);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
                 .answers(answerResponses)
                 .answerStatistics(answerStatistics)
+                .encryptKey(keyForJS)
                 .build());
     }
 
@@ -222,7 +204,9 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .answers(publishAnswers)
                         .build());
 
-        // questionRepository.updateAskDateByQuestionId(now, question.getId());
+        byte[] bytes = EncryptUtil.generateRandomKeyStore();
+
+        questionRepository.updateAskDateAndEncryptKeyByQuestionId(now, bytes, question.getId());
 
 
     }

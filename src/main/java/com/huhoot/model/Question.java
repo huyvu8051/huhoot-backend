@@ -39,6 +39,8 @@ public class Question extends Auditable {
 
     private boolean isNonDeleted;
 
+    private byte[] byteKey;
+
     @ManyToOne
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;

@@ -21,15 +21,7 @@ public interface HostOrganizeChallengeService {
      */
     void startChallenge(int challengeId, int adminId);
 
-    /**
-     * Publish a question and answers to all clients in Room.
-     * Set publish time to question and update at db
-     *
-     * @param questionId question id
-     * @param adminId    admin id
-     * @throws NotFoundException challenge not found
-     */
-    void publishQuestion(int questionId, int adminId) throws NotFoundException;
+
 
     /**
      * Sent all Answer to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}

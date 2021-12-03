@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -31,7 +32,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
      * @param adminId     {@link com.huhoot.model.Admin} id
      * @return Challenge
      */
-    Optional<Challenge> findOneByIdAndAdminId(int challengeId, int adminId);
+    Optional<Challenge> findOneByIdAndAdminId( int challengeId, int adminId);
 
     /**
      * Update challenge status
@@ -45,7 +46,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
     @Query("UPDATE Challenge c " +
             "SET c.ChallengeStatus = :challengeStatus " +
             "WHERE c.id =:challengeId AND c.admin.id = :adminId ")
-    void updateChallengeStatusByIdAndAdminId(ChallengeStatus challengeStatus, int challengeId, int adminId);
+    void updateChallengeStatusByIdAndAdminId(@Param("challengeStatus") ChallengeStatus challengeStatus,
+                                             @Param("challengeId") int challengeId,
+                                             @Param("adminId") int adminId);
 
 
     /**
@@ -56,10 +59,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
     @Query("SELECT n.challenge.id " +
             "FROM Question n " +
             "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
-    Optional<Integer> findOneByQuestionIdAndAdminId(int questionId, int adminId);
+    Optional<Integer> findOneByQuestionIdAndAdminId(@Param("questionId") int questionId,@Param("adminId") int adminId);
 
     @Query("SELECT n.questions.size " +
             "FROM Challenge n " +
             "WHERE  n.id = :challengeId")
-    int findCountQuestion(int challengeId);
+    int findCountQuestion(@Param("challengeId") int challengeId);
 }

@@ -11,4 +11,6 @@ public class CorrectAnswerResponse {
     private List<PublishAnswer> answers;
     private List<AnswerStatisticsResponse> answerStatistics;
 
+    private String encryptKey;
+
 }

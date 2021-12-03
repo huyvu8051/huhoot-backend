@@ -62,19 +62,6 @@ public class HostOrganizeChallengeController {
         hostOrganizeChallengeService.startChallenge(challengeId, userDetails.getId());
     }
 
-    /**
-     * Publish a question and answers to all clients in room
-     *
-     * @param questionId question id
-     * @throws NotFoundException not found
-     */
-    @GetMapping("/publishQuestion")
-    public void publishQuestion(@RequestParam int questionId) throws NotFoundException {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-
-        hostOrganizeChallengeService.publishQuestion(questionId, userDetails.getId());
-    }
 
     /**
      * Show correct answer
