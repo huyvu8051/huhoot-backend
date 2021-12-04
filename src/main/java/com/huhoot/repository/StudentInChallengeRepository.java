@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,9 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
     @Query("SELECT n " +
             "FROM StudentInChallenge n " +
             "WHERE n.primaryKey.student.id IN :studentIds AND n.primaryKey.challenge.id = :challengeId AND n.primaryKey.challenge.admin.id = :adminId")
-    List<StudentInChallenge> findAllByStudentIdInAndChallengeIdAndChallengeAdminId(List<Integer> studentIds, int challengeId, int adminId);
+    List<StudentInChallenge> findAllByStudentIdInAndChallengeIdAndChallengeAdminId(@Param("studentIds") List<Integer> studentIds,
+                                                                                   @Param("challengeId") int challengeId,
+                                                                                   @Param("adminId") int adminId);
 
     Optional<StudentInChallenge> findOneByPrimaryKeyStudentIdAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int studentId, int challengeId, int adminId);
 }
