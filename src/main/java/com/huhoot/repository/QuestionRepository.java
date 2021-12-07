@@ -55,7 +55,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Question q " +
-            "SET q.askDate = :askDate, q.byteKey = :byteKey " +
+            "SET q.askDate = :askDate, q.encryptKey = :byteKey " +
             "WHERE q.id = :questionId")
     void updateAskDateAndEncryptKeyByQuestionId(@Param("askDate") Timestamp askDate,
                                                 @Param("byteKey") byte[] byteKey,
@@ -67,4 +67,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
 
     Optional<Question> findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId, int adminId);
+
+    @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId AND n.askDate IS NOT NULL")
+    int findNumberOfPublishedQuestion(@Param("challengeId") int challengeId);
 }

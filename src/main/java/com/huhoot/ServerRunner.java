@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "159.223.38.181";
-    //private String host = "localhost";
+    //private String host = "159.223.38.181";
+    private String host = "localhost";
     private Integer port = 8082;
 
     @Bean

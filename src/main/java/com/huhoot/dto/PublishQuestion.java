@@ -30,6 +30,10 @@ public class PublishQuestion {
 
     private int totalQuestion;
 
+    private int questionOrder;
+
+    private boolean theLastQuestion;
+
     public PublishQuestion(int id, int ordinalNumber, String questionContent, String questionImage, int answerTimeLimit, Points point, AnswerOption answerOption, int challengeId,int totalQuestion) {
         this.id = id;
         this.ordinalNumber = ordinalNumber;

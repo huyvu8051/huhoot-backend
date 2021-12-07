@@ -16,7 +16,6 @@ import com.huhoot.utils.EncryptUtil;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -91,7 +90,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         // questionRepository.save(question);
 
         // gen key for js size
-        byte[] byteKey = question.getByteKey();
+        byte[] byteKey = question.getEncryptKey();
         String keyForJS = EncryptUtil.genKeyForJsSide(byteKey);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
@@ -180,33 +179,45 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     public void publishNextQuestion(int challengeId, int adminId) throws Exception {
         Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, adminId);
         Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
-        int countQuestion = challengeRepository.findCountQuestion(challengeId);
 
-        PublishQuestion publishQuestion = new PublishQuestion(question.getId(),
-                question.getOrdinalNumber(),
-                question.getQuestionContent(),
-                question.getQuestionImage(),
-                question.getAnswerTimeLimit(),
-                question.getPoint(),
-                question.getAnswerOption(),
-                challengeId, countQuestion);
+        int countQuestion = challengeRepository.findCountQuestion(challengeId);
+        int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
+
+        PublishQuestion publishQuest = PublishQuestion.builder()
+                .id(question.getId())
+                .ordinalNumber(question.getOrdinalNumber())
+                .questionContent(question.getQuestionContent())
+                .questionImage(question.getQuestionImage())
+                .answerTimeLimit(question.getAnswerTimeLimit())
+                .point(question.getPoint())
+                .answerOption(question.getAnswerOption())
+                .challengeId(challengeId)
+                .totalQuestion(countQuestion)
+                .questionOrder(questionOrder)
+                .theLastQuestion(countQuestion == questionOrder)
+                .build();
 
 
         List<PublishAnswer> publishAnswers = answerRepository.findAllPublishAnswerByQuestionId(question.getId());
 
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
-        publishQuestion.setAskDate(now);
+
+        // delay 6 sec
+        long sec = 6;
+        Timestamp later = new Timestamp(System.currentTimeMillis() + sec * 1000);
+        publishQuest.setAskDate(later);
 
         socketIOServer.getRoomOperations(challengeId + "")
                 .sendEvent("publishQuestion", PublishQuestionResponse.builder()
-                        .question(publishQuestion)
+                        .question(publishQuest)
                         .answers(publishAnswers)
                         .build());
 
-        byte[] bytes = EncryptUtil.generateRandomKeyStore();
 
-        questionRepository.updateAskDateAndEncryptKeyByQuestionId(now, bytes, question.getId());
+
+        byte[] bytes = EncryptUtil.generateRandomKeyStore();
+        questionRepository.updateAskDateAndEncryptKeyByQuestionId(later, bytes, question.getId());
 
 
     }

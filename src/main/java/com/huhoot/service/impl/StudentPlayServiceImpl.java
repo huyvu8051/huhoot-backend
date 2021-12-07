@@ -116,7 +116,7 @@ public class StudentPlayServiceImpl implements StudentPlayService {
 
         // response encrypt message
 
-        byte[] byteKey = quest.getByteKey();
+        byte[] byteKey = quest.getEncryptKey();
 
         String isAnswerCorrectEncrypted = EncryptUtil.encrypt(isAnswersCorrect + "", byteKey);
         String totalPointEncrypted = EncryptUtil.encrypt(totalPoint + "", byteKey);

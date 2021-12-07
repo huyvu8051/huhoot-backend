@@ -107,18 +107,14 @@ public class HostOrganizeChallengeController {
 
     /**
      * @param challengeId {@link com.huhoot.model.Challenge} id
-     * @param size        size
      * @return List of {@link StudentScoreResponse}
      * @throws NotFoundException not found
      */
     @GetMapping("/endChallenge")
-    public ResponseEntity<PageResponse<StudentScoreResponse>> endChallenge(@RequestParam int challengeId,
-                                                                   @RequestParam(defaultValue = "20") int size) throws NotFoundException {
+    public void endChallenge(@RequestParam int challengeId) throws NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
-        Pageable pageable = PageRequest.of(0, size);
-        return ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
 
