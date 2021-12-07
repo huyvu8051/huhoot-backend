@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class PublishQuestionResponse {
     private PublishQuestion question;
-    private List<PublishAnswer> answers;
+    private List<AnswerResultResponse> answers;
 }

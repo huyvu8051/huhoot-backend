@@ -82,11 +82,9 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         Question question = optionalQuestion.orElseThrow(() -> new NotFoundException("Question not found"));
 
-        List<PublishAnswer> answerResponses = answerRepository.findAllAnswerByQuestionIdAndAdminId(questionId);
+        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId, adminId);
 
-        List<AnswerStatisticsResponse> answerStatistics = this.getAnswerStatistics(questionId, adminId);
-
-       // question.setAskDate(null);
+        // question.setAskDate(null);
         // questionRepository.save(question);
 
         // gen key for js size
@@ -94,8 +92,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         String keyForJS = EncryptUtil.genKeyForJsSide(byteKey);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
-                .answers(answerResponses)
-                .answerStatistics(answerStatistics)
+                .answers(answerResult)
                 .encryptKey(keyForJS)
                 .build());
     }
@@ -125,7 +122,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      * @return list of answer contain number of student select
      */
     @Override
-    public List<AnswerStatisticsResponse> getAnswerStatistics(int questionId, int adminId) {
+    public List<AnswerResultResponse> getAnswerStatistics(int questionId, int adminId) {
         return studentAnswerRepository.findStatisticsByQuestionId(questionId, adminId);
     }
 
@@ -198,15 +195,14 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                 .build();
 
 
-        List<PublishAnswer> publishAnswers = answerRepository.findAllPublishAnswerByQuestionId(question.getId());
+        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
 
 
-        Timestamp now = new Timestamp(System.currentTimeMillis());
 
         // delay 6 sec
         long sec = 6;
-        Timestamp later = new Timestamp(System.currentTimeMillis() + sec * 1000);
-        publishQuest.setAskDate(later);
+        Timestamp askDate = new Timestamp(System.currentTimeMillis() + sec * 1000);
+        publishQuest.setAskDate(askDate);
 
         socketIOServer.getRoomOperations(challengeId + "")
                 .sendEvent("publishQuestion", PublishQuestionResponse.builder()
@@ -214,10 +210,9 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .answers(publishAnswers)
                         .build());
 
-
-
+        // update ask date and decryptKey
         byte[] bytes = EncryptUtil.generateRandomKeyStore();
-        questionRepository.updateAskDateAndEncryptKeyByQuestionId(later, bytes, question.getId());
+        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, bytes, question.getId());
 
 
     }

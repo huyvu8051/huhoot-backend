@@ -6,10 +6,8 @@ import com.huhoot.service.HostManageService;
 import com.huhoot.service.HostOrganizeChallengeService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -94,10 +92,10 @@ public class HostOrganizeChallengeController {
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
-     * @return List of {@link AnswerStatisticsResponse}
+     * @return List of {@link AnswerResultResponse}
      */
     @GetMapping("/getAnswerStatistics")
-    public ResponseEntity<List<AnswerStatisticsResponse>> getAnswerStatistics(@RequestParam int questionId) {
+    public ResponseEntity<List<AnswerResultResponse>> getAnswerStatistics(@RequestParam int questionId) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 

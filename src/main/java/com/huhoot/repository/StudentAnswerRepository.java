@@ -1,6 +1,6 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.AnswerStatisticsResponse;
+import com.huhoot.dto.AnswerResultResponse;
 import com.huhoot.dto.StudentScoreResponse;
 import com.huhoot.model.StudentAnswer;
 import org.springframework.data.domain.Page;
@@ -53,13 +53,26 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @param hostId     host id
      * @return List of answer contain number of student choose
      */
-    @Query("SELECT new com.huhoot.dto.AnswerStatisticsResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
+    @Query("SELECT new com.huhoot.dto.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
             "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.question.id ")
-    List<AnswerStatisticsResponse> findStatisticsByQuestionId(@Param("questionId")int questionId,
-                                                              @Param("hostId") int hostId);
+    List<AnswerResultResponse> findStatisticsByQuestionId(@Param("questionId")int questionId,
+                                                          @Param("hostId") int hostId);
+
+
+
+
+    @Query("SELECT new com.huhoot.dto.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
+            "FROM Answer m LEFT JOIN StudentAnswer n " +
+            "ON m.id = n.primaryKey.answer.id " +
+            "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
+            "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.isCorrect, m.question.id ")
+    List<AnswerResultResponse> findAnswerStatistics(@Param("questionId")int questionId,
+                                                    @Param("hostId") int hostId);
+
+
 
     /**
      * A method for update student answer

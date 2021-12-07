@@ -46,7 +46,7 @@ public interface HostOrganizeChallengeService {
      * @param adminId    {@link Admin} id
      * @return list of answer contain number of student select
      */
-    List<AnswerStatisticsResponse> getAnswerStatistics(int adminId, int questionId);
+    List<AnswerResultResponse> getAnswerStatistics(int adminId, int questionId);
 
     /**
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
