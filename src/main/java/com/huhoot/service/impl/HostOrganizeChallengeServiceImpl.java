@@ -174,7 +174,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public void publishNextQuestion(int challengeId, int adminId) throws Exception {
-        Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, adminId);
+            Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, adminId);
         Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
 
         int countQuestion = challengeRepository.findCountQuestion(challengeId);
@@ -199,10 +199,11 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
 
 
+
         // delay 6 sec
         long sec = 6;
         Timestamp askDate = new Timestamp(System.currentTimeMillis() + sec * 1000);
-        publishQuest.setAskDate(askDate);
+        publishQuest.setAskDate(askDate.getTime());
 
         socketIOServer.getRoomOperations(challengeId + "")
                 .sendEvent("publishQuestion", PublishQuestionResponse.builder()
@@ -210,11 +211,34 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .answers(publishAnswers)
                         .build());
 
+        challengeRepository.updateCurrentQuestionId(challengeId, question.getId());
+
         // update ask date and decryptKey
         byte[] bytes = EncryptUtil.generateRandomKeyStore();
         questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, bytes, question.getId());
 
 
+    }
+
+    @Override
+    public PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NotFoundException {
+
+        Optional<PublishQuestion> optional = challengeRepository.findCurrentPublishedQuestion(challengeId, adminId);
+
+        PublishQuestion question = optional.orElseThrow(() -> new NotFoundException("Question  not found"));
+
+        int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
+
+        question.setQuestionOrder(questionOrder);
+
+        question.setTheLastQuestion(question.getTotalQuestion() == question.getQuestionOrder());
+
+        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
+
+        return PublishQuestionResponse.builder()
+                .question(question)
+                .answers(publishAnswers)
+                .build();
     }
 
 

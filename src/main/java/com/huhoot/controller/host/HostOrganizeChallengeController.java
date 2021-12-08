@@ -87,7 +87,7 @@ public class HostOrganizeChallengeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
-        return  ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
+        return ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
     /**
@@ -137,6 +137,13 @@ public class HostOrganizeChallengeController {
         } catch (Exception e) {
             hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
         }
+    }
+
+    @GetMapping("/getCurrentQuestion")
+    public ResponseEntity<PublishQuestionResponse> getCurrentQuestion(@RequestParam int challengeId) throws Exception {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return ResponseEntity.ok(hostOrganizeChallengeService.getCurrentQuestion(challengeId, userDetails.getId()));
     }
 
 

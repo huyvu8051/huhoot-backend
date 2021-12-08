@@ -1,7 +1,9 @@
 package com.huhoot.repository;
 
+import com.huhoot.dto.PublishQuestion;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.model.Challenge;
+import com.huhoot.model.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,4 +67,28 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "FROM Challenge n " +
             "WHERE  n.id = :challengeId")
     int findCountQuestion(@Param("challengeId") int challengeId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Challenge n " +
+            "SET n.currentQuestionId = :questionId " +
+            "WHERE n.id = :challengeId")
+    void updateCurrentQuestionId(@Param("challengeId")int challengeId,
+                                 @Param("questionId") int currentQuestionId);
+
+
+    @Query("SELECT n.currentQuestionId " +
+            "FROM Challenge n " +
+            "WHERE n.id = :challengeId AND n.admin.id = :adminId")
+    Optional<Integer> findCurrentQuestionId(@Param("challengeId") int challengeId,
+                                            @Param("adminId") int adminId);
+
+
+    @Query("SELECT new com.huhoot.dto.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, m.answerTimeLimit, m.point, m.askDate, m.answerOption, m.challenge.id, m.challenge.questions.size) " +
+            "FROM Question m " +
+            "WHERE m.id IN (SELECT n.currentQuestionId FROM Challenge n WHERE n.id = :challengeId AND n.admin.id = :adminId)")
+    Optional<PublishQuestion> findCurrentPublishedQuestion(@Param("challengeId") int challengeId,
+                                                           @Param("adminId") int adminId);
+
+
 }

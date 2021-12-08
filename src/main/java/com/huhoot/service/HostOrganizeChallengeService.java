@@ -66,4 +66,6 @@ public interface HostOrganizeChallengeService {
     void kickStudent(List<Integer> studentIds, int challengeId, int adminId);
 
     void publishNextQuestion(int challengeId, int id) throws Exception;
+
+    PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NotFoundException;
 }

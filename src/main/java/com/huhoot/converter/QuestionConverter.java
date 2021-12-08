@@ -53,7 +53,7 @@ public class QuestionConverter {
         response.setAnswerTimeLimit(question.getAnswerTimeLimit());
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
-        response.setAskDate(question.getAskDate());
+        response.setAskDate(question.getAskDate().getTime());
 
         return response;
 
