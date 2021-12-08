@@ -1,5 +1,6 @@
 package com.huhoot.repository;
 
+import com.huhoot.dto.StudentInChallengeResponse;
 import com.huhoot.model.StudentInChallenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +14,6 @@ import java.util.Optional;
 public interface StudentInChallengeRepository extends JpaRepository<StudentInChallenge, Integer> {
 
     Page<StudentInChallenge> findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int challengeId, int id, Pageable pageable);
-
-    List<StudentInChallenge> findAllByPrimaryKeyStudentIdInAndPrimaryKeyChallengeId(List<Integer> studentIds, int challengeId);
 
     Page<StudentInChallenge> findAllByPrimaryKeyStudentUsernameContainingIgnoreCaseAndPrimaryKeyChallengeId(String studentUsername, int challengeId, Pageable pageable);
 
@@ -35,10 +34,31 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
      */
     @Query("SELECT n " +
             "FROM StudentInChallenge n " +
-            "WHERE n.primaryKey.student.id IN :studentIds AND n.primaryKey.challenge.id = :challengeId AND n.primaryKey.challenge.admin.id = :adminId")
+            "WHERE n.primaryKey.student.id IN :studentIds " +
+            "AND n.primaryKey.challenge.id = :challengeId " +
+            "AND n.primaryKey.challenge.admin.id = :adminId")
     List<StudentInChallenge> findAllByStudentIdInAndChallengeIdAndChallengeAdminId(@Param("studentIds") List<Integer> studentIds,
                                                                                    @Param("challengeId") int challengeId,
                                                                                    @Param("adminId") int adminId);
 
     Optional<StudentInChallenge> findOneByPrimaryKeyStudentIdAndPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(int studentId, int challengeId, int adminId);
+
+    @Query("SELECT n " +
+            "FROM StudentInChallenge n " +
+            "WHERE n.primaryKey.challenge.id = :challengeId " +
+            "AND n.primaryKey.student.id = :studentId " +
+            "AND n.isNonDeleted = TRUE " +
+            "AND n.isKicked = FALSE " +
+            "AND n.primaryKey.challenge.challengeStatus NOT IN (com.huhoot.enums.ChallengeStatus.BUILDING, com.huhoot.enums.ChallengeStatus.ENDED)")
+    Optional<StudentInChallenge> findOneByChallengeIdAndStudentIdAndAvailable(@Param("challengeId") int challengeId, @Param("studentId") int studentId);
+
+
+    @Query("SELECT new com.huhoot.dto.StudentInChallengeResponse(n.primaryKey.student.id, n.primaryKey.student.username, n.primaryKey.student.fullName, n.isLogin, n.isKicked, n.isOnline, n.createdBy, n.createdDate, n.modifiedBy, n.modifiedDate, n.isNonDeleted) " +
+            "FROM StudentInChallenge n " +
+            "WHERE n.primaryKey.challenge.id = :challengeId " +
+            "AND n.primaryKey.challenge.admin.id = :adminId " +
+            "AND n.isLogin = TRUE " +
+            "AND n.isNonDeleted = TRUE " +
+            "AND n.isKicked = FALSE")
+    List<StudentInChallengeResponse> findAllStudentIsLogin(@Param("challengeId") int challengeId, @Param("adminId") int adminId);
 }

@@ -29,7 +29,7 @@ public class Challenge extends Auditable {
 
     private boolean randomQuest;
 
-    private ChallengeStatus ChallengeStatus;
+    private ChallengeStatus challengeStatus;
 
     private Integer currentQuestionId;
 

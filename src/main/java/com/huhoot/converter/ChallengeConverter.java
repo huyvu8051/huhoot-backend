@@ -18,9 +18,14 @@ public class ChallengeConverter {
         response.setRandomQuest(entity.isRandomQuest());
         response.setChallengeStatus(entity.getChallengeStatus());
         response.setOwner(entity.getAdmin().getUsername());
-        response.setCreatedDate(entity.getCreatedDate());
+        if(entity.getCreatedDate() != null){
+            response.setCreatedDate(entity.getCreatedDate().getTime());
+        }
+        if(entity.getModifiedDate() != null){
+            response.setModifiedDate(entity.getModifiedDate().getTime());
+        }
         response.setCreatedBy(entity.getCreatedBy());
-        response.setModifiedDate(entity.getModifiedDate());
+
         response.setModifiedBy(entity.getModifiedBy());
         return response;
     }

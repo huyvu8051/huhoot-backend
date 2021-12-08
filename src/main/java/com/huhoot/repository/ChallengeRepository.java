@@ -4,6 +4,7 @@ import com.huhoot.dto.PublishQuestion;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
+import com.huhoot.model.StudentInChallenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,7 +47,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
     @Modifying
     @Transactional
     @Query("UPDATE Challenge c " +
-            "SET c.ChallengeStatus = :challengeStatus " +
+            "SET c.challengeStatus = :challengeStatus " +
             "WHERE c.id =:challengeId AND c.admin.id = :adminId ")
     void updateChallengeStatusByIdAndAdminId(@Param("challengeStatus") ChallengeStatus challengeStatus,
                                              @Param("challengeId") int challengeId,
@@ -91,4 +92,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
                                                            @Param("adminId") int adminId);
 
 
+    @Query("SELECT n.primaryKey.challenge " +
+            "FROM StudentInChallenge n " +
+            "WHERE n.primaryKey.student.id = :studentId AND n.primaryKey.challenge.isNonDeleted = TRUE AND n.primaryKey.challenge.challengeStatus <> com.huhoot.enums.ChallengeStatus.BUILDING")
+    List<Challenge> findAllByStudentIdAndIsAvailable(@Param("studentId") int studentId, Pageable pageable);
 }

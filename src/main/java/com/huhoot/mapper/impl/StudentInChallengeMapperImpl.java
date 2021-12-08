@@ -35,9 +35,9 @@ public class StudentInChallengeMapperImpl implements StudentInChallengeMapper {
         studentInChallengeResponse.setIsKicked(entity.isKicked());
         studentInChallengeResponse.setIsOnline(entity.isOnline());
         studentInChallengeResponse.setCreatedBy(entity.getCreatedBy());
-        studentInChallengeResponse.setCreatedDate(entity.getCreatedDate());
+        studentInChallengeResponse.setCreatedDate(entity.getCreatedDate().getTime());
         studentInChallengeResponse.setModifiedBy(entity.getModifiedBy());
-        studentInChallengeResponse.setModifiedDate(entity.getModifiedDate());
+        studentInChallengeResponse.setModifiedDate(entity.getModifiedDate().getTime());
         studentInChallengeResponse.setIsNonDeleted(entity.isNonDeleted());
 
         return studentInChallengeResponse;

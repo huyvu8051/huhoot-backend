@@ -2,9 +2,11 @@ package com.huhoot.controller.student;
 
 import com.huhoot.dto.SendAnswerResponse;
 import com.huhoot.dto.StudentAnswerRequest;
+import com.huhoot.exception.ChallengeException;
 import com.huhoot.model.Student;
-import com.huhoot.service.StudentPlayService;
+import com.huhoot.service.StudentParticipateService;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,21 +15,24 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("student")
-public class StudentPlayController {
+@AllArgsConstructor
+public class StudentParticipateController {
 
-    private final StudentPlayService studentPlayService;
+    private final StudentParticipateService studentParticipateService;
 
-    public StudentPlayController(StudentPlayService studentPlayService) {
-        this.studentPlayService = studentPlayService;
-    }
-
+    /**
+     * May remove
+     *
+     * @param challengeId
+     * @throws ChallengeException
+     */
     @GetMapping("/joinRoom")
-    public void joinRoom(@RequestParam int challengeId) throws NotFoundException {
+    public void joinRoom(@RequestParam int challengeId) throws ChallengeException {
 
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        studentPlayService.join(challengeId, userDetails);
+        // studentParticipateService.join(challengeId, userDetails.getId());
 
     }
 
@@ -37,7 +42,7 @@ public class StudentPlayController {
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(studentPlayService.answer(request, userDetails));
+        return ResponseEntity.ok(studentParticipateService.answer(request, userDetails));
 
     }
 

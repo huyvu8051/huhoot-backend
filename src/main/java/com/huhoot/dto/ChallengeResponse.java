@@ -15,9 +15,9 @@ public class ChallengeResponse {
     private boolean randomQuest;
     private ChallengeStatus ChallengeStatus;
     private String owner;
-    private Timestamp createdDate;
+    private Long createdDate;
     private String createdBy;
-    private Timestamp modifiedDate;
+    private Long modifiedDate;
     private String modifiedBy;
     private UUID adminSocketId;
 }

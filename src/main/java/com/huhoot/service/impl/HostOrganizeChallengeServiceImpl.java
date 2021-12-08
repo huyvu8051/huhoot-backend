@@ -37,10 +37,8 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
-        List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminIdAndIsLoginTrue(challengeId, userDetails.getId());
-
-        return listConverter.toListResponse(studentInChallenges, StudentInChallengeConverter::toStudentChallengeResponse);
-
+        List<StudentInChallengeResponse> studentInChallenges = studentInChallengeRepository.findAllStudentIsLogin(challengeId, userDetails.getId());
+        return studentInChallenges;
     }
 
 

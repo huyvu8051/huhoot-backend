@@ -1,15 +1,19 @@
 package com.huhoot.service.impl;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.dto.SendAnswerResponse;
 import com.huhoot.dto.StudentAnswerRequest;
+import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.enums.Points;
+import com.huhoot.exception.ChallengeException;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.service.StudentPlayService;
+import com.huhoot.service.StudentParticipateService;
 import com.huhoot.utils.EncryptUtil;
 import io.netty.channel.ChannelException;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,27 +25,47 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class StudentPlayServiceImpl implements StudentPlayService {
+@AllArgsConstructor
+public class StudentParticipateServiceImpl implements StudentParticipateService {
 
     private final SocketIOServer socketIOServer;
 
     private final StudentInChallengeRepository studentInChallengeRepository;
 
-    public StudentPlayServiceImpl(SocketIOServer socketIOServer, StudentInChallengeRepository studentInChallengeRepository, AnswerRepository answerRepository, StudentAnswerRepository studentAnswerRepository, QuestionRepository questionRepository, ChallengeRepository challengeRepository) {
-        this.socketIOServer = socketIOServer;
-        this.studentInChallengeRepository = studentInChallengeRepository;
-        this.answerRepository = answerRepository;
-        this.studentAnswerRepository = studentAnswerRepository;
-        this.questionRepository = questionRepository;
-        this.challengeRepository = challengeRepository;
-    }
+    private final StudentRepository studentRepository;
 
     @Override
-    public void join(int challengeId, Student userDetails) throws NotFoundException {
+    public void join(SocketIOClient client, int challengeId, Student student) throws ChallengeException {
 
-        Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(challengeId, userDetails.getId());
+        Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByChallengeIdAndStudentIdAndAvailable(challengeId, student.getId());
+        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new ChallengeException("Challenge not available!"));
+        Challenge challenge = studentInChallenge.getChallenge();
+        ChallengeStatus challengeStatus = challenge.getChallengeStatus();
 
-        StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new ChannelException("Challenge not available!"));
+        if (challengeStatus.equals(ChallengeStatus.IN_PROGRESS) || challengeStatus.equals(ChallengeStatus.LOCKED)) {
+            if (!studentInChallenge.isLogin()) {
+                throw new ChallengeException("Challenge not available!");
+            }
+        }
+
+        // if another device connect to server, disconnect old client
+        // Prevent multi device connect to server
+        if(student.getSocketId() != null && !student.getSocketId().equals(client.getSessionId())){
+            try {
+
+                SocketIOClient oldClient = socketIOServer.getClient(student.getSocketId());
+                oldClient.sendEvent("joinError", "joinError");
+                oldClient.disconnect();
+            } catch (Exception e) {
+                log.info("Cannot disconnect old client or client not found!");
+            }
+        }
+
+        client.joinRoom(challengeId + "");
+
+        // update socket id
+        studentRepository.updateSocketId(client.getSessionId(), student.getId());
+
 
         studentInChallenge.setLogin(true);
 
@@ -111,7 +135,6 @@ public class StudentPlayServiceImpl implements StudentPlayService {
         socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
 
         int totalPoint = studentAnswerRepository.getTotalPointInChallenge(request.getChallengeId(), userDetails.getId());
-
 
 
         // response encrypt message

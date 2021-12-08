@@ -14,6 +14,7 @@ import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.*;
+import com.huhoot.service.StudentParticipateService;
 import com.huhoot.service.impl.MyUserDetailsService;
 import com.huhoot.utils.JwtUtil;
 import javassist.NotFoundException;
@@ -48,6 +49,7 @@ public class MessageEventHandler {
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
+
         client.disconnect();
         log.info("a client was disconnected");
 
@@ -91,11 +93,14 @@ public class MessageEventHandler {
         log.info("save admin success");
     }
 
+    private final StudentParticipateService studentParticipateService;
+
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
 
         try {
 
+            // authorization
             String token = request.getToken().substring(7);
 
             String username = jwtUtil.extractUsername(token);
@@ -108,20 +113,11 @@ public class MessageEventHandler {
                 throw new Exception("Bad token");
             }
 
-            Optional<StudentInChallenge> optional = studentInChallengeRepository.findOneByPrimaryKeyChallengeIdAndPrimaryKeyStudentId(request.getChallengeId(), student.getId());
 
-            StudentInChallenge studentInChallenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+            studentParticipateService.join(client, request.getChallengeId(), student);
 
-            studentInChallenge.setLogin(true);
-
-            client.joinRoom(request.getChallengeId() + "");
-
-            student.setSocketId(client.getSessionId());
-
-            studentInChallengeRepository.save(studentInChallenge);
-
-            studentRepository.save(student);
         } catch (Exception e) {
+            log.error(e.getMessage());
             client.sendEvent("joinError", "joinError");
             client.disconnect();
         }
