@@ -68,7 +68,7 @@ public class DataLoader implements ApplicationRunner {
 
             adminRepository.save(admin);
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 1; i++) {
                 Admin admin1 = new Admin("admin" + i, passwordEncoder.encode("password"));
 
                 admin1.setRole(Role.HOST);
@@ -80,7 +80,7 @@ public class DataLoader implements ApplicationRunner {
                 Admin host = adminRepository.save(admin1);
 
 
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < 1; j++) {
                     Challenge challenge = new Challenge();
                     challenge.setTitle("title " + i + j);
                     challenge.setChallengeStatus(ChallengeStatus.WAITING);
