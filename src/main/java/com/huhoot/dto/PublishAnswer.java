@@ -16,7 +16,7 @@ public class PublishAnswer {
     private int ordinalNumber;
     private String answerContent;
     private Boolean isCorrect;
-    private Timestamp createdDate;
+    private Long createdDate;
     private boolean isSelected;
 
     public PublishAnswer(int id, int ordinalNumber, String answerContent, boolean isCorrect){

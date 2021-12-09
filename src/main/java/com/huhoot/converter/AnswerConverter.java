@@ -28,7 +28,7 @@ public class AnswerConverter {
                 .id(answer.getId())
                 .ordinalNumber(answer.getOrdinalNumber())
                 .answerContent(answer.getAnswerContent())
-                .createdDate(answer.getCreatedDate())
+                .createdDate(answer.getCreatedDate().getTime())
                 .isCorrect(answer.isCorrect())
                 .build();
     }

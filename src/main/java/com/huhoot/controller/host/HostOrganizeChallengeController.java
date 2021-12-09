@@ -23,13 +23,6 @@ public class HostOrganizeChallengeController {
 
     private final HostOrganizeChallengeService hostOrganizeChallengeService;
 
-
-    @GetMapping("/joinChallenge")
-    public void joinChallenge(@RequestParam int challengeId) {
-        // validate challenge
-    }
-
-
     @GetMapping("/openChallenge")
     public ResponseEntity<List<StudentInChallengeResponse>> openChallenge(@RequestParam int challengeId) throws Exception {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()

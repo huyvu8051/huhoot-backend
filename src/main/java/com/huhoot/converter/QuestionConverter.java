@@ -20,9 +20,11 @@ public class QuestionConverter {
         response.setAnswerTimeLimit(question.getAnswerTimeLimit());
         response.setPoint(question.getPoint());
         response.setAnswerOption(question.getAnswerOption());
-        response.setAskDate(question.getAskDate());
+        if (question.getAskDate() != null)
+            response.setAskDate(question.getAskDate().getTime());
         response.setNonDeleted(question.isNonDeleted());
-        response.setCreatedDate(question.getCreatedDate());
+        if (question.getCreatedDate() != null)
+            response.setCreatedDate(question.getCreatedDate().getTime());
         return response;
     }
 
@@ -41,7 +43,7 @@ public class QuestionConverter {
 
         List<PublishAnswer> publishAnswerResponses = new ArrayList<>();
 
-        for (Answer ans : question.getAnswers()){
+        for (Answer ans : question.getAnswers()) {
             publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
         }
 
@@ -56,7 +58,6 @@ public class QuestionConverter {
         response.setAskDate(question.getAskDate().getTime());
 
         return response;
-
 
 
     }

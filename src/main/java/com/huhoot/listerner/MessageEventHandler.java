@@ -7,8 +7,10 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.dto.SocketAuthorizationRequest;
 import com.huhoot.exception.StudentAddException;
+import com.huhoot.mapper.ChallengeMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
@@ -40,6 +42,8 @@ public class MessageEventHandler {
 
     private final QuestionRepository questionRepository;
 
+    private final ChallengeMapper challengeMapper;
+
     @OnConnect
     public void onConnect(SocketIOClient client) throws NotFoundException {
         client.sendEvent("connected", "connect success");
@@ -63,34 +67,44 @@ public class MessageEventHandler {
 
     @OnEvent("registerHostSocket")
     public void registerHostSocket(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
-        String token = request.getToken().substring(7);
+        try{
+            String token = request.getToken().substring(7);
 
-        String username = jwtUtil.extractUsername(token);
+            String username = jwtUtil.extractUsername(token);
 
-        Optional<Admin> optional = adminRepository.findOneByUsername(username);
+            Optional<Admin> optional = adminRepository.findOneByUsername(username);
 
-        Admin admin = optional.orElseThrow(()->new NotFoundException("Admin not found"));
+            Admin admin = optional.orElseThrow(()->new NotFoundException("Admin not found"));
 
-        if (!jwtUtil.validateToken(token, admin)) {
-            throw new Exception("Bad token");
+            if (!jwtUtil.validateToken(token, admin)) {
+                throw new Exception("Bad token");
+            }
+
+            // missing set security context holder
+
+            Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId());
+            Challenge challenge = optionalChallenge.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+
+            client.joinRoom(challenge.getId() + "");
+
+            List<Integer> questionIds = questionRepository.findAllIdsByChallengeId(request.getChallengeId());
+
+            ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
+
+            client.sendEvent("registerSuccess", challengeResponse);
+
+            challengeRepository.save(challenge);
+
+            admin.setSocketId(client.getSessionId());
+            adminRepository.save(admin);
+
+            log.info("save admin success");
+        }catch (Exception e){
+            log.error(e.getMessage());
+            client.sendEvent("joinError", "joinError");
+            client.disconnect();
         }
-
-        Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId());
-        Challenge challenge = optionalChallenge.orElseThrow(() -> new NotFoundException("Challenge not found"));
-
-
-        client.joinRoom(challenge.getId() + "");
-
-        List<Integer> questionIds = questionRepository.findAllIdsByChallengeId(request.getChallengeId());
-
-        client.sendEvent("registerSuccess", questionIds);
-
-        challengeRepository.save(challenge);
-
-        admin.setSocketId(client.getSessionId());
-        adminRepository.save(admin);
-
-        log.info("save admin success");
     }
 
     private final StudentParticipateService studentParticipateService;
@@ -113,9 +127,12 @@ public class MessageEventHandler {
                 throw new Exception("Bad token");
             }
 
+            // missing set security context holder
+
 
             studentParticipateService.join(client, request.getChallengeId(), student);
 
+            log.info("Client connect socket success!");
         } catch (Exception e) {
             log.error(e.getMessage());
             client.sendEvent("joinError", "joinError");
