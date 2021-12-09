@@ -27,6 +27,6 @@ public class MvcConfig implements WebMvcConfigurer {
         log.info("file:/" + uploadPath + "/");
         log.info(uploadDir.toUri().toString());
 
-        registry.addResourceHandler("/" + dirName + "/**").addResourceLocations(uploadDir.toUri().toString());
+        registry.addResourceHandler("/" + dirName + "/**").addResourceLocations(uploadDir.toUri().toString() + "/");
     }
 }
