@@ -28,6 +28,6 @@ public class MvcConfig implements WebMvcConfigurer {
 
         registry
                 .addResourceHandler("/uploads/**")
-                .addResourceLocations("file:/uploads/");
+                .addResourceLocations("/uploads/");
     }
 }
