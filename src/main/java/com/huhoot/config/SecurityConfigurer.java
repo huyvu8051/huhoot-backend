@@ -3,7 +3,7 @@ package com.huhoot.config;
 import com.huhoot.exception.RestAccessDeniedHandler;
 import com.huhoot.exception.RestAuthenticationEntryPoint;
 import com.huhoot.filter.JwtRequestFilter;
-import com.huhoot.service.impl.MyUserDetailsService;
+import com.huhoot.auth.MyUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

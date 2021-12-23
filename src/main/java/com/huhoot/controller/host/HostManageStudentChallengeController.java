@@ -3,7 +3,7 @@ package com.huhoot.controller.host;
 import com.huhoot.dto.*;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.service.AdminManageService;
+import com.huhoot.admin.student.AdminManageService;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;

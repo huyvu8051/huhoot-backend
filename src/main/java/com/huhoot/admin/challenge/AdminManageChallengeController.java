@@ -1,4 +1,4 @@
-package com.huhoot.controller.admin;
+package com.huhoot.admin.challenge;
 
 import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.dto.ChallengeUpdateRequest;
@@ -6,7 +6,7 @@ import com.huhoot.dto.PageResponse;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.NoCheckOwnChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.service.AdminManageService;
+import com.huhoot.admin.student.AdminManageService;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;

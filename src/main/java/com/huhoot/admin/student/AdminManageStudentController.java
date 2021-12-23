@@ -1,8 +1,7 @@
-package com.huhoot.controller.admin;
+package com.huhoot.admin.student;
 
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
-import com.huhoot.service.AdminManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;

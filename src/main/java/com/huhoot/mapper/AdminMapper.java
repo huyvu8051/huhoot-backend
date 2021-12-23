@@ -1,7 +1,7 @@
 package com.huhoot.mapper;
 
 import com.huhoot.dto.HostAddRequest;
-import com.huhoot.dto.HostResponse;
+import com.huhoot.admin.host.HostResponse;
 import com.huhoot.dto.HostUpdateRequest;
 import com.huhoot.model.Admin;
 import org.mapstruct.*;

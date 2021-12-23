@@ -1,4 +1,4 @@
-package com.huhoot.controller.admin;
+package com.huhoot.admin;
 
 import com.huhoot.dto.ChangePasswordRequest;
 import com.huhoot.exception.AccountException;

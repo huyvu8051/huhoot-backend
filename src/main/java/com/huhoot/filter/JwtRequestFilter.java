@@ -1,7 +1,7 @@
 package com.huhoot.filter;
 
-import com.huhoot.service.impl.MyUserDetailsService;
-import com.huhoot.utils.JwtUtil;
+import com.huhoot.auth.MyUserDetailsService;
+import com.huhoot.auth.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

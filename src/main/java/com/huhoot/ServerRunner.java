@@ -5,6 +5,7 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
-    private String host = "159.223.38.181";
-    // private String host = "localhost";
-    private Integer port = 8082;
+    @Value("${huhoot.serverip}")
+    private String host = null;
+
+    @Value("${huhoot.socket.port}")
+    private Integer port = null;
 
     @Bean
     public SocketIOServer socketioserver() {

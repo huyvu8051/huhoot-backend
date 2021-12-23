@@ -1,9 +1,7 @@
-package com.huhoot.controller;
+package com.huhoot.auth;
 
 import com.huhoot.dto.AuthenticationRequest;
 import com.huhoot.dto.AuthenticationResponse;
-import com.huhoot.service.impl.MyUserDetailsService;
-import com.huhoot.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

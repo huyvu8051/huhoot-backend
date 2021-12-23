@@ -1,34 +1,27 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.AdminConverter;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
-import com.huhoot.enums.Role;
 import com.huhoot.exception.UsernameExistedException;
-import com.huhoot.mapper.AdminMapper;
 import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
-import com.huhoot.repository.AdminRepository;
-import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
-import com.huhoot.service.AdminManageService;
+import com.huhoot.admin.student.AdminManageService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import java.util.ArrayList;
@@ -40,125 +33,15 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class AdminManageServiceImpl implements AdminManageService {
-    private final AdminRepository adminRepository;
-    private final AdminConverter adminConverter;
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final Validator validator;
 
-    private final AnswerRepository answerRepository;
-
-    private final AdminMapper adminMapper;
 
 
-    @Override
-    public PageResponse<HostResponse> findAllHostAccount(Pageable pageable) {
-
-        Page<Admin> admins = adminRepository.findAll(pageable);
-
-        return listConverter.toPageResponse(admins, e -> adminMapper.toDto(e));
-    }
 
     private final ListConverter listConverter;
 
-    @Override
-    public HostResponse getOneHostAccountDetailsById(int id) {
-        Optional<Admin> entity = adminRepository.findOneById(id);
-        return AdminConverter.toHostResponse(entity.get());
-    }
-
-    @Override
-    public PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable) {
-
-        Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-
-        return listConverter.toPageResponse(entities, AdminConverter::toHostResponse);
-    }
-
-
-    @Override
-    public void updateHostAccount(@Valid HostUpdateRequest request) throws UsernameExistedException {
-
-        Optional<Admin> optional = adminRepository.findOneById(request.getId());
-
-        Admin host = optional.orElseThrow(() -> new UsernameNotFoundException("Username with id: " + request.getId() + " not found"));
-
-        if (!request.getUsername().equals(host.getUsername())) {
-            Optional<Admin> duplicate = adminRepository.findOneByUsername(request.getUsername());
-            if (duplicate.isPresent() && duplicate.get().getId() != request.getId())
-                throw new UsernameExistedException("Username existed!");
-        }
-
-        adminMapper.update(request, host);
-
-        adminRepository.save(host);
-
-    }
-
-    @Override
-    public void lockManyHostAccount(List<Integer> ids) {
-        List<Admin> hosts = adminRepository.findAllById(ids);
-
-        for (Admin host : hosts) {
-            host.setNonLocked(false);
-        }
-
-        adminRepository.saveAll(hosts);
-
-    }
-
-    private void addOneHostAccount(HostAddRequest addRequest) throws UsernameExistedException {
-
-        Set<ConstraintViolation<HostAddRequest>> violations = validator.validate(addRequest);
-
-        if (violations.size() > 0) {
-
-            StringBuilder sb = new StringBuilder();
-
-            for (ConstraintViolation<HostAddRequest> violation : violations) {
-                sb.append(violation.getPropertyPath());
-                sb.append(" :");
-                sb.append(violation.getMessage());
-                sb.append(" | ");
-            }
-
-            throw new ValidationException(sb.toString());
-        }
-
-        String formattedUsername = addRequest.getUsername().trim().toLowerCase();
-
-        /**Because of sqlite can't check the unique, so we need check it manually
-         */
-
-        Optional<Admin> duplicate = adminRepository.findOneByUsername(formattedUsername);
-
-        if (duplicate.isPresent()) {
-            throw new UsernameExistedException("Username existed!");
-        }
-
-        String hashedPassword = passwordEncoder.encode("password");
-        Admin host = new Admin(formattedUsername, hashedPassword);
-        adminRepository.save(host);
-    }
-
-    @Override
-    public List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOs) {
-
-        List<HostAddErrorResponse> errors = new ArrayList<>();
-
-        for (HostAddRequest hostDTO : hostDTOs) {
-            try {
-                this.addOneHostAccount(hostDTO);
-            } catch (Exception e) {
-                HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO, e.getMessage());
-                errors.add(errResponse);
-            }
-        }
-
-        return errors;
-
-
-    }
 
     private final StudentMapper studentMapper;
 
@@ -298,21 +181,6 @@ public class AdminManageServiceImpl implements AdminManageService {
 
     }
 
-    @Override
-    public void addHostAccount(HostAddRequest request) throws UsernameExistedException {
-        request.setUsername(request.getUsername().trim());
 
-        Optional<Admin> duplicate = adminRepository.findOneByUsername(request.getUsername());
-        if (duplicate.isPresent()) throw new UsernameExistedException("Username existed!");
-
-
-        Admin host = adminMapper.toEntity(request);
-
-        host.setPassword(passwordEncoder.encode("password"));
-
-        host.setRole(Role.HOST);
-
-        adminRepository.save(host);
-    }
 
 }

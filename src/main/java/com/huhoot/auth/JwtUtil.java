@@ -1,4 +1,4 @@
-package com.huhoot.utils;
+package com.huhoot.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-	private final int TEN_HOUR = 1000 * 60 * 60 * 10 * 10; // 100 hour
+	private final int TEN_HOUR = 1000 * 60 * 60 * 24 * 7; // 7 days
 	
 	@Value("${huhoot.secret-key}")
 	private final String SECRET_KEY = null;

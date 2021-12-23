@@ -1,7 +1,7 @@
 package com.huhoot.mapper.impl;
 
 import com.huhoot.dto.HostAddRequest;
-import com.huhoot.dto.HostResponse;
+import com.huhoot.admin.host.HostResponse;
 import com.huhoot.dto.HostUpdateRequest;
 import com.huhoot.mapper.AdminMapper;
 import com.huhoot.model.Admin;
@@ -31,9 +31,13 @@ public class AdminMapperImpl implements AdminMapper {
 
         hostResponse.setIsNonLocked(entity.isNonLocked());
         hostResponse.setUsername(entity.getUsername());
-        hostResponse.setCreatedDate(entity.getCreatedDate());
+       if(entity.getCreatedDate() != null){
+            hostResponse.setCreatedDate(entity.getCreatedDate().getTime());
+       }
         hostResponse.setCreatedBy(entity.getCreatedBy());
-        hostResponse.setModifiedDate(entity.getModifiedDate());
+        if(entity.getModifiedDate() != null){
+            hostResponse.setModifiedDate(entity.getModifiedDate().getTime());
+        }
         hostResponse.setModifiedBy(entity.getModifiedBy());
 
         return hostResponse;
