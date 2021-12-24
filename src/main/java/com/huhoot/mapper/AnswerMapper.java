@@ -1,11 +1,9 @@
 package com.huhoot.mapper;
 
-import com.huhoot.dto.AnswerUpdateRequest;
+import com.huhoot.host.manage.answer.AnswerUpdateRequest;
 import com.huhoot.model.Answer;
-import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
 
 @Mapper(componentModel = "spring")

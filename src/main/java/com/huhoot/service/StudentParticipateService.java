@@ -1,12 +1,10 @@
 package com.huhoot.service;
 
 import com.corundumstudio.socketio.SocketIOClient;
-import com.huhoot.dto.SendAnswerResponse;
-import com.huhoot.dto.StudentAnswerRequest;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.model.Student;
-import io.netty.channel.ChannelException;
-import javassist.NotFoundException;
+import com.huhoot.student.participate.SendAnswerResponse;
+import com.huhoot.student.participate.StudentAnswerRequest;
 
 public interface StudentParticipateService {
 

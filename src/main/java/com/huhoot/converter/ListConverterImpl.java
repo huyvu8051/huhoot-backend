@@ -1,6 +1,6 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.PageResponse;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 

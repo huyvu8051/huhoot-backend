@@ -1,10 +1,11 @@
 package com.huhoot.mapper;
 
 
-import com.huhoot.dto.QuestionResponse;
-import com.huhoot.dto.QuestionUpdateRequest;
+import com.huhoot.host.manage.question.QuestionResponse;
+import com.huhoot.host.manage.question.QuestionUpdateRequest;
 import com.huhoot.model.Question;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface QuestionMapper {

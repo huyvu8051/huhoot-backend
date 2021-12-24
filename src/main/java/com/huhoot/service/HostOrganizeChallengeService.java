@@ -1,9 +1,13 @@
 package com.huhoot.service;
 
 import com.corundumstudio.socketio.SocketIOClient;
-import com.huhoot.dto.*;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
+import com.huhoot.host.organize.AnswerResultResponse;
+import com.huhoot.host.organize.PublishQuestionResponse;
+import com.huhoot.host.organize.StudentScoreResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 

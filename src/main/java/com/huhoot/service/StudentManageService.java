@@ -1,8 +1,8 @@
 package com.huhoot.service;
 
-import com.huhoot.dto.ChallengeResponse;
-import com.huhoot.dto.PageResponse;
+import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Student;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface StudentManageService {

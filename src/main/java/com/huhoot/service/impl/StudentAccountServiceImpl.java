@@ -1,9 +1,9 @@
 package com.huhoot.service.impl;
 
+import com.huhoot.admin.manage.student.StudentRepository;
 import com.huhoot.dto.ChangePasswordRequest;
 import com.huhoot.exception.AccountException;
 import com.huhoot.model.Student;
-import com.huhoot.repository.StudentRepository;
 import com.huhoot.service.StudentAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

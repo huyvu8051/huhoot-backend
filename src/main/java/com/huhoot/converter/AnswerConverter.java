@@ -1,7 +1,7 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.AnswerAddRequest;
-import com.huhoot.dto.PublishAnswer;
+import com.huhoot.host.manage.answer.AnswerAddRequest;
+import com.huhoot.host.organize.PublishAnswer;
 import com.huhoot.model.Answer;
 
 public class AnswerConverter {

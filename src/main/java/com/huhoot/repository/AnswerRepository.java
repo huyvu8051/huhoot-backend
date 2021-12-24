@@ -1,7 +1,7 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.AnswerResultResponse;
-import com.huhoot.dto.PublishAnswer;
+import com.huhoot.host.organize.AnswerResultResponse;
+import com.huhoot.host.organize.PublishAnswer;
 import com.huhoot.model.Answer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

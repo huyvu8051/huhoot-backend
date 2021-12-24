@@ -1,19 +1,32 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.converter.*;
-import com.huhoot.dto.*;
+import com.huhoot.admin.manage.student.StudentRepository;
+import com.huhoot.converter.AnswerConverter;
+import com.huhoot.converter.ListConverter;
+import com.huhoot.converter.QuestionConverter;
+import com.huhoot.converter.StudentInChallengeConverter;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
+import com.huhoot.host.manage.answer.AnswerAddRequest;
+import com.huhoot.host.manage.answer.AnswerUpdateRequest;
+import com.huhoot.host.manage.question.QuestionAddRequest;
+import com.huhoot.host.manage.question.QuestionResponse;
+import com.huhoot.host.manage.question.QuestionUpdateRequest;
+import com.huhoot.host.manage.studentInChallenge.StudentChallengeAddError;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeAddRequest;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeUpdateRequest;
+import com.huhoot.host.organize.PublishAnswer;
 import com.huhoot.mapper.AnswerMapper;
-import com.huhoot.mapper.ChallengeMapper;
 import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.service.HostManageService;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,73 +48,7 @@ public class HostManageServiceImpl implements HostManageService {
 
     private final ListConverter listConverter;
 
-    @Override
-    public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAllByAdminId(userDetails.getId(), pageable);
 
-        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
-    }
-
-    @Override
-    public ChallengeResponse getOneOwnChallengeDetailsById(Admin userDetails, int id, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
-        Optional<Challenge> optional = challengeRepository.findOneById(id);
-
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
-
-        checker.accept(userDetails, challenge);
-
-        return ChallengeConverter.toChallengeResponse(challenge);
-    }
-
-    @Override
-    public PageResponse<ChallengeResponse> searchOwnChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
-        Page<Challenge> result = challengeRepository.findAllByTitleContainingIgnoreCaseAndAdminId(title, userDetails.getId(), pageable);
-        return listConverter.toPageResponse(result, ChallengeConverter::toChallengeResponse);
-    }
-
-
-    @Override
-    public ChallengeResponse addOneChallenge(Admin userDetails, ChallengeAddRequest request) {
-
-        Challenge challenge = challengeMapper.toEntity(request);
-        challenge.setAdmin(userDetails);
-
-        Challenge saved = challengeRepository.save(challenge);
-
-        return challengeMapper.toDto(saved);
-
-    }
-
-    private final ChallengeMapper challengeMapper;
-
-    @Override
-    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
-        Optional<Challenge> optional = challengeRepository.findOneById(request.getId());
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
-        checker.accept(userDetails, challenge);
-        challengeMapper.update(request, challenge);
-        challengeRepository.save(challenge);
-
-    }
-
-    @Override
-    public void deleteManyChallenge(Admin userDetails, List<Integer> ids) {
-
-        List<Challenge> challenges = challengeRepository.findAllByAdminIdAndIdIn(userDetails.getId(), ids);
-
-        for (Challenge challenge : challenges) {
-            challenge.setNonDeleted(false);
-        }
-
-        challengeRepository.saveAll(challenges);
-    }
-
-
-    @Override
-    public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
-        Page<Question> questions = questionRepository.findAllByChallengeIdAndChallengeAdminId(challengeId, userDetails.getId(), pageable);
-        return listConverter.toPageResponse(questions, QuestionConverter::toQuestionResponse);
-    }
 
     @Override
     public QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {

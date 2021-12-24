@@ -1,17 +1,10 @@
 package com.huhoot.service.impl;
 
-import com.huhoot.admin.student.StudentResponse;
-import com.huhoot.converter.ChallengeConverter;
+import com.huhoot.admin.manage.student.*;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
-import com.huhoot.admin.student.StudentMapper;
-import com.huhoot.model.Admin;
-import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
-import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.StudentRepository;
-import com.huhoot.admin.student.ManageStudentService;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +29,7 @@ public class ManageStudentServiceImpl implements ManageStudentService {
     private final StudentRepository studentRepository;
     private final Validator validator;
 
-
-
-
     private final ListConverter listConverter;
-
-
     private final StudentMapper studentMapper;
 
     @Override
@@ -124,19 +112,8 @@ public class ManageStudentServiceImpl implements ManageStudentService {
 
 
 
-    private final ChallengeRepository challengeRepository;
 
-    @Override
-    public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAll(pageable);
-        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
-    }
 
-    @Override
-    public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
-        return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
-    }
 
 
 

@@ -1,6 +1,6 @@
 package com.huhoot.mapper.impl;
 
-import com.huhoot.dto.AnswerUpdateRequest;
+import com.huhoot.host.manage.answer.AnswerUpdateRequest;
 import com.huhoot.mapper.AnswerMapper;
 import com.huhoot.model.Answer;
 import org.springframework.context.annotation.Primary;

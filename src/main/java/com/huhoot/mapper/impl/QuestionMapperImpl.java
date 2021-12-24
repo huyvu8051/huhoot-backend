@@ -1,7 +1,7 @@
 package com.huhoot.mapper.impl;
 
-import com.huhoot.dto.QuestionResponse;
-import com.huhoot.dto.QuestionUpdateRequest;
+import com.huhoot.host.manage.question.QuestionResponse;
+import com.huhoot.host.manage.question.QuestionUpdateRequest;
 import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.model.Question;
 import org.springframework.context.annotation.Primary;

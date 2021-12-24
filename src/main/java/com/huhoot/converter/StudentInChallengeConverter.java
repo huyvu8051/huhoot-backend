@@ -1,6 +1,6 @@
 package com.huhoot.converter;
 
-import com.huhoot.dto.StudentInChallengeResponse;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 

@@ -1,10 +1,9 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.PublishQuestion;
 import com.huhoot.enums.ChallengeStatus;
+import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.host.organize.PublishQuestion;
 import com.huhoot.model.Challenge;
-import com.huhoot.model.Question;
-import com.huhoot.model.StudentInChallenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,15 +19,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     Optional<Challenge> findOneById(int id);
 
-    Page<Challenge> findAllByTitleContainingIgnoreCaseAndAdminId(String title, int id, Pageable pageable);
-
-    Page<Challenge> findAllByAdminId(int id, Pageable pageable);
+    @Query("SELECT new com.huhoot.host.manage.challenge.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
+            "n.randomQuest, n.challengeStatus, n.admin.username, n.admin.socketId, n.createdDate, n.createdBy, " +
+            "n.modifiedDate, n.modifiedBy) " +
+            "FROM Challenge n " +
+            "WHERE n.admin.id = :adminId")
+    Page<ChallengeResponse> findAllByAdminId(@Param("adminId") int adminId, Pageable pageable);
 
     Page<Challenge> findAll(Pageable pageable);
 
-    Page<Challenge> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
-
-    List<Challenge> findAllByAdminIdAndIdIn(int id, List<Integer> ids);
 
     /**
      * @param challengeId {@link Challenge} id
@@ -85,15 +84,18 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
                                             @Param("adminId") int adminId);
 
 
-    @Query("SELECT new com.huhoot.dto.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, m.answerTimeLimit, m.point, m.askDate, m.answerOption, m.challenge.id, m.challenge.questions.size) " +
+    @Query("SELECT new com.huhoot.dto.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, " +
+            "m.answerTimeLimit, m.point, m.askDate, m.answerOption, m.challenge.id, m.challenge.questions.size) " +
             "FROM Question m " +
-            "WHERE m.id IN (SELECT n.currentQuestionId FROM Challenge n WHERE n.id = :challengeId AND n.admin.id = :adminId)")
+            "WHERE m.id IN (SELECT n.currentQuestionId FROM Challenge n WHERE n.id = :challengeId " +
+            "AND n.admin.id = :adminId)")
     Optional<PublishQuestion> findCurrentPublishedQuestion(@Param("challengeId") int challengeId,
                                                            @Param("adminId") int adminId);
 
 
     @Query("SELECT n.primaryKey.challenge " +
             "FROM StudentInChallenge n " +
-            "WHERE n.primaryKey.student.id = :studentId AND n.primaryKey.challenge.isNonDeleted = TRUE AND n.primaryKey.challenge.challengeStatus <> com.huhoot.enums.ChallengeStatus.BUILDING")
+            "WHERE n.primaryKey.student.id = :studentId AND n.primaryKey.challenge.isNonDeleted = TRUE " +
+            "AND n.primaryKey.challenge.challengeStatus <> com.huhoot.enums.ChallengeStatus.BUILDING")
     List<Challenge> findAllByStudentIdAndIsAvailable(@Param("studentId") int studentId, Pageable pageable);
 }

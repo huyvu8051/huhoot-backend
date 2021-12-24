@@ -2,22 +2,19 @@ package com.huhoot.service.impl;
 
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.converter.ListConverterImpl;
-import com.huhoot.dto.ChallengeResponse;
-import com.huhoot.dto.PageResponse;
+import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
-import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.service.StudentManageService;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

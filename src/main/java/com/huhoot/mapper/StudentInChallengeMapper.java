@@ -1,9 +1,10 @@
 package com.huhoot.mapper;
 
-import com.huhoot.dto.StudentInChallengeResponse;
-import com.huhoot.dto.StudentInChallengeUpdateRequest;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeUpdateRequest;
 import com.huhoot.model.StudentInChallenge;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper
 public interface StudentInChallengeMapper {

@@ -1,7 +1,7 @@
 package com.huhoot.mapper.impl;
 
-import com.huhoot.dto.StudentInChallengeResponse;
-import com.huhoot.dto.StudentInChallengeUpdateRequest;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeUpdateRequest;
 import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;

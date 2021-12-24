@@ -1,6 +1,6 @@
 package com.huhoot.repository;
 
-import com.huhoot.dto.StudentInChallengeResponse;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.StudentInChallenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

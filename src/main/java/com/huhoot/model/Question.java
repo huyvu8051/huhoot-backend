@@ -1,7 +1,7 @@
 package com.huhoot.model;
 
-import com.huhoot.enums.Points;
 import com.huhoot.enums.AnswerOption;
+import com.huhoot.enums.Points;
 import lombok.Data;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
