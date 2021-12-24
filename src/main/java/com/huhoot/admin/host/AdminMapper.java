@@ -1,4 +1,4 @@
-package com.huhoot.mapper;
+package com.huhoot.admin.host;
 
 import com.huhoot.dto.HostAddRequest;
 import com.huhoot.admin.host.HostResponse;
@@ -6,7 +6,7 @@ import com.huhoot.dto.HostUpdateRequest;
 import com.huhoot.model.Admin;
 import org.mapstruct.*;
 
-@Mapper
+// @Mapper
 public interface AdminMapper {
 
     // @Mapping(source = "nonLocked", target = "isNonLocked")

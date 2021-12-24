@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface ManageHostRepository extends JpaRepository<Admin, Integer> {
 
     @Query("SELECT new com.huhoot.admin.host.HostResponse(n.id, n.username, n.isNonLocked, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy) " +
-            "FROM Admin n")
+            "FROM Admin n " +
+            "WHERE n.role = com.huhoot.enums.Role.HOST")
     Page<HostResponse> findAllHost(Pageable pageable);
 }

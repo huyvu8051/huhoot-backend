@@ -4,21 +4,26 @@ import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
 import org.springframework.data.domain.Pageable;
 
-import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 
 public interface ManageHostService {
+    /**
+     * Find all host account
+     *
+     * @param pageable
+     * @return
+     */
     PageResponse<HostResponse> findAllHostAccount(Pageable pageable);
 
+    /**
+     * Update host account information with FETCH
+     *
+     * @param hostDTO
+     * @throws UsernameExistedException
+     */
     void updateHostAccount(@Valid HostUpdateRequest hostDTO) throws UsernameExistedException;
 
-    /**
-     * Lock account, account cannot log in.
-     *
-     * @param hostIds
-     */
-    void lockManyHostAccount(List<Integer> hostIds);
 
     /**
      * <ul>
@@ -26,30 +31,10 @@ public interface ManageHostService {
      * <li>It will return a list of insert error, on each error, they will contain an error message.</li>
      * </ul>
      *
-     * @param hostDTOS
+     * @param hostDTOs
      * @return List of insert error
      * @throws UsernameExistedException
      */
-    List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOS);
+    List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOs);
 
-
-    /**
-     * Get details of one host account.
-     *
-     * @param id
-     * @return AdminDTO
-     * @throws AccountNotFoundException
-     */
-    HostResponse getOneHostAccountDetailsById(int id);
-
-    /**
-     * Search list of host account by username.
-     *
-     * @param username
-     * @param pageable
-     * @return AdminDTO
-     */
-    PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable);
-
-    void addHostAccount(HostAddRequest request) throws UsernameExistedException;
 }

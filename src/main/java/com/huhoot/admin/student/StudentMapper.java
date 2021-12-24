@@ -1,13 +1,13 @@
-package com.huhoot.mapper;
+package com.huhoot.admin.student;
 
 import com.huhoot.dto.StudentAddRequest;
-import com.huhoot.dto.StudentResponse;
+import com.huhoot.admin.student.StudentResponse;
 import com.huhoot.dto.StudentUpdateRequest;
 import com.huhoot.model.Student;
 import org.mapstruct.*;
 
 
-@Mapper
+//@Mapper
 public interface StudentMapper {
 
     // @Mapping(source = "nonLocked", target = "isNonLocked")

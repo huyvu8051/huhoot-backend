@@ -6,7 +6,7 @@ import com.huhoot.dto.PageResponse;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.NoCheckOwnChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.admin.student.AdminManageService;
+import com.huhoot.admin.student.ManageStudentService;
 import com.huhoot.service.HostManageService;
 import javassist.NotFoundException;
 import org.hibernate.validator.constraints.Length;
@@ -25,13 +25,13 @@ import java.util.List;
 @RequestMapping("admin")
 public class AdminManageChallengeController {
 
-    private final AdminManageService adminService;
+    private final ManageStudentService adminService;
 
     private final HostManageService hostService;
 
     private final NoCheckOwnChallenge noCheckOwnerChallenge;
 
-    public AdminManageChallengeController(AdminManageService adminService, HostManageService hostService, NoCheckOwnChallenge noCheckOwnerChallenge) {
+    public AdminManageChallengeController(ManageStudentService adminService, HostManageService hostService, NoCheckOwnChallenge noCheckOwnerChallenge) {
         this.adminService = adminService;
         this.hostService = hostService;
         this.noCheckOwnerChallenge = noCheckOwnerChallenge;

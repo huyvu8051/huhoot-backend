@@ -1,27 +1,26 @@
-package com.huhoot.admin.host;
+package com.huhoot.admin.student;
 
 import com.huhoot.auditing.AuditableDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class HostResponse extends AuditableDto {
+public class StudentResponse extends AuditableDto {
     private int id;
     private String username;
+    private String fullName;
+
+
     private Boolean isNonLocked;
 
-    public HostResponse(int id, String username, Boolean isNonLocked, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
+    public StudentResponse(int id, String username, String fullName, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy, Boolean isNonLocked) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.username = username;
+        this.fullName = fullName;
         this.isNonLocked = isNonLocked;
-
     }
 }

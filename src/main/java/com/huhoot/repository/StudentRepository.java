@@ -1,6 +1,6 @@
 package com.huhoot.repository;
 
-import com.fasterxml.jackson.databind.annotation.JsonTypeResolver;
+import com.huhoot.admin.student.StudentResponse;
 import com.huhoot.model.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,19 +19,21 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
 
     Optional<Student> findOneById(int id);
 
-    Page<Student> findAllByIsNonLocked(boolean isLocked, Pageable pageable);
-
     Page<Student> findAllByUsernameContainingIgnoreCaseAndIsNonLocked(String username, boolean isNonLocked, Pageable pageable);
 
-    @Query("SELECT n.primaryKey.student FROM StudentInChallenge n WHERE n.primaryKey.challenge.id = :challengeId")
+    @Query("SELECT n.primaryKey.student " +
+            "FROM StudentInChallenge n " +
+            "WHERE n.primaryKey.challenge.id = :challengeId")
     List<Student> findAllStudentInChallenge(@Param("challengeId") int challengeId);
-
-    List<Student> findAllByIdIn(List<Integer> studentIds);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Student n " +
-            "SET n.socketId = :socketId " +
+    @Query("UPDATE Student n " + "SET n.socketId = :socketId " +
             "WHERE n.id = :studentId")
     void updateSocketId(@Param("socketId") UUID socketId, @Param("studentId") int studentId);
+
+
+    @Query("SELECT new com.huhoot.admin.student.StudentResponse(n.id, n.username, n.fullName, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy, n.isNonLocked) " +
+            "FROM Student n ")
+    Page<StudentResponse> findAllStudent(Pageable pageable);
 }

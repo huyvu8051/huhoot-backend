@@ -1,9 +1,10 @@
-package com.huhoot.mapper.impl;
+package com.huhoot.admin.host;
 
+import com.huhoot.auditing.AuditingDtoMapper;
 import com.huhoot.dto.HostAddRequest;
 import com.huhoot.admin.host.HostResponse;
 import com.huhoot.dto.HostUpdateRequest;
-import com.huhoot.mapper.AdminMapper;
+import com.huhoot.admin.host.AdminMapper;
 import com.huhoot.model.Admin;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import javax.annotation.Generated;
 )
 @Primary
 @Component("myAdminMapper")
-public class AdminMapperImpl implements AdminMapper {
+public class AdminMapperImpl extends AuditingDtoMapper<Admin, HostResponse> implements AdminMapper {
 
     @Override
     public HostResponse toDto(Admin entity) {
@@ -31,13 +32,8 @@ public class AdminMapperImpl implements AdminMapper {
 
         hostResponse.setIsNonLocked(entity.isNonLocked());
         hostResponse.setUsername(entity.getUsername());
-       if(entity.getCreatedDate() != null){
-            hostResponse.setCreatedDate(entity.getCreatedDate().getTime());
-       }
         hostResponse.setCreatedBy(entity.getCreatedBy());
-        if(entity.getModifiedDate() != null){
-            hostResponse.setModifiedDate(entity.getModifiedDate().getTime());
-        }
+
         hostResponse.setModifiedBy(entity.getModifiedBy());
 
         return hostResponse;

@@ -1,4 +1,4 @@
-package com.huhoot.admin.host;
+package com.huhoot.vue.vdatatable;
 
 import lombok.Data;
 
@@ -13,13 +13,13 @@ public class VDataTablePagingRequest {
     //
 
     @Min(0)
-    private int itemsPerPage;
+    private int itemsPerPage = 12;
 
     private boolean multiSort;
     private boolean mustSort;
 
     @Min(0)
-    private int page;
+    private int page = 1;
 
     private List<String> sortBy;
     private List<Boolean> sortDesc;

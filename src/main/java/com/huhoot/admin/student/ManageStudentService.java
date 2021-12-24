@@ -6,56 +6,34 @@ import com.huhoot.model.Admin;
 import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
-import javax.security.auth.login.AccountNotFoundException;
-import javax.validation.Valid;
 import java.util.List;
 
-public interface AdminManageService {
+public interface ManageStudentService {
 
     /**
      * Find all Student account
      *
      *
-     * @param pageable
-     * @return
+     * @param pageable pageable
+     * @return list of student
      */
     PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable);
 
     /**
-     * @param id
-     * @return
-     * @throws AccountNotFoundException
-     */
-    StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException;
-
-    /**
-     * @param username
-     * @param isNonLocked
-     * @param pageable
-     * @return
-     */
-    PageResponse<StudentResponse> searchStudentAccountByUsername(String username, boolean isNonLocked, Pageable pageable);
-
-    /**
-     * @param request
-     * @return
+     * @param request list of student
+     * @return list of student add error
      */
     List<StudentAddErrorResponse> addManyStudentAccount(List<StudentAddRequest> request);
 
     /**
-     * @param request
+     * @param request student update request
      */
     void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException, UsernameExistedException;
 
-    /**
-     * @param hostIds
-     */
-    void lockManyStudentAccount(List<Integer> hostIds);
 
     PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable);
 
     PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable);
 
-    void addStudentAccount(StudentAddRequest request) throws Exception;
 
 }

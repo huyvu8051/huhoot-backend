@@ -1,9 +1,10 @@
-package com.huhoot.mapper.impl;
+package com.huhoot.admin.student;
 
+import com.huhoot.auditing.AuditingDtoMapper;
 import com.huhoot.dto.StudentAddRequest;
-import com.huhoot.dto.StudentResponse;
+import com.huhoot.admin.student.StudentResponse;
 import com.huhoot.dto.StudentUpdateRequest;
-import com.huhoot.mapper.StudentMapper;
+import com.huhoot.admin.student.StudentMapper;
 import com.huhoot.model.Student;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import javax.annotation.Generated;
 )
 @Primary
 @Component("myStudentMapper")
-public class StudentMapperImpl implements StudentMapper {
+public class StudentMapperImpl extends AuditingDtoMapper<Student, StudentResponse>  implements StudentMapper{
 
     @Override
     public StudentResponse toDto(Student entity) {
@@ -25,18 +26,17 @@ public class StudentMapperImpl implements StudentMapper {
             return null;
         }
 
-        StudentResponse studentResponse = new StudentResponse();
+        StudentResponse response = new StudentResponse();
 
-        studentResponse.setIsNonLocked(entity.isNonLocked());
-        studentResponse.setId(entity.getId());
-        studentResponse.setUsername(entity.getUsername());
-        studentResponse.setFullName(entity.getFullName());
-        studentResponse.setCreatedDate(entity.getCreatedDate());
-        studentResponse.setCreatedBy(entity.getCreatedBy());
-        studentResponse.setModifiedDate(entity.getModifiedDate());
-        studentResponse.setModifiedBy(entity.getModifiedBy());
+        setAudit(entity, response);
 
-        return studentResponse;
+        response.setIsNonLocked(entity.isNonLocked());
+        response.setId(entity.getId());
+        response.setUsername(entity.getUsername());
+        response.setFullName(entity.getFullName());
+
+
+        return response;
     }
 
     @Override

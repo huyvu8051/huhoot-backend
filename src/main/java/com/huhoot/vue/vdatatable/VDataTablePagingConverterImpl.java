@@ -1,4 +1,4 @@
-package com.huhoot.admin.host;
+package com.huhoot.vue.vdatatable;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -6,12 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Not support groupBy yet
@@ -40,9 +35,6 @@ public class VDataTablePagingConverterImpl implements VDataTablePagingConverter 
 
         Sort sort = Sort.by(orders);
 
-        Pageable result = PageRequest.of(request.getPage() - 1, request.getItemsPerPage(), sort);
-
-
-        return result;
+        return PageRequest.of(request.getPage() - 1, request.getItemsPerPage(), sort);
     }
 }

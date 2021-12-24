@@ -1,17 +1,17 @@
 package com.huhoot.service.impl;
 
+import com.huhoot.admin.student.StudentResponse;
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.converter.StudentConverter;
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
-import com.huhoot.mapper.StudentMapper;
+import com.huhoot.admin.student.StudentMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentRepository;
-import com.huhoot.admin.student.AdminManageService;
+import com.huhoot.admin.student.ManageStudentService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.AccountNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -32,7 +31,7 @@ import java.util.Set;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AdminManageServiceImpl implements AdminManageService {
+public class ManageStudentServiceImpl implements ManageStudentService {
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final Validator validator;
@@ -48,26 +47,13 @@ public class AdminManageServiceImpl implements AdminManageService {
     @Override
     public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
 
-        Page<Student> all = studentRepository.findAll(pageable);
+        Page<StudentResponse> all = studentRepository.findAllStudent(pageable);
 
-        return listConverter.toPageResponse(all, e -> studentMapper.toDto(e));
+        return listConverter.toPageResponse(all);
 
     }
 
-    @Override
-    public StudentResponse getOneStudentAccountDetailsById(int id) throws AccountNotFoundException {
-        Optional<Student> optional = studentRepository.findOneById(id);
 
-        Student student = optional.orElseThrow(() -> new AccountNotFoundException("Account not found"));
-
-        return StudentConverter.toStudentResponse(student);
-    }
-
-    @Override
-    public PageResponse<StudentResponse> searchStudentAccountByUsername(String username, boolean isNonLocked, Pageable pageable) {
-        Page<Student> entity = studentRepository.findAllByUsernameContainingIgnoreCaseAndIsNonLocked(username, isNonLocked, pageable);
-        return listConverter.toPageResponse(entity, StudentConverter::toStudentResponse);
-    }
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
         Set<ConstraintViolation<StudentAddRequest>> violations = validator.validate(addRequest);
@@ -136,16 +122,7 @@ public class AdminManageServiceImpl implements AdminManageService {
         studentRepository.save(entity);
     }
 
-    @Override
-    public void lockManyStudentAccount(List<Integer> ids) {
-        List<Student> students = studentRepository.findAllById(ids);
 
-        for (Student student : students) {
-            student.setNonLocked(false);
-        }
-
-        studentRepository.saveAll(students);
-    }
 
     private final ChallengeRepository challengeRepository;
 
@@ -159,26 +136,6 @@ public class AdminManageServiceImpl implements AdminManageService {
     public PageResponse<ChallengeResponse> searchChallengeByTitle(Admin userDetails, String title, Pageable pageable) {
         Page<Challenge> challenges = challengeRepository.findAllByTitleContainingIgnoreCase(title, pageable);
         return listConverter.toPageResponse(challenges, ChallengeConverter::toChallengeResponse);
-    }
-
-    @Override
-    public void addStudentAccount(StudentAddRequest request) throws Exception {
-
-        request.setUsername(request.getUsername().trim());
-
-        Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
-
-        if (duplicate.isPresent()) {
-            throw new UsernameExistedException("Username existed!");
-        }
-
-        Student student = studentMapper.toEntity(request);
-
-        student.setPassword(passwordEncoder.encode("password"));
-
-        studentRepository.save(student);
-
-
     }
 
 

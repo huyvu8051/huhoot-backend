@@ -1,4 +1,4 @@
-package com.huhoot.admin.host;
+package com.huhoot.vue.vdatatable;
 
 import org.springframework.data.domain.Pageable;
 

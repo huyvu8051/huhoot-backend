@@ -1,14 +1,15 @@
 package com.huhoot.admin.host;
 
-import com.huhoot.converter.AdminConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.dto.*;
-import com.huhoot.enums.Role;
+import com.huhoot.dto.HostAddErrorResponse;
+import com.huhoot.dto.HostAddRequest;
+import com.huhoot.dto.HostUpdateRequest;
+import com.huhoot.dto.PageResponse;
 import com.huhoot.exception.UsernameExistedException;
-import com.huhoot.mapper.AdminMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.repository.AdminRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,8 +27,7 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class ManageHostServiceImpl implements ManageHostService{
-
+public class ManageHostServiceImpl implements ManageHostService {
 
 
     private final AdminMapper adminMapper;
@@ -35,11 +35,15 @@ public class ManageHostServiceImpl implements ManageHostService{
     private final PasswordEncoder passwordEncoder;
 
     private final Validator validator;
-
     private final ListConverter listConverter;
-
     private final ManageHostRepository manageHostRepository;
 
+    /**
+     * Find all host account
+     *
+     * @param pageable
+     * @return
+     */
     @Override
     public PageResponse<HostResponse> findAllHostAccount(Pageable pageable) {
 
@@ -48,21 +52,16 @@ public class ManageHostServiceImpl implements ManageHostService{
         return listConverter.toPageResponse(admins2);
     }
 
-
-    @Override
-    public HostResponse getOneHostAccountDetailsById(int id) {
-        Optional<Admin> entity = adminRepository.findOneById(id);
-        return AdminConverter.toHostResponse(entity.get());
-    }
-
-    @Override
-    public PageResponse<HostResponse> searchHostAccountByUsername(String username, Pageable pageable) {
-
-        Page<Admin> entities = adminRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
-
-        return listConverter.toPageResponse(entities, AdminConverter::toHostResponse);
-    }
-
+    /**
+     * <ul>
+     * <li>Add many host account, if you want to add one account, just give it a list with one account.</li>
+     * <li>It will return a list of insert error, on each error, they will contain an error message.</li>
+     * </ul>
+     *
+     * @param hostDTOs
+     * @return List of insert error
+     * @throws UsernameExistedException
+     */
     @Override
     public List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOs) {
 
@@ -71,6 +70,9 @@ public class ManageHostServiceImpl implements ManageHostService{
         for (HostAddRequest hostDTO : hostDTOs) {
             try {
                 this.addOneHostAccount(hostDTO);
+            } catch (DataIntegrityViolationException e) {
+                HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO, "Username existed");
+                errors.add(errResponse);
             } catch (Exception e) {
                 HostAddErrorResponse errResponse = new HostAddErrorResponse(hostDTO, e.getMessage());
                 errors.add(errResponse);
@@ -83,7 +85,7 @@ public class ManageHostServiceImpl implements ManageHostService{
     }
 
 
-    private void addOneHostAccount(HostAddRequest addRequest) throws UsernameExistedException {
+    private void addOneHostAccount(HostAddRequest addRequest) {
 
         Set<ConstraintViolation<HostAddRequest>> violations = validator.validate(addRequest);
 
@@ -92,10 +94,7 @@ public class ManageHostServiceImpl implements ManageHostService{
             StringBuilder sb = new StringBuilder();
 
             for (ConstraintViolation<HostAddRequest> violation : violations) {
-                sb.append(violation.getPropertyPath());
-                sb.append(" :");
-                sb.append(violation.getMessage());
-                sb.append(" | ");
+                sb.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append(", ");
             }
 
             throw new ValidationException(sb.toString());
@@ -103,22 +102,18 @@ public class ManageHostServiceImpl implements ManageHostService{
 
         String formattedUsername = addRequest.getUsername().trim().toLowerCase();
 
-        /**Because of sqlite can't check the unique, so we need check it manually
-         */
-
-        Optional<Admin> duplicate = adminRepository.findOneByUsername(formattedUsername);
-
-        if (duplicate.isPresent()) {
-            throw new UsernameExistedException("Username existed!");
-        }
-
         String hashedPassword = passwordEncoder.encode("password");
         Admin host = new Admin(formattedUsername, hashedPassword);
         adminRepository.save(host);
     }
 
 
-
+    /**
+     * Update host account information with FETCH
+     *
+     * @param request
+     * @throws UsernameExistedException
+     */
     @Override
     public void updateHostAccount(@Valid HostUpdateRequest request) throws UsernameExistedException {
 
@@ -138,31 +133,5 @@ public class ManageHostServiceImpl implements ManageHostService{
 
     }
 
-    @Override
-    public void lockManyHostAccount(List<Integer> ids) {
-        List<Admin> hosts = adminRepository.findAllById(ids);
 
-        for (Admin host : hosts) {
-            host.setNonLocked(false);
-        }
-
-        adminRepository.saveAll(hosts);
-
-    }
-    @Override
-    public void addHostAccount(HostAddRequest request) throws UsernameExistedException {
-        request.setUsername(request.getUsername().trim());
-
-        Optional<Admin> duplicate = adminRepository.findOneByUsername(request.getUsername());
-        if (duplicate.isPresent()) throw new UsernameExistedException("Username existed!");
-
-
-        Admin host = adminMapper.toEntity(request);
-
-        host.setPassword(passwordEncoder.encode("password"));
-
-        host.setRole(Role.HOST);
-
-        adminRepository.save(host);
-    }
 }

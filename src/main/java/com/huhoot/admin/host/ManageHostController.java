@@ -2,11 +2,10 @@ package com.huhoot.admin.host;
 
 import com.huhoot.dto.*;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.vue.vdatatable.VDataTablePagingConverter;
+import com.huhoot.vue.vdatatable.VDataTablePagingRequest;
 import lombok.AllArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,23 +27,7 @@ public class ManageHostController {
 
         Pageable pageable1 = vDataTablePagingConverter.toPageable(pagingRequest);
 
-        Pageable pageable = PageRequest.of(pagingRequest.getPage() - 1, pagingRequest.getItemsPerPage(), Sort.Direction.fromString("DESC"), "createdDate");
-
         return ResponseEntity.ok(manageHostService.findAllHostAccount(pageable1));
-
-    }
-
-
-    @GetMapping("/host/search")
-    public ResponseEntity<PageResponse<HostResponse>> search(@Length(min = 1, max = 15) @RequestParam String username,
-                                                             @RequestParam(defaultValue = "1") int page,
-                                                             @RequestParam(defaultValue = "12") int size,
-                                                             @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                             @RequestParam(defaultValue = "DESC") String direction) {
-
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.fromString(direction), sortBy);
-
-        return ResponseEntity.ok(manageHostService.searchHostAccountByUsername(username, pageable));
 
     }
 

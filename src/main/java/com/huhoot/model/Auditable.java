@@ -1,5 +1,6 @@
 package com.huhoot.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -19,6 +20,7 @@ import java.sql.Timestamp;
 @EntityListeners(AuditingEntityListener.class)
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public abstract class Auditable {
 
     @CreatedBy
