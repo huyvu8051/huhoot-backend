@@ -35,7 +35,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @return list of student id, fullName, score <br/>
      * Not contain <b>rank</b>
      */
-    @Query("SELECT new com.huhoot.dto.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName)  " +
+    @Query("SELECT new com.huhoot.host.organize.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName)  " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
             "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName " +
@@ -53,7 +53,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @param hostId     host id
      * @return List of answer contain number of student choose
      */
-    @Query("SELECT new com.huhoot.dto.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
+    @Query("SELECT new com.huhoot.host.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
@@ -64,7 +64,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
 
 
 
-    @Query("SELECT new com.huhoot.dto.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
+    @Query("SELECT new com.huhoot.host.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +

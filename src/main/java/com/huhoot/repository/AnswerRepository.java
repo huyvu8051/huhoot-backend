@@ -35,7 +35,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
      * @param questionId {@link com.huhoot.model.Question} id
      * @return List of {@link PublishAnswer}
      */
-    @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id,n.ordinalNumber, n.answerContent) " +
+    @Query("SELECT new com.huhoot.host.organize.PublishAnswer(n.id,n.ordinalNumber, n.answerContent) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
     List<PublishAnswer> findAllPublishAnswerByQuestionId(@Param("questionId") int questionId);
@@ -44,13 +44,13 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
      * @param questionId {@link com.huhoot.model.Question} id
      * @return List of {@link PublishAnswer}
      */
-    @Query("SELECT new com.huhoot.dto.PublishAnswer(n.id, n.ordinalNumber, n.answerContent,n.isCorrect) " +
+    @Query("SELECT new com.huhoot.host.organize.PublishAnswer(n.id, n.ordinalNumber, n.answerContent,n.isCorrect) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
     List<PublishAnswer> findAllAnswerByQuestionIdAndAdminId(@Param("questionId") int questionId);
 
 
-    @Query("SELECT new com.huhoot.dto.AnswerResultResponse(n.id, n.ordinalNumber, n.answerContent) " +
+    @Query("SELECT new com.huhoot.host.organize.AnswerResultResponse(n.id, n.ordinalNumber, n.answerContent) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
     List<AnswerResultResponse> findAllPublishAnswer(@Param("questionId") int questionId);

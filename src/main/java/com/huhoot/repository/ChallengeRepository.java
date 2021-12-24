@@ -84,7 +84,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
                                             @Param("adminId") int adminId);
 
 
-    @Query("SELECT new com.huhoot.dto.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, " +
+    @Query("SELECT new com.huhoot.host.organize.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, " +
             "m.answerTimeLimit, m.point, m.askDate, m.answerOption, m.challenge.id, m.challenge.questions.size) " +
             "FROM Question m " +
             "WHERE m.id IN (SELECT n.currentQuestionId FROM Challenge n WHERE n.id = :challengeId " +

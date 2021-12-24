@@ -1,6 +1,7 @@
 package com.huhoot.test;
 
 import com.huhoot.utils.FileUploadUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +15,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("host")
+@AllArgsConstructor
 public class UploadFileController {
 
+    private final FileUploadUtil fileUploadUtil;
 
     @PostMapping("/upload")
     public ResponseEntity<String> upload(@RequestParam("file") MultipartFile multipartFile) throws IOException {
@@ -24,9 +27,8 @@ public class UploadFileController {
 
         fileName = UUID.randomUUID().toString() + fileName.substring(fileName.lastIndexOf("."));
 
-        String uploadDir = "uploads/";
 
-        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        fileUploadUtil.saveFile(fileName, multipartFile);
 
         return ResponseEntity.ok(fileName);
     }

@@ -53,7 +53,7 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
     Optional<StudentInChallenge> findOneByChallengeIdAndStudentIdAndAvailable(@Param("challengeId") int challengeId, @Param("studentId") int studentId);
 
 
-    @Query("SELECT new com.huhoot.dto.StudentInChallengeResponse(n.primaryKey.student.id, n.primaryKey.student.username, n.primaryKey.student.fullName, n.isLogin, n.isKicked, n.isOnline, n.createdBy, n.createdDate, n.modifiedBy, n.modifiedDate, n.isNonDeleted) " +
+    @Query("SELECT new com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse(n.primaryKey.student.id, n.primaryKey.student.username, n.primaryKey.student.fullName, n.isLogin, n.isKicked, n.isOnline, n.createdBy, n.createdDate, n.modifiedBy, n.modifiedDate, n.isNonDeleted) " +
             "FROM StudentInChallenge n " +
             "WHERE n.primaryKey.challenge.id = :challengeId " +
             "AND n.primaryKey.challenge.admin.id = :adminId " +
