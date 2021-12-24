@@ -10,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+
 @Component
 @Slf4j
 public class ServerRunner implements CommandLineRunner {
