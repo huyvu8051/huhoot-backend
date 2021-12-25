@@ -1,5 +1,9 @@
-package com.huhoot.admin.manage.student;
+package com.huhoot.mapper.impl;
 
+import com.huhoot.admin.manage.student.StudentAddRequest;
+import com.huhoot.mapper.StudentMapper;
+import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.admin.manage.student.StudentUpdateRequest;
 import com.huhoot.auditing.AuditingMapperImpl;
 import com.huhoot.model.Student;
 import lombok.AllArgsConstructor;
@@ -16,7 +20,7 @@ import javax.annotation.Generated;
 @Primary
 @Component("myStudentMapper")
 @AllArgsConstructor
-public class StudentMapperImplImpl  implements StudentMapper{
+public class StudentMapperImpl implements StudentMapper {
 
     private final AuditingMapperImpl auditingMapper;
 

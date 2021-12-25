@@ -62,12 +62,17 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
                                                 @Param("questionId") int questionId);
 
 
-    @Query("SELECT n.id FROM Question n WHERE n.challenge.id = :challengeId")
-    List<Integer> findAllIdsByChallengeId(@Param("challengeId") int challengeId);
-
 
     Optional<Question> findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId, int adminId);
 
     @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId AND n.askDate IS NOT NULL")
     int findNumberOfPublishedQuestion(@Param("challengeId") int challengeId);
+
+    @Query("SELECT new com.huhoot.host.manage.question.QuestionResponse(n.id, n.ordinalNumber, n.questionContent, " +
+            "n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.askDate, n.isNonDeleted, n.createdDate, " +
+            "n.createdBy, n.modifiedDate, n.modifiedBy) " +
+            "FROM Question n " +
+            "WHERE n.challenge.id = :challengeId " +
+            "AND n.challenge.admin.id = :adminId")
+    Page<QuestionResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("admin") int adminId, Pageable pageable);
 }

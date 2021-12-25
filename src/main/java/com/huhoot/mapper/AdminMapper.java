@@ -1,5 +1,8 @@
-package com.huhoot.admin.manage.host;
+package com.huhoot.mapper;
 
+import com.huhoot.admin.manage.host.HostAddRequest;
+import com.huhoot.admin.manage.host.HostResponse;
+import com.huhoot.admin.manage.host.HostUpdateRequest;
 import com.huhoot.model.Admin;
 import org.mapstruct.MappingTarget;
 
@@ -11,7 +14,7 @@ public interface AdminMapper {
 
     // @Mapping(source = "isNonLocked", target = "nonLocked")
     // @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(HostUpdateRequest request,@MappingTarget Admin host);
+    void update(HostUpdateRequest request, @MappingTarget Admin host);
 
     Admin toEntity(HostAddRequest dto);
 }

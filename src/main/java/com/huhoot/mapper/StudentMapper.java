@@ -1,5 +1,8 @@
-package com.huhoot.admin.manage.student;
+package com.huhoot.mapper;
 
+import com.huhoot.admin.manage.student.StudentAddRequest;
+import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.admin.manage.student.StudentUpdateRequest;
 import com.huhoot.model.Student;
 import org.mapstruct.MappingTarget;
 
@@ -14,5 +17,5 @@ public interface StudentMapper {
 
     //@Mapping(source = "isNonLocked", target = "nonLocked")
     //@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(StudentUpdateRequest request,@MappingTarget Student entity);
+    void update(StudentUpdateRequest request, @MappingTarget Student entity);
 }

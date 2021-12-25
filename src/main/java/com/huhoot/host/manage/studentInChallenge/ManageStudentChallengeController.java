@@ -2,10 +2,11 @@ package com.huhoot.host.manage.studentInChallenge;
 
 import com.huhoot.admin.manage.student.ManageStudentService;
 import com.huhoot.admin.manage.student.StudentResponse;
-import com.huhoot.functional.impl.CheckOwnerChallenge;
+import com.huhoot.host.manage.question.FindAllQuestionRequest;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostManageService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
+import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
+import com.huhoot.vue.vdatatable.paging.VDataTablePagingRequest;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -23,38 +24,28 @@ import java.util.List;
 @RestController
 @RequestMapping("host")
 @AllArgsConstructor
-public class HostManageStudentChallengeController {
-    private final HostManageService hostService;
+public class ManageStudentChallengeController {
+    private final ManageStudentInChallengeService hostService;
 
-    private final CheckOwnerChallenge checkOwnerChallenge;
-
-    private final ManageStudentService adminService;
-
-
+    private final ManageStudentService manageStudentService;
+    private final VDataTablePagingConverter vDataTablePagingConverter;
 
     @GetMapping("/student")
-    public ResponseEntity<PageResponse<StudentResponse>> findALlStudent(@RequestParam(defaultValue = "1") int page,
-                                                                        @RequestParam(defaultValue = "12") int itemsPerPage,
-                                                                        @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                                        @RequestParam(defaultValue = "DESC") String direction) {
-        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
-        return ResponseEntity.ok(adminService.findAllStudentAccount(pageable));
+    public ResponseEntity<PageResponse<StudentResponse>> findAllStudent(@RequestBody VDataTablePagingRequest request) {
+        Pageable pageable = vDataTablePagingConverter.toPageable(request);
+        return ResponseEntity.ok(manageStudentService.findAllStudentAccount(pageable));
     }
 
 
 
 
     @GetMapping("/studentChallenge")
-    public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestParam int challengeId,
-                                                                            @RequestParam(defaultValue = "1") int page,
-                                                                            @RequestParam(defaultValue = "12") int itemsPerPage,
-                                                                            @RequestParam(defaultValue = "createdDate") String sortBy,
-                                                                            @RequestParam(defaultValue = "DESC") String direction) {
+    public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(FindAllQuestionRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = vDataTablePagingConverter.toPageable(request);
 
-        return ResponseEntity.ok(hostService.findAllStudentInChallenge(userDetails, pageable, challengeId));
+        return ResponseEntity.ok(hostService.findAllStudentInChallenge(userDetails, pageable, request.getChallengeId()));
     }
 
 
@@ -69,7 +60,7 @@ public class HostManageStudentChallengeController {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return ResponseEntity.ok(hostService.searchStudentInChallengeByTitle(userDetails, studentUsername, challengeId, pageable));
+        return ResponseEntity.ok(hostService.searchStudentInChallengeByUsername(userDetails, studentUsername, challengeId, pageable));
 
     }
 

@@ -1,17 +1,17 @@
-package com.huhoot.service.impl;
+package com.huhoot.host.organize;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.converter.ListConverter;
+import com.huhoot.converter.StudentInChallengeConverter;
+import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
+import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.host.organize.*;
-import com.huhoot.model.Admin;
-import com.huhoot.model.Challenge;
-import com.huhoot.model.Question;
-import com.huhoot.model.StudentInChallenge;
+import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.service.HostOrganizeChallengeService;
+import com.huhoot.host.organize.HostOrganizeChallengeService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,9 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     private final ChallengeRepository challengeRepository;
     private final SocketIOServer socketIOServer;
     private final ListConverter listConverter;
+
+    private final StudentRepository studentRepository;
+    private final StudentInChallengeRepository studentChallengeRepository;
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
@@ -150,7 +154,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      */
     @Override
     public void kickStudent(List<Integer> studentIds, int challengeId, int adminId) {
-        List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByStudentIdInAndChallengeIdAndChallengeAdminId(studentIds, challengeId, adminId);
+        List<StudentInChallenge> studentInChallenges = studentInChallengeRepository.findAllByStudentIdInAndChallengeIdAndAdminId(studentIds, challengeId, adminId);
 
 
         for (StudentInChallenge sic : studentInChallenges) {
@@ -233,11 +237,77 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
 
-        return PublishQuestionResponse.builder()
-                .question(question)
-                .answers(publishAnswers)
-                .build();
+        return PublishQuestionResponse.builder().question(question).answers(publishAnswers).build();
+    }
+
+    @Override
+    public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
+        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
+        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+
+        long t0 = System.nanoTime();
+        this.createAllStudentAnswerInChallenge(challenge);
+        long t1 = System.nanoTime();
+        double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
+        log.info("Elapsed time =" + elapsedTimeInSecond + " seconds");
+
+
+        challenge.setChallengeStatus(ChallengeStatus.WAITING);
+        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
+
+        List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
+        return listConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
+
     }
 
 
+    private void createAllStudentAnswerInChallenge(Challenge challenge) throws Exception {
+
+
+        List<Student> students = studentRepository.findAllStudentInChallenge(challenge.getId());
+
+        List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
+
+        if (students.size() == 0 || questions.size() == 0)
+            throw new ChallengeException("No student or question found in challenge id = " + challenge.getId());
+
+        List<StudentAnswer> studentAnswers = new ArrayList<>();
+
+        for (Question quest : questions) {
+            List<Answer> answers = quest.getAnswers();
+
+            validateQuestion(quest, answers);
+
+            for (Answer ans : answers) {
+                for (Student stu : students) {
+
+                    StudentAnswerId id = StudentAnswerId.builder().student(stu).answer(ans).challenge(challenge).question(quest).build();
+
+                    studentAnswers.add(StudentAnswer.builder().primaryKey(id).score(0).isCorrect(false).answerDate(null).build());
+
+                }
+            }
+        }
+
+
+        studentAnswerRepository.saveAll(studentAnswers);
+
+    }
+
+    private void validateQuestion(Question quest, List<Answer> answers) throws ChallengeException {
+        if (answers.size() == 0) throw new ChallengeException("No answer found for question id = " + quest.getId());
+
+        boolean noAnswerCorrect = answers.stream().noneMatch(e -> e.isCorrect());
+
+        if (noAnswerCorrect) {
+            throw new ChallengeException("No any answer correct for question id = " + quest.getId());
+        }
+
+        if (quest.getAnswerOption().equals(AnswerOption.SINGLE_SELECT)) {
+            long answerCount = answers.stream().filter(e -> e.isCorrect()).count();
+            if (answerCount > 1)
+                throw new ChallengeException("SINGLE_SELECT: Ony one answer is correct for question id = " + quest.getId());
+
+        }
+    }
 }

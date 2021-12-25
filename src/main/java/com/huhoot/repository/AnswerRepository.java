@@ -14,13 +14,9 @@ import java.util.Optional;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
-    Optional<Answer> findOneByIdAndQuestionChallengeAdminId(int answerId, int id);
-
     Optional<Answer> findOneById(int id);
 
     List<Answer> findAllByIdIn(List<Integer> ids);
-
-    Page<Answer> findAllByQuestionChallengeAdminIdAndQuestionId(int id, int questionId, Pageable pageable);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
@@ -55,4 +51,9 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             "WHERE n.question.id = :questionId")
     List<AnswerResultResponse> findAllPublishAnswer(@Param("questionId") int questionId);
 
+    @Query("SELECT new com.huhoot.host.organize.PublishAnswer(n.id, n.ordinalNumber, n.answerContent, n.isCorrect, false, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy) " +
+            "FROM Answer n " +
+            "WHERE n.question.id = :questionId " +
+            "AND n.question.challenge.admin.id = :adminId")
+    Page<PublishAnswer> findAllByQuestionIdAndAdminId(@Param("questionId") int questionId, @Param("adminId") int adminId, Pageable pageable);
 }

@@ -2,7 +2,6 @@ package com.huhoot.student.manage;
 
 import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Student;
-import com.huhoot.service.StudentManageService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

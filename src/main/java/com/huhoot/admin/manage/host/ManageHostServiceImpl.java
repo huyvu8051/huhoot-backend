@@ -2,8 +2,10 @@ package com.huhoot.admin.manage.host;
 
 import com.huhoot.converter.ListConverter;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.mapper.AdminMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.repository.AdminRepository;
+import com.huhoot.repository.ManageHostRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

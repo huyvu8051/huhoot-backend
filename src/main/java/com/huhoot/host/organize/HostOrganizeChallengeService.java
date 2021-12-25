@@ -1,4 +1,4 @@
-package com.huhoot.service;
+package com.huhoot.host.organize;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface HostOrganizeChallengeService {
+
+    List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws Exception;
+
     List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId);
 
     /**

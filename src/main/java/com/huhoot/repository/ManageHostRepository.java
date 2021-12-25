@@ -1,5 +1,6 @@
-package com.huhoot.admin.manage.host;
+package com.huhoot.repository;
 
+import com.huhoot.admin.manage.host.HostResponse;
 import com.huhoot.model.Admin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

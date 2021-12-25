@@ -1,6 +1,10 @@
-package com.huhoot.admin.manage.host;
+package com.huhoot.mapper.impl;
 
+import com.huhoot.admin.manage.host.HostAddRequest;
+import com.huhoot.admin.manage.host.HostResponse;
+import com.huhoot.admin.manage.host.HostUpdateRequest;
 import com.huhoot.auditing.AuditingMapper;
+import com.huhoot.mapper.AdminMapper;
 import com.huhoot.model.Admin;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;

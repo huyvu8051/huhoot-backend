@@ -24,15 +24,6 @@ public class ServerRunner implements CommandLineRunner {
     @Bean
     public SocketIOServer socketioserver() {
 
-        /*
-        try {
-            InetAddress IP = InetAddress.getLocalHost();
-            this.host = IP.getHostAddress();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }*/
-
         Configuration config = new Configuration();
         config.setHostname(host);
         config.setPort(port);

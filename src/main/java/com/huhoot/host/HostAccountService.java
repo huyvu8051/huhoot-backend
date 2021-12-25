@@ -1,4 +1,4 @@
-package com.huhoot.service;
+package com.huhoot.host;
 
 import com.huhoot.dto.ChangePasswordRequest;
 import com.huhoot.exception.AccountException;

@@ -1,5 +1,6 @@
-package com.huhoot.admin.manage.student;
+package com.huhoot.repository;
 
+import com.huhoot.admin.manage.student.StudentResponse;
 import com.huhoot.model.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

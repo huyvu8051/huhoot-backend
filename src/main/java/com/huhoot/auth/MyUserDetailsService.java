@@ -1,6 +1,6 @@
 package com.huhoot.auth;
 
-import com.huhoot.admin.manage.student.StudentRepository;
+import com.huhoot.repository.StudentRepository;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Student;
 import com.huhoot.repository.AdminRepository;

@@ -1,15 +1,15 @@
-package com.huhoot.service.impl;
+package com.huhoot.student.participate;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.huhoot.admin.manage.student.StudentRepository;
+import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.enums.Points;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.organize.EncryptUtil;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.service.StudentParticipateService;
+import com.huhoot.student.participate.StudentParticipateService;
 import com.huhoot.student.participate.SendAnswerResponse;
 import com.huhoot.student.participate.StudentAnswerRequest;
 import javassist.NotFoundException;

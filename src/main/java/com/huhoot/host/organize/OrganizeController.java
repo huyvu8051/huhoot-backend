@@ -2,8 +2,6 @@ package com.huhoot.host.organize;
 
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostManageService;
-import com.huhoot.service.HostOrganizeChallengeService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -20,7 +18,6 @@ import java.util.List;
 @RequestMapping("host")
 public class OrganizeController {
 
-    private final HostManageService hostService;
 
     private final HostOrganizeChallengeService hostOrganizeChallengeService;
 
@@ -29,7 +26,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostService.openChallenge(userDetails, challengeId));
+        return ResponseEntity.ok(hostOrganizeChallengeService.openChallenge(userDetails, challengeId));
     }
 
     @GetMapping("/studentOnline")

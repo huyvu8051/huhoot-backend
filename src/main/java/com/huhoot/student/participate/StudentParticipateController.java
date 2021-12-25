@@ -1,7 +1,6 @@
 package com.huhoot.student.participate;
 
 import com.huhoot.model.Student;
-import com.huhoot.service.StudentParticipateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

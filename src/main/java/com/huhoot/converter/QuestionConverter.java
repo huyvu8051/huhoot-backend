@@ -11,22 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionConverter {
-    public static QuestionResponse toQuestionResponse(Question question) {
-        QuestionResponse response = new QuestionResponse();
-        response.setId(question.getId());
-        response.setOrdinalNumber(question.getOrdinalNumber());
-        response.setQuestionContent(question.getQuestionContent());
-        response.setQuestionImage(question.getQuestionImage());
-        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
-        response.setPoint(question.getPoint());
-        response.setAnswerOption(question.getAnswerOption());
-        if (question.getAskDate() != null)
-            response.setAskDate(question.getAskDate().getTime());
-        response.setNonDeleted(question.isNonDeleted());
-        if (question.getCreatedDate() != null)
-            response.setCreatedDate(question.getCreatedDate().getTime());
-        return response;
-    }
+
 
     public static Question toEntity(QuestionAddRequest request) {
         Question question = new Question();
@@ -39,26 +24,5 @@ public class QuestionConverter {
         return question;
     }
 
-    public static PublishQuestion toPublishQuestionResponse(Question question) {
 
-        List<PublishAnswer> publishAnswerResponses = new ArrayList<>();
-
-        for (Answer ans : question.getAnswers()) {
-            publishAnswerResponses.add(AnswerConverter.toPublishAnswerResponse(ans));
-        }
-
-        PublishQuestion response = new PublishQuestion();
-
-        response.setId(question.getId());
-        response.setOrdinalNumber(question.getOrdinalNumber());
-        response.setQuestionContent(question.getQuestionContent());
-        response.setAnswerTimeLimit(question.getAnswerTimeLimit());
-        response.setPoint(question.getPoint());
-        response.setAnswerOption(question.getAnswerOption());
-        response.setAskDate(question.getAskDate().getTime());
-
-        return response;
-
-
-    }
 }

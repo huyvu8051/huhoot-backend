@@ -7,7 +7,6 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
-import com.huhoot.admin.manage.student.StudentRepository;
 import com.huhoot.auth.JwtUtil;
 import com.huhoot.auth.MyUserDetailsService;
 import com.huhoot.exception.StudentAddException;
@@ -16,17 +15,13 @@ import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
-import com.huhoot.repository.AdminRepository;
-import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.QuestionRepository;
-import com.huhoot.repository.StudentInChallengeRepository;
-import com.huhoot.service.StudentParticipateService;
+import com.huhoot.repository.*;
+import com.huhoot.student.participate.StudentParticipateService;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -64,7 +59,7 @@ public class MessageEventHandler {
     @OnEvent("messageEvent")
     public void onEvent(SocketIOClient client, AckRequest request, String data) {
         log.info("get data = " + data.toString());
-        client.sendEvent("message", "chung ta cua hien tai");
+        client.sendEvent("message", "a dump message");
     }
 
     @OnEvent("registerHostSocket")
@@ -89,8 +84,6 @@ public class MessageEventHandler {
 
 
             client.joinRoom(challenge.getId() + "");
-
-            List<Integer> questionIds = questionRepository.findAllIdsByChallengeId(request.getChallengeId());
 
             ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
 

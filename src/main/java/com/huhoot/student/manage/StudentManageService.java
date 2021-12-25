@@ -1,4 +1,4 @@
-package com.huhoot.service;
+package com.huhoot.student.manage;
 
 import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Student;

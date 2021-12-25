@@ -1,4 +1,4 @@
-package com.huhoot.service.impl;
+package com.huhoot.student.manage;
 
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
@@ -7,7 +7,7 @@ import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
-import com.huhoot.service.StudentManageService;
+import com.huhoot.student.manage.StudentManageService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,8 +22,6 @@ import java.util.List;
 public class StudentManageServiceImpl implements StudentManageService {
 
     private final ChallengeRepository challengeRepository;
-
-    private final StudentInChallengeRepository studentChallengeRepository;
 
     private final ListConverter listConverter;
 

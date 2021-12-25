@@ -3,7 +3,7 @@ package com.huhoot.admin;
 import com.huhoot.dto.ChangePasswordRequest;
 import com.huhoot.exception.AccountException;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostAccountService;
+import com.huhoot.host.HostAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PutMapping;

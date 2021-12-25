@@ -1,10 +1,10 @@
-package com.huhoot.service.impl;
+package com.huhoot.host;
 
 import com.huhoot.dto.ChangePasswordRequest;
 import com.huhoot.exception.AccountException;
 import com.huhoot.model.Admin;
 import com.huhoot.repository.AdminRepository;
-import com.huhoot.service.HostAccountService;
+import com.huhoot.host.HostAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

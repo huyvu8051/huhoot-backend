@@ -3,7 +3,6 @@ package com.huhoot.host.manage.question;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
-import com.huhoot.service.HostManageService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
 import javassist.NotFoundException;
@@ -20,7 +19,6 @@ import java.io.IOException;
 @RequestMapping("host")
 @AllArgsConstructor
 public class ManageQuestionController {
-    private final HostManageService hostService;
 
     private final ManageQuestionService manageQuestionService;
 
@@ -45,7 +43,7 @@ public class ManageQuestionController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostService.addOneQuestion(userDetails, request, checkOwnerChallenge));
+        return ResponseEntity.ok(manageQuestionService.addOneQuestion(userDetails, request, checkOwnerChallenge));
 
     }
 
@@ -54,7 +52,7 @@ public class ManageQuestionController {
     public void update(@RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        hostService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
+        manageQuestionService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
 
     }
 

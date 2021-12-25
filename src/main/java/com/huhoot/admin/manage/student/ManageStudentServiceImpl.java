@@ -1,9 +1,10 @@
-package com.huhoot.service.impl;
+package com.huhoot.admin.manage.student;
 
-import com.huhoot.admin.manage.student.*;
 import com.huhoot.converter.ListConverter;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Student;
+import com.huhoot.repository.StudentRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;

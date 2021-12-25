@@ -5,15 +5,7 @@ import com.huhoot.host.organize.PublishAnswer;
 import com.huhoot.model.Answer;
 
 public class AnswerConverter {
-    public static PublishAnswer toAnswerResponse(Answer entity) {
-        PublishAnswer response = new PublishAnswer();
-        response.setId(entity.getId());
-        response.setOrdinalNumber(entity.getOrdinalNumber());
-        response.setAnswerContent(entity.getAnswerContent());
-        response.setIsCorrect(entity.isCorrect());
 
-        return response;
-    }
 
     public static Answer toEntity(AnswerAddRequest request) {
         Answer answer = new Answer();
@@ -23,13 +15,5 @@ public class AnswerConverter {
         return answer;
     }
 
-    public static PublishAnswer toPublishAnswerResponse(Answer answer) {
-        return PublishAnswer.builder()
-                .id(answer.getId())
-                .ordinalNumber(answer.getOrdinalNumber())
-                .answerContent(answer.getAnswerContent())
-                .createdDate(answer.getCreatedDate().getTime())
-                .isCorrect(answer.isCorrect())
-                .build();
-    }
+
 }

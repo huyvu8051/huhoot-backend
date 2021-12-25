@@ -1,6 +1,6 @@
 package com.huhoot.config;
 
-import com.huhoot.admin.manage.student.StudentRepository;
+import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.enums.Points;
