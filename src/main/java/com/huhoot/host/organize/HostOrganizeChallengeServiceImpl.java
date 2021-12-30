@@ -8,10 +8,8 @@ import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
-import com.huhoot.host.organize.*;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.host.organize.HostOrganizeChallengeService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -195,13 +193,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                 .questionOrder(questionOrder)
                 .theLastQuestion(countQuestion == questionOrder)
                 .build();
-
-
         List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
-
-
-
-
         // delay 6 sec
         long sec = 6;
         Timestamp askDate = new Timestamp(System.currentTimeMillis() + sec * 1000);
@@ -212,14 +204,10 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .question(publishQuest)
                         .answers(publishAnswers)
                         .build());
-
         challengeRepository.updateCurrentQuestionId(challengeId, question.getId());
-
         // update ask date and decryptKey
         byte[] bytes = EncryptUtil.generateRandomKeyStore();
         questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, bytes, question.getId());
-
-
     }
 
     @Override
@@ -275,6 +263,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         for (Question quest : questions) {
             List<Answer> answers = quest.getAnswers();
+            quest.setAskDate(null);
 
             validateQuestion(quest, answers);
 
@@ -289,7 +278,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
             }
         }
 
-
+        questionRepository.saveAll(questions);
         studentAnswerRepository.saveAll(studentAnswers);
 
     }

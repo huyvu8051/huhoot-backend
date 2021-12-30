@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,9 +41,9 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
         Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
 
         Answer answer = AnswerConverter.toEntity(request);
-
+        int nextOrdinalNumber = answerRepository.getNextOrdinalNumber(question.getId());
         answer.setQuestion(question);
-
+        answer.setOrdinalNumber(nextOrdinalNumber);
         answerRepository.save(answer);
 
     }
@@ -57,5 +59,20 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
         answerMapper.updateAnswer(request, answer);
 
         answerRepository.save(answer);
+    }
+
+    @Override
+    public void updateOrdinal(Admin userDetails, AnswerOrdinalUpdateRequest request) throws NotFoundException {
+        List<AnswerOrdinal> list = request.getList();
+        List<Answer> result = new ArrayList<>();
+
+        for (AnswerOrdinal dto : list) {
+            Optional<Answer> optional = answerRepository.findOneById(dto.getId());
+            Answer entity = optional.orElseThrow(() -> new NotFoundException("Question not found"));
+            entity.setOrdinalNumber(dto.getOrdinalNumber());
+         result.add(entity);
+        }
+
+        answerRepository.saveAll(result);
     }
 }

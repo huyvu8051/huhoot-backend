@@ -54,6 +54,12 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     @Query("SELECT new com.huhoot.host.organize.PublishAnswer(n.id, n.ordinalNumber, n.answerContent, n.isCorrect, false, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy) " +
             "FROM Answer n " +
             "WHERE n.question.id = :questionId " +
-            "AND n.question.challenge.admin.id = :adminId")
+            "AND n.question.challenge.admin.id = :adminId " +
+            "ORDER BY n.ordinalNumber ASC ")
     Page<PublishAnswer> findAllByQuestionIdAndAdminId(@Param("questionId") int questionId, @Param("adminId") int adminId, Pageable pageable);
+
+    @Query("SELECT COALESCE(MAX (n.ordinalNumber + 1), 0) " +
+            "FROM Answer n " +
+            "WHERE n.question.id = :questionId")
+    int getNextOrdinalNumber(@Param("questionId") int questionId);
 }

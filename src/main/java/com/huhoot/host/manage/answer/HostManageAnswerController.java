@@ -49,4 +49,11 @@ public class HostManageAnswerController {
         manageAnswerService.updateOneAnswer(userDetails, request);
     }
 
+    @PatchMapping("/answer/ordinal")
+    public void updateOrdinal(@Valid @RequestBody AnswerOrdinalUpdateRequest request) throws NotFoundException {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        manageAnswerService.updateOrdinal(userDetails, request);
+    }
+
 }

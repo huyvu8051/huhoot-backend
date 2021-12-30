@@ -52,7 +52,16 @@ public class ManageQuestionController {
     public void update(@RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        manageQuestionService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
+      manageQuestionService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
+
+
+    }
+
+    @PatchMapping("/question/ordinal")
+    public void updateOrdinal(@RequestBody QuestionOrdinalUpdateRequest request) throws NotYourOwnException, NotFoundException {
+        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        manageQuestionService.updateOrdinal(userDetails, request);
 
     }
 

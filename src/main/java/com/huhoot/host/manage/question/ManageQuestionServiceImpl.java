@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,6 +44,9 @@ public class ManageQuestionServiceImpl implements ManageQuestionService{
 
         Question question = QuestionConverter.toEntity(request);
 
+        int nextOrdinalNumber = questionRepository.getNextOrdinalNumber(challenge.getId());
+
+        question.setOrdinalNumber(nextOrdinalNumber);
         question.setChallenge(challenge);
 
         Question save = questionRepository.save(question);
@@ -59,7 +64,20 @@ public class ManageQuestionServiceImpl implements ManageQuestionService{
 
         questionMapper.update(request, question);
 
-        questionRepository.save(question);
+       questionRepository.save(question);
+    }
 
+    @Override
+    public void updateOrdinal(Admin userDetails, QuestionOrdinalUpdateRequest request) {
+        List<QuestionOrdinal> list = request.getList();
+
+        List<Question> result = new ArrayList<>();
+        for (QuestionOrdinal dto : list) {
+            Optional<Question> optional = questionRepository.findOneById(dto.getId());
+            Question entity = optional.orElseThrow(() -> new NullPointerException("Question not found"));
+            entity.setOrdinalNumber(dto.getOrdinalNumber());
+            result.add(entity);
+        }
+        questionRepository.saveAll(result);
     }
 }

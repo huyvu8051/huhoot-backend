@@ -15,7 +15,6 @@ public class QuestionConverter {
 
     public static Question toEntity(QuestionAddRequest request) {
         Question question = new Question();
-        question.setOrdinalNumber(request.getOrdinalNumber());
         question.setQuestionContent(request.getQuestionContent());
         question.setQuestionImage(request.getQuestionImage());
         question.setAnswerTimeLimit(request.getAnswerTimeLimit());

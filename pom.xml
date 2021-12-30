@@ -48,23 +48,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
         </dependency>
-
-        <!-- junit test -->
+        <!-- junit -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.0</version>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.0</version>
-            <scope>test</scope>
-        </dependency>
-
-
         <!-- sqlite -->
         <dependency>
             <groupId>com.zsoltfabok</groupId>
@@ -173,6 +163,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>

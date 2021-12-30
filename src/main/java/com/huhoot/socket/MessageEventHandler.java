@@ -106,7 +106,6 @@ public class MessageEventHandler {
 
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
-
         try {
 
             // authorization
@@ -123,7 +122,6 @@ public class MessageEventHandler {
             }
 
             // missing set security context holder
-
 
             studentParticipateService.join(client, request.getChallengeId(), student);
 

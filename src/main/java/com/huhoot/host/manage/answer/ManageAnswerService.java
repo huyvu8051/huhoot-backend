@@ -13,4 +13,6 @@ public interface ManageAnswerService {
     void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws Exception;
 
     void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException;
+
+    void updateOrdinal(Admin userDetails, AnswerOrdinalUpdateRequest request) throws NotFoundException;
 }

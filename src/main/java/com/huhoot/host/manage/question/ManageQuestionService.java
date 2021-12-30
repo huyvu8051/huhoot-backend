@@ -2,6 +2,7 @@ package com.huhoot.host.manage.question;
 
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
+import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
@@ -17,4 +18,5 @@ public interface ManageQuestionService {
     void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException;
 
 
+    void updateOrdinal(Admin userDetails, QuestionOrdinalUpdateRequest request);
 }

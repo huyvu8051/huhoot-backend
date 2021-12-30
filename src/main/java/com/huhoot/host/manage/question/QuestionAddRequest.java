@@ -14,8 +14,6 @@ public class QuestionAddRequest {
 
     private int challengeId;
 
-    private int ordinalNumber;
-
     @NotNull
     @NotEmpty
     @NotBlank

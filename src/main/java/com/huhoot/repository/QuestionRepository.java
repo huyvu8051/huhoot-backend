@@ -17,35 +17,13 @@ import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
-    Page<Question> findAllByChallengeIdAndChallengeAdminId(int challengeId, int id, Pageable pageable);
-
     Optional<Question> findOneById(int id);
 
-    List<Question> findAllByIdIn(List<Integer> ids);
 
     List<Question> findAllByChallengeId(int id);
 
     Optional<Question> findOneByIdAndAskDateNotNull(int questionId);
 
-    /**
-     * @param challengeId challenge id
-     * @param adminId     admin id
-     * @return List of QuestionResponse(id, ordinalNumber, questionContent, answerTimeLimit, point, answerOption, askDate, isNonDeleted)
-     */
-    @Query("SELECT new com.huhoot.host.manage.question.QuestionResponse(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.askDate, n.isNonDeleted) " +
-            "FROM Question n " +
-            "WHERE n.challenge.id = :challengeId AND n.challenge.admin.id = :adminId")
-    List<QuestionResponse> findAllQuestionResponse(@Param("challengeId") int challengeId, @Param("adminId") int adminId);
-
-    /**
-     * @param questionId question id
-     * @param adminId    admin id
-     * @return List of PublishQuestionResponse
-     */
-    @Query("SELECT new com.huhoot.host.organize.PublishQuestion(n.id, n.ordinalNumber, n.questionContent, n.questionImage, n.answerTimeLimit, n.point, n.answerOption, n.challenge.id, n.challenge.questions.size) " +
-            "FROM Question n " +
-            "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
-    Optional<PublishQuestion> findAllPublishQuestion(@Param("questionId") int questionId, @Param("adminId") int adminId);
 
 
     /**
@@ -73,6 +51,12 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "n.createdBy, n.modifiedDate, n.modifiedBy) " +
             "FROM Question n " +
             "WHERE n.challenge.id = :challengeId " +
-            "AND n.challenge.admin.id = :adminId")
-    Page<QuestionResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("admin") int adminId, Pageable pageable);
+            "AND n.challenge.admin.id = :adminId " +
+            "ORDER BY n.ordinalNumber ASC")
+    Page<QuestionResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("adminId") int adminId, Pageable pageable);
+
+    @Query("SELECT COALESCE(MAX (n.ordinalNumber + 1), 0) " +
+            "FROM Question n " +
+            "WHERE n.challenge.id = :challengeId")
+    int getNextOrdinalNumber(@Param("challengeId") int challengeId);
 }
