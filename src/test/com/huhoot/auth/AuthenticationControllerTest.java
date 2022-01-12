@@ -30,18 +30,21 @@ public class AuthenticationControllerTest {
         Collection<? extends GrantedAuthority> authorities = body.getAuthorities();
         assertTrue(authorities.stream().anyMatch(e -> e.getAuthority().equals("ADMIN")));
     }
-    @Test
-    void incorrectPassword(){
-        assertThrows(BadCredentialsException.class, ()->{
-            getAuth("admin", "incorrectPassword");
-        });
-    }
+
     @Test
     void incorrectAuthorities(){
         AuthenticationResponse body = getAuth("admin0", "password");
         Collection<? extends GrantedAuthority> authorities = body.getAuthorities();
         assertFalse(authorities.stream().anyMatch(e -> e.getAuthority().equals("ADMIN")));
     }
+
+    @Test
+    void incorrectPassword(){
+        assertThrows(BadCredentialsException.class, ()->{
+            getAuth("admin", "incorrectPassword");
+        });
+    }
+
     private AuthenticationResponse getAuth(String username, String password) {
         AuthenticationRequest request = new AuthenticationRequest().builder()
                 .username(username)
