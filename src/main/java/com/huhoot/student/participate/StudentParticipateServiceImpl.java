@@ -14,9 +14,16 @@ import com.huhoot.student.participate.SendAnswerResponse;
 import com.huhoot.student.participate.StudentAnswerRequest;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +84,10 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
     @Override
     public SendAnswerResponse answer(StudentAnswerRequest request, Student userDetails) throws Exception {
+
+
+
+
         // check is answered by query is any student answer have answer date not null
         // not check yet
 
