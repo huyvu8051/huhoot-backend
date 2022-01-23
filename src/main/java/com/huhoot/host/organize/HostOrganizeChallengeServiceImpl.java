@@ -20,8 +20,11 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -173,8 +176,8 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     }
 
     @Override
-    public void publishNextQuestion(int challengeId, int adminId) throws Exception {
-            Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, adminId);
+    public void publishNextQuestion(int challengeId, Admin admin) throws Exception {
+            Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
         Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
 
         int countQuestion = challengeRepository.findCountQuestion(challengeId);
@@ -193,21 +196,42 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                 .questionOrder(questionOrder)
                 .theLastQuestion(countQuestion == questionOrder)
                 .build();
+
         List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
+
+
         // delay 6 sec
         long sec = 6;
-        Timestamp askDate = new Timestamp(System.currentTimeMillis() + sec * 1000);
-        publishQuest.setAskDate(askDate.getTime());
+        long askDate = System.currentTimeMillis() + sec * 1000;
+        publishQuest.setAskDate(askDate);
+
+
+
+        // update ask date and decryptKey
+        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
+        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, byteKey, question.getId());
+
+        // hash correct answer ids
+        Stream<PublishAnswer> stream = answerRepository.findAllByQuestionIdAndAdminId(question.getId(), admin.getId(), Pageable.unpaged()).stream();
+        String numbersString = stream.filter(e->e.getIsCorrect()).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e->String.valueOf(e.getId()))
+                .collect(Collectors.joining(""));
+        String hashCorrectAnswerIds = EncryptUtil.encrypt(numbersString, byteKey);
+
+
+
 
         socketIOServer.getRoomOperations(challengeId + "")
                 .sendEvent("publishQuestion", PublishQuestionResponse.builder()
                         .question(publishQuest)
                         .answers(publishAnswers)
+                        .hashCorrectAnswerIds(hashCorrectAnswerIds)
+                        .adminSocketId(admin.getSocketId().toString())
                         .build());
+
+        // update current question id
         challengeRepository.updateCurrentQuestionId(challengeId, question.getId());
-        // update ask date and decryptKey
-        byte[] bytes = EncryptUtil.generateRandomKeyStore();
-        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, bytes, question.getId());
+
+
     }
 
     @Override
@@ -272,7 +296,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
                     StudentAnswerId id = StudentAnswerId.builder().student(stu).answer(ans).challenge(challenge).question(quest).build();
 
-                    studentAnswers.add(StudentAnswer.builder().primaryKey(id).score(0).isCorrect(false).answerDate(null).build());
+                    studentAnswers.add(StudentAnswer.builder().primaryKey(id).score(0d).isCorrect(false).answerDate(null).build());
 
                 }
             }

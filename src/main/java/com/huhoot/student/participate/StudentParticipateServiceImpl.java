@@ -24,11 +24,15 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -92,65 +96,65 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         // not check yet
 
         // check after skip question, student can send answer ... not checked
+        long nowLong = System.currentTimeMillis();
 
-        // the question answer option not match. if single select but multi answer @@
 
-        // multi correct answer, point may / for num of correct answer
 
-        // open challenge must validate num of correct answer > 0
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        List<Integer> correctAnswers = answerRepository.findAllCorrectAnswerIds(request.getQuestionId());
-        boolean isAnswersCorrect = isAnswerCorrect(request.getAnswerIds(), correctAnswers);
         // find question with askDate not null help prevent hacker try to get correct answer
         // they only can get question if it has been published
-        Optional<Question> optional = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId());
-        Question quest = optional.orElseThrow(() -> new NotFoundException("Question not found"));
-        List<Answer> answers = answerRepository.findAllByIdIn(request.getAnswerIds());
-        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), now, quest.getPoint(), quest.getAnswerTimeLimit(), correctAnswers.size()) : 0;
-        for (Answer ans : answers) {
-            try {
-                studentAnswerRepository.updateAnswer(point, isAnswersCorrect, now, ans.getId(), userDetails.getId());
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
+        Question quest = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId()).orElseThrow(() -> new NotFoundException("Question not found"));
+
+
+        // isAnswersCorrect
+        String decrypt = EncryptUtil.decrypt(request.getHashCorrectAnswerIds(), quest.getEncryptKey());
+        String collect = request.getAnswerIds().stream().sorted().map(e -> e.toString()).collect(Collectors.joining(""));
+        boolean isAnswersCorrect = decrypt.equals(collect);
+
+        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), nowLong, quest.getPoint().getValue(), quest.getAnswerTimeLimit()) : 0;
+
+
+        studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), userDetails.getId(), point / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
+
+
         // sent socket to host notice answered
-        Optional<Challenge> optionalChallenge = challengeRepository.findOneById(request.getChallengeId());
-        Challenge challenge = optionalChallenge.orElseThrow(() -> new NotFoundException("Challenge not found"));
-        UUID adminSocketId = challenge.getAdmin().getSocketId();
+
+        UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
         socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
 
         int totalPoint = studentAnswerRepository.getTotalPointInChallenge(request.getChallengeId(), userDetails.getId());
+
+
+
         // response encrypt message
         byte[] byteKey = quest.getEncryptKey();
         String isAnswerCorrectEncrypted = EncryptUtil.encrypt(isAnswersCorrect + "", byteKey);
         String totalPointEncrypted = EncryptUtil.encrypt(totalPoint + "", byteKey);
+
+
+
+
         return SendAnswerResponse.builder()
                 .isCorrect(isAnswerCorrectEncrypted)
                 .totalPoint(totalPointEncrypted)
                 .build();
     }
 
-    private double calculatePoint(Timestamp askDate, Timestamp now, Points point, int answerTimeLimit, int numOfCorrectAnswer) {
 
-        long diff = now.getTime() - askDate.getTime();
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
-        long timeLeft = answerTimeLimit - seconds;
 
-        if (timeLeft < 0) {
+    private double calculatePoint(long askDate, long now, int pointCoefficient, int answerTimeLimit) {
+
+        long timeLeft = askDate + (answerTimeLimit * 1000) - now;
+
+        if(timeLeft <= 0){
             return 0;
         }
 
-        double timeLeftPercent = timeLeft * 1.0 / answerTimeLimit;
+        double timeLeftPercent = timeLeft * 1.0 / (answerTimeLimit * 1000);
 
-        return (500 + (500 * timeLeftPercent) * point.getValue()) / numOfCorrectAnswer;
+        int defaultCorrectPoint = 500;
+
+        return (defaultCorrectPoint + (500 * timeLeftPercent) * pointCoefficient);
     }
 
 
-    private boolean isAnswerCorrect(List<Integer> answerIds, List<Integer> correctAnswerIds) {
-        final boolean a = correctAnswerIds.containsAll(answerIds);
-        // final boolean b = correctAnswerIds.stream().allMatch(e -> answerIds.contains(e));
-        return a && answerIds.containsAll(correctAnswerIds);
-
-    }
 }

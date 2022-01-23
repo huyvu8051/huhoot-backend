@@ -8,8 +8,8 @@ import javax.annotation.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-01-11T08:08:17+0700",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.13 (Ubuntu)"
+    date = "2022-01-23T22:12:10+0700",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.1 (Private Build)"
 )
 public class StudentInChallengeMapperImpl implements StudentInChallengeMapper {
 

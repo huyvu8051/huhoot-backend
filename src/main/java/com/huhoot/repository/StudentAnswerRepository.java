@@ -21,7 +21,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @param studentId   student id
      * @return total point of student answer
      */
-    @Query("SELECT SUM(m.score) " +
+    @Query("SELECT  COALESCE(SUM(m.score), 0) " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId and m.primaryKey.student.id = :studentId")
     int getTotalPointInChallenge(@Param("challengeId")int challengeId,
@@ -94,5 +94,12 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
                       @Param("now") Timestamp now,
                       @Param("answerId")int answerId,
                       @Param("studentId") int studentId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE StudentAnswer q " +
+            "SET q.score = :point, q.isCorrect = :isCorrect, q.answerDate = :answerDate " +
+            "WHERE q.primaryKey.answer.id IN (:ids) AND q.primaryKey.student.id = :studentId")
+    void updateAnswerPoint(@Param("ids") List<Integer> ids,@Param("studentId") int studentId,@Param("point") double point,@Param("isCorrect") boolean isCorrect,@Param("answerDate") long answerDate);
 }
 //

@@ -64,7 +64,7 @@ public class QuestionMapperImpl implements QuestionMapper {
         questionResponse.setPoint(entity.getPoint());
         questionResponse.setAnswerOption(entity.getAnswerOption());
         if (entity.getAskDate() != null) {
-            questionResponse.setAskDate(entity.getAskDate().getTime());
+            questionResponse.setAskDate(entity.getAskDate());
         }
 
         questionResponse.setNonDeleted(entity.isNonDeleted());

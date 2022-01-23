@@ -26,6 +26,20 @@ public class EncryptUtil {
             throw new IllegalArgumentException(e);
         }
     }
+    public static String decrypt(String encryptedValue, byte[] KEY) {
+        byte[] decryptedValue = Base64.decodeBase64(encryptedValue.getBytes());
+        byte[] decValue;
+        try {
+            Cipher dcipher = Cipher.getInstance("AES");
+            SecretKeySpec dSpec = new SecretKeySpec(KEY, "AES");
+            dcipher.init(Cipher.DECRYPT_MODE, dSpec);
+
+            decValue = dcipher.doFinal(decryptedValue);
+            return new String(decValue);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     public static byte[] generateRandomKeyStore() {
 

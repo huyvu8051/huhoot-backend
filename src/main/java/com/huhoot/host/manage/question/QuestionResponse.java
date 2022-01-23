@@ -27,7 +27,7 @@ public class QuestionResponse extends AuditableDto {
     }
 
     public QuestionResponse(int id, int ordinalNumber, String questionContent, String questionImage,
-                            int answerTimeLimit, Points point, AnswerOption answerOption, Date askDate,
+                            int answerTimeLimit, Points point, AnswerOption answerOption, Long askDate,
                             boolean isNonDeleted, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
@@ -38,22 +38,10 @@ public class QuestionResponse extends AuditableDto {
         this.point = point;
         this.answerOption = answerOption;
         if(askDate != null){
-            this.askDate = askDate.getTime();
+            this.askDate = askDate;
         }
         this.isNonDeleted = isNonDeleted;
     }
 
-    public QuestionResponse(int id, int ordinalNumber, String questionContent, String questionImage, int answerTimeLimit, Points point, AnswerOption answerOption, Date askDate, boolean isNonDeleted ){
-        this.id = id;
-        this.ordinalNumber = ordinalNumber;
-        this.questionContent = questionContent;
-        this.questionImage = questionImage;
-        this.answerTimeLimit = answerTimeLimit;
-        this.point = point;
-        this.answerOption = answerOption;
-        if(askDate != null){
-            this.askDate = askDate.getTime();
-        }
-        this.isNonDeleted = isNonDeleted;
-    }
+
 }

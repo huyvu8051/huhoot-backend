@@ -124,7 +124,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         try {
-            hostOrganizeChallengeService.publishNextQuestion(challengeId, userDetails.getId());
+            hostOrganizeChallengeService.publishNextQuestion(challengeId, userDetails);
         } catch (Exception e) {
             hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
         }

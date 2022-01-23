@@ -77,11 +77,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
                                  @Param("questionId") int currentQuestionId);
 
 
-    @Query("SELECT n.currentQuestionId " +
-            "FROM Challenge n " +
-            "WHERE n.id = :challengeId AND n.admin.id = :adminId")
-    Optional<Integer> findCurrentQuestionId(@Param("challengeId") int challengeId,
-                                            @Param("adminId") int adminId);
 
 
     @Query("SELECT new com.huhoot.host.organize.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, " +

@@ -127,7 +127,7 @@ public class DataLoader implements ApplicationRunner {
                         question.setQuestionImage(getRandomImgUrl());
                         question.setAnswerTimeLimit(answerTime);
                         question.setPoint(Points.STANDARD);
-                        question.setAnswerOption(AnswerOption.SINGLE_SELECT);
+                        question.setAnswerOption(AnswerOption.MULTI_SELECT);
 
                         question.setChallenge(chall);
 
@@ -141,10 +141,11 @@ public class DataLoader implements ApplicationRunner {
 
                         List<Answer> answers = new ArrayList<>();
 
-                        int randAnswerCorrect = random.nextInt(4);
+                        int i1 = random.nextInt(7);
 
-                        for (int a = 0; a < 4; a++) {
-                            boolean corr = a == randAnswerCorrect;
+                        for (int a = 0; a < i1 + 1; a++) {
+                            int randAnswerCorrect = random.nextInt(10);
+                            boolean corr = (randAnswerCorrect % 3) == 0;
                             Answer answer = new Answer();
                             answer.setOrdinalNumber(a);
                             answer.setAnswerContent("content " + i + j + x + a + corr);
@@ -158,6 +159,9 @@ public class DataLoader implements ApplicationRunner {
 
                             answers.add(answer);
                         }
+
+                        if(answers.stream().noneMatch(e->e.isCorrect())) answers.get(0).setCorrect(true);
+
                         answerRepository.saveAll(answers);
 
                     }

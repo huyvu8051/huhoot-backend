@@ -40,7 +40,7 @@ public class Question extends Auditable {
 
     private AnswerOption answerOption;
 
-    private Timestamp askDate;
+    private Long askDate;
 
     private boolean isNonDeleted;
 

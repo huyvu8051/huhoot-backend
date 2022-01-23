@@ -10,4 +10,7 @@ import java.util.List;
 public class PublishQuestionResponse {
     private PublishQuestion question;
     private List<AnswerResultResponse> answers;
+    private String hashCorrectAnswerIds;
+    private String adminSocketId;
+
 }

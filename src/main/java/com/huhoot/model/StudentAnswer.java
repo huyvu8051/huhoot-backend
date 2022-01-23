@@ -23,15 +23,15 @@ public class StudentAnswer extends Auditable {
 
     @Getter
     @Setter
-    private double score;
+    private Double score;
 
     @Getter
     @Setter
-    private boolean isCorrect;
+    private Boolean isCorrect;
 
     @Getter
     @Setter
-    private Timestamp answerDate;
+    private Long answerDate;
 
     public StudentAnswer() {
         super();

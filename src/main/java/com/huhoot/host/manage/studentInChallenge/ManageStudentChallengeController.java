@@ -30,7 +30,7 @@ public class ManageStudentChallengeController {
     private final ManageStudentService manageStudentService;
     private final VDataTablePagingConverter vDataTablePagingConverter;
 
-    @GetMapping("/student")
+    @PostMapping("/student")
     public ResponseEntity<PageResponse<StudentResponse>> findAllStudent(@RequestBody VDataTablePagingRequest request) {
         Pageable pageable = vDataTablePagingConverter.toPageable(request);
         return ResponseEntity.ok(manageStudentService.findAllStudentAccount(pageable));
@@ -39,8 +39,8 @@ public class ManageStudentChallengeController {
 
 
 
-    @GetMapping("/studentChallenge")
-    public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(FindAllQuestionRequest request) {
+    @PostMapping("/studentChallenge/findAll")
+    public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestBody FindAllQuestionRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Pageable pageable = vDataTablePagingConverter.toPageable(request);
@@ -64,7 +64,7 @@ public class ManageStudentChallengeController {
 
     }
 
-    @PostMapping("/studentChallenge")
+    @PostMapping("/studentChallenge/add")
     public ResponseEntity<List<StudentChallengeAddError>> add(@Valid @RequestBody StudentInChallengeAddRequest request) throws IOException, NotFoundException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()

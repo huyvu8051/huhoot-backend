@@ -46,12 +46,12 @@ public class PublishQuestion {
         this.challengeId = challengeId;
         this.totalQuestion = totalQuestion;
     }
-    public PublishQuestion(int id, int ordinalNumber, String questionContent, String questionImage, int answerTimeLimit, Points point, Date askDate, AnswerOption answerOption, int challengeId, int totalQuestion) {
+    public PublishQuestion(int id, int ordinalNumber, String questionContent, String questionImage, int answerTimeLimit, Points point, Long askDate, AnswerOption answerOption, int challengeId, int totalQuestion) {
         this.id = id;
         this.ordinalNumber = ordinalNumber;
         this.questionContent = questionContent;
         this.answerTimeLimit = answerTimeLimit;
-        this.askDate = askDate.getTime();
+        this.askDate = askDate;
         this.questionImage = questionImage;
         this.point = point;
         this.answerOption = answerOption;
