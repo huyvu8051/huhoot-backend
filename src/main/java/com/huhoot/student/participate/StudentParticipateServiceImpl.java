@@ -9,6 +9,7 @@ import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.organize.EncryptUtil;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
+import com.huhoot.socket.SocketRegisterSuccessResponse;
 import com.huhoot.student.participate.StudentParticipateService;
 import com.huhoot.student.participate.SendAnswerResponse;
 import com.huhoot.student.participate.StudentAnswerRequest;
@@ -60,7 +61,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         }
         // if another device connect to server, disconnect old client
         // Prevent multi device connect to server
-        if(student.getSocketId() != null && !student.getSocketId().equals(client.getSessionId())){
+        if (student.getSocketId() != null && !student.getSocketId().equals(client.getSessionId())) {
             try {
                 SocketIOClient oldClient = socketIOServer.getClient(student.getSocketId());
                 oldClient.sendEvent("joinError", "joinError");
@@ -70,7 +71,13 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
             }
         }
 
+
+        double totalPoints = studentAnswerRepository.getTotalPointInChallenge(challengeId, student.getId());
+
         client.joinRoom(challengeId + "");
+        client.sendEvent("registerSuccess", SocketRegisterSuccessResponse.builder()
+                .totalPoints(totalPoints)
+                .build());
         // update socket id
         studentRepository.updateSocketId(client.getSessionId(), student.getId());
         studentInChallenge.setLogin(true);
@@ -90,14 +97,11 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     public SendAnswerResponse answer(StudentAnswerRequest request, Student userDetails) throws Exception {
 
 
-
-
         // check is answered by query is any student answer have answer date not null
         // not check yet
 
         // check after skip question, student can send answer ... not checked
         long nowLong = System.currentTimeMillis();
-
 
 
         // find question with askDate not null help prevent hacker try to get correct answer
@@ -121,31 +125,20 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
         socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
 
-        int totalPoint = studentAnswerRepository.getTotalPointInChallenge(request.getChallengeId(), userDetails.getId());
-
-
-
         // response encrypt message
         byte[] byteKey = quest.getEncryptKey();
-        String isAnswerCorrectEncrypted = EncryptUtil.encrypt(isAnswersCorrect + "", byteKey);
-        String totalPointEncrypted = EncryptUtil.encrypt(totalPoint + "", byteKey);
-
-
-
+        String pointsReceived = EncryptUtil.encrypt(point + "", byteKey);
 
         return SendAnswerResponse.builder()
-                .isCorrect(isAnswerCorrectEncrypted)
-                .totalPoint(totalPointEncrypted)
-                .build();
+                .pointsReceived(pointsReceived).build();
     }
-
 
 
     private double calculatePoint(long askDate, long now, int pointCoefficient, int answerTimeLimit) {
 
         long timeLeft = askDate + (answerTimeLimit * 1000) - now;
 
-        if(timeLeft <= 0){
+        if (timeLeft <= 0) {
             return 0;
         }
 

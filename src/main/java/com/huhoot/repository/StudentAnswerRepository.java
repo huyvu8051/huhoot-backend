@@ -24,7 +24,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
     @Query("SELECT  COALESCE(SUM(m.score), 0) " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId and m.primaryKey.student.id = :studentId")
-    int getTotalPointInChallenge(@Param("challengeId")int challengeId,
+    double getTotalPointInChallenge(@Param("challengeId")int challengeId,
                                  @Param("studentId") int studentId);
 
 

@@ -6,6 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class SendAnswerResponse {
-    private String isCorrect;
-    private String totalPoint;
+    private String pointsReceived;
 }
