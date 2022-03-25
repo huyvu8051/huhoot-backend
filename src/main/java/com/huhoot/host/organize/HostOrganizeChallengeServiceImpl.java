@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -42,8 +41,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
-        List<StudentInChallengeResponse> studentInChallenges = studentInChallengeRepository.findAllStudentIsLogin(challengeId, userDetails.getId());
-        return studentInChallenges;
+        return studentInChallengeRepository.findAllStudentIsLogin(challengeId, userDetails.getId());
     }
 
 
@@ -52,7 +50,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      *
      * @param challengeId challenge id
      * @param adminId     admin id
-     * @return List of QuestionResponse
      */
     @Override
     public void startChallenge(int challengeId, int adminId) {
@@ -208,14 +205,13 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
 
         // update ask date and decryptKey
-        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
-        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, byteKey, question.getId());
+        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, question.getId());
 
         // hash correct answer ids
         Stream<PublishAnswer> stream = answerRepository.findAllByQuestionIdAndAdminId(question.getId(), admin.getId(), Pageable.unpaged()).stream();
-        String numbersString = stream.filter(e->e.getIsCorrect()).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e->String.valueOf(e.getId()))
+        String numbersString = stream.filter(PublishAnswer::getIsCorrect).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e->String.valueOf(e.getId()))
                 .collect(Collectors.joining(""));
-        String hashCorrectAnswerIds = EncryptUtil.encrypt(numbersString, byteKey);
+        String hashCorrectAnswerIds = EncryptUtil.encrypt(numbersString, question.getEncryptKey());
 
 
 
@@ -310,14 +306,14 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     private void validateQuestion(Question quest, List<Answer> answers) throws ChallengeException {
         if (answers.size() == 0) throw new ChallengeException("No answer found for question id = " + quest.getId());
 
-        boolean noAnswerCorrect = answers.stream().noneMatch(e -> e.isCorrect());
+        boolean noAnswerCorrect = answers.stream().noneMatch(Answer::isCorrect);
 
         if (noAnswerCorrect) {
             throw new ChallengeException("No any answer correct for question id = " + quest.getId());
         }
 
         if (quest.getAnswerOption().equals(AnswerOption.SINGLE_SELECT)) {
-            long answerCount = answers.stream().filter(e -> e.isCorrect()).count();
+            long answerCount = answers.stream().filter(Answer::isCorrect).count();
             if (answerCount > 1)
                 throw new ChallengeException("SINGLE_SELECT: Ony one answer is correct for question id = " + quest.getId());
 

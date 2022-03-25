@@ -2,37 +2,25 @@ package com.huhoot.student.participate;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.ChallengeStatus;
-import com.huhoot.enums.Points;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.organize.EncryptUtil;
-import com.huhoot.model.*;
-import com.huhoot.repository.*;
+import com.huhoot.model.Challenge;
+import com.huhoot.model.Question;
+import com.huhoot.model.Student;
+import com.huhoot.model.StudentInChallenge;
+import com.huhoot.repository.QuestionRepository;
+import com.huhoot.repository.StudentAnswerRepository;
+import com.huhoot.repository.StudentInChallengeRepository;
+import com.huhoot.repository.StudentRepository;
 import com.huhoot.socket.SocketRegisterSuccessResponse;
-import com.huhoot.student.participate.StudentParticipateService;
-import com.huhoot.student.participate.SendAnswerResponse;
-import com.huhoot.student.participate.StudentAnswerRequest;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SealedObject;
-import javax.crypto.SecretKey;
-import java.io.Serializable;
-import java.math.RoundingMode;
-import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +33,12 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     private final StudentInChallengeRepository studentInChallengeRepository;
 
     private final StudentRepository studentRepository;
+
+
+
+    private final StudentAnswerRepository studentAnswerRepository;
+
+    private final QuestionRepository questionRepository;
 
     @Override
     public void join(SocketIOClient client, int challengeId, Student student) throws ChallengeException {
@@ -85,13 +79,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
     }
 
-    private final AnswerRepository answerRepository;
 
-    private final StudentAnswerRepository studentAnswerRepository;
-
-    private final QuestionRepository questionRepository;
-
-    private final ChallengeRepository challengeRepository;
 
     @Override
     public SendAnswerResponse answer(StudentAnswerRequest request, Student userDetails) throws Exception {
@@ -136,7 +124,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
     private double calculatePoint(long askDate, long now, int pointCoefficient, int answerTimeLimit) {
 
-        long timeLeft = askDate + (answerTimeLimit * 1000) - now;
+        long timeLeft = askDate + (answerTimeLimit * 1000L) - now;
 
         if (timeLeft <= 0) {
             return 0;

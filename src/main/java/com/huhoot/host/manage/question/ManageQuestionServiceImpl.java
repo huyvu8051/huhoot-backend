@@ -4,6 +4,7 @@ import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
+import com.huhoot.host.organize.EncryptUtil;
 import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
@@ -48,6 +49,9 @@ public class ManageQuestionServiceImpl implements ManageQuestionService{
 
         question.setOrdinalNumber(nextOrdinalNumber);
         question.setChallenge(challenge);
+
+        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
+        question.setEncryptKey(byteKey);
 
         Question save = questionRepository.save(question);
 

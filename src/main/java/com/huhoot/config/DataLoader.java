@@ -1,5 +1,7 @@
 package com.huhoot.config;
 
+import com.github.javafaker.Faker;
+import com.huhoot.host.organize.EncryptUtil;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
@@ -8,17 +10,14 @@ import com.huhoot.enums.Role;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
+import java.util.*;
 
 
 @Component
@@ -36,6 +35,9 @@ public class DataLoader implements ApplicationRunner {
 
     public void run(ApplicationArguments args) {
         Random random = new Random();
+
+        Faker faker = new Faker(new Locale("vi-VN"));
+
 
         Timestamp date = new Timestamp(System.currentTimeMillis());
 
@@ -83,10 +85,13 @@ public class DataLoader implements ApplicationRunner {
 
                 for (int j = 0; j < 1; j++) {
                     Challenge challenge = new Challenge();
-                    challenge.setTitle("title " + i + j);
+
+
+
+                    challenge.setTitle(faker.lorem().paragraph());
                     challenge.setChallengeStatus(ChallengeStatus.WAITING);
 
-                    challenge.setCoverImage(getRandomImgUrl());
+                    challenge.setCoverImage(faker.internet().image());
                     challenge.setRandomQuest(true);
                     challenge.setRandomAnswer(true);
                     challenge.setAdmin(host);
@@ -99,7 +104,7 @@ public class DataLoader implements ApplicationRunner {
 
 
                     for (int x = 0; x < 7; x++) {
-                        Student student1 = new Student("student" + i + j + x, "student" + i + j + x, passwordEncoder.encode("password"));
+                        Student student1 = new Student("student" + i + j + x,  faker.name().fullName(), passwordEncoder.encode("password"));
                         student1.setCreatedDate(date);
                         student1.setCreatedBy("BobVu");
                         student1.setModifiedDate(date);
@@ -123,13 +128,16 @@ public class DataLoader implements ApplicationRunner {
                         Question question
                                 = new Question();
                         question.setOrdinalNumber(x);
-                        question.setQuestionContent(getRandomImgUrl() + " Question content");
+                        question.setQuestionContent(faker.lorem().paragraph());
                         question.setQuestionImage(getRandomImgUrl());
                         question.setAnswerTimeLimit(answerTime);
                         question.setPoint(Points.STANDARD);
                         question.setAnswerOption(AnswerOption.MULTI_SELECT);
 
                         question.setChallenge(chall);
+
+                        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
+                        question.setEncryptKey(byteKey);
 
 
                         question.setCreatedDate(date);
@@ -148,7 +156,9 @@ public class DataLoader implements ApplicationRunner {
                             boolean corr = (randAnswerCorrect % 3) == 0;
                             Answer answer = new Answer();
                             answer.setOrdinalNumber(a);
-                            answer.setAnswerContent("content " + i + j + x + a + corr);
+
+
+                            answer.setAnswerContent(faker.lorem().paragraph() + " " + corr);
                             answer.setCorrect(corr);
                             answer.setQuestion(quest);
 
@@ -224,4 +234,5 @@ public class DataLoader implements ApplicationRunner {
 
         return imgUrls.get(rand);
     }
+
 }

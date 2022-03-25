@@ -33,10 +33,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Question q " +
-            "SET q.askDate = :askDate, q.encryptKey = :byteKey " +
+            "SET q.askDate = :askDate " +
             "WHERE q.id = :questionId")
     void updateAskDateAndEncryptKeyByQuestionId(@Param("askDate") long askDate,
-                                                @Param("byteKey") byte[] byteKey,
                                                 @Param("questionId") int questionId);
 
 
