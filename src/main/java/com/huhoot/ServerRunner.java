@@ -38,18 +38,10 @@ public class ServerRunner implements CommandLineRunner {
         return new SpringAnnotationScanner(socketserver);
     }
 
-    @Autowired
-    private SocketIOServer server;
 
     @Override
     public void run(String... args) throws Exception {
-        try {
-            server.start();
-            log.info("Socket launch successful!");
-        } catch (Exception e) {
-            log.error("Socket launch failure!");
-            log.error(e.getMessage());
-        }
+
 
     }
 }

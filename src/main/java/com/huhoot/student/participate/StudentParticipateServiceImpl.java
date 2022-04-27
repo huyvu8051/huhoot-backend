@@ -14,7 +14,6 @@ import com.huhoot.repository.StudentAnswerRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.socket.SocketRegisterSuccessResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     private final StudentInChallengeRepository studentInChallengeRepository;
 
     private final StudentRepository studentRepository;
-
 
 
     private final StudentAnswerRepository studentAnswerRepository;
@@ -80,22 +78,14 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     }
 
 
-
     @Override
-    public SendAnswerResponse answer(StudentAnswerRequest request, Student userDetails) throws Exception {
+    public SendAnswerResponse sendAnswer(StudentAnswerRequest request, Student userDetails) throws Exception {
 
-
-        // check is answered by query is any student answer have answer date not null
-        // not check yet
-
-        // check after skip question, student can send answer ... not checked
         long nowLong = System.currentTimeMillis();
 
+        Question quest = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId()).orElseThrow(() -> new NullPointerException("Question not found"));
 
-        // find question with askDate not null help prevent hacker try to get correct answer
-        // they only can get question if it has been published
-        Question quest = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId()).orElseThrow(() -> new NotFoundException("Question not found"));
-
+        // sinh viên gửi lên 1 cái danh sách id đáp án(bị sắp xếp + nối chuỗi)
 
         // isAnswersCorrect
         String decrypt = EncryptUtil.decrypt(request.getHashCorrectAnswerIds(), quest.getEncryptKey());
@@ -103,22 +93,20 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         boolean isAnswersCorrect = decrypt.equals(collect);
 
         double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), nowLong, quest.getPoint().getValue(), quest.getAnswerTimeLimit()) : 0;
-
-
         studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), userDetails.getId(), point / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
 
 
         // sent socket to host notice answered
-
         UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
         socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
 
-        // response encrypt message
+        // encrypt response message
         byte[] byteKey = quest.getEncryptKey();
         String pointsReceived = EncryptUtil.encrypt(point + "", byteKey);
 
         return SendAnswerResponse.builder()
                 .pointsReceived(pointsReceived).build();
+
     }
 
 
@@ -134,7 +122,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
         int defaultCorrectPoint = 500;
 
-        return (defaultCorrectPoint + (500 * timeLeftPercent) * pointCoefficient);
+        return (defaultCorrectPoint + (500 * timeLeftPercent)) * pointCoefficient;
     }
 
 

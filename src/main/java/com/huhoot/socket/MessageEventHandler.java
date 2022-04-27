@@ -17,7 +17,6 @@ import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.*;
 import com.huhoot.student.participate.StudentParticipateService;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,7 +41,7 @@ public class MessageEventHandler {
     private final ChallengeMapper challengeMapper;
 
     @OnConnect
-    public void onConnect(SocketIOClient client) throws NotFoundException {
+    public void onConnect(SocketIOClient client) throws NullPointerException {
         client.sendEvent("connected", "connect success");
         log.info("a client was connected");
     }
@@ -64,14 +63,14 @@ public class MessageEventHandler {
 
     @OnEvent("registerHostSocket")
     public void registerHostSocket(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
-        try{
+        try {
             String token = request.getToken().substring(7);
 
             String username = jwtUtil.extractUsername(token);
 
             Optional<Admin> optional = adminRepository.findOneByUsername(username);
 
-            Admin admin = optional.orElseThrow(()->new NotFoundException("Admin not found"));
+            Admin admin = optional.orElseThrow(() -> new NullPointerException("Admin not found"));
 
             if (!jwtUtil.validateToken(token, admin)) {
                 throw new Exception("Bad token");
@@ -80,7 +79,7 @@ public class MessageEventHandler {
             // missing set security context holder
 
             Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId());
-            Challenge challenge = optionalChallenge.orElseThrow(() -> new NotFoundException("Challenge not found"));
+            Challenge challenge = optionalChallenge.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
 
             client.joinRoom(challenge.getId() + "");
@@ -95,7 +94,7 @@ public class MessageEventHandler {
             adminRepository.save(admin);
 
             log.info("save admin success");
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             client.sendEvent("joinError", "joinError");
             client.disconnect();
@@ -115,7 +114,7 @@ public class MessageEventHandler {
 
             Optional<Student> optionalStudent = studentRepository.findOneByUsername(username);
 
-            Student student = optionalStudent.orElseThrow(()->new StudentAddException("Student not found"));
+            Student student = optionalStudent.orElseThrow(() -> new StudentAddException("Student not found"));
 
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");

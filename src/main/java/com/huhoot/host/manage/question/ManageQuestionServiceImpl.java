@@ -12,7 +12,6 @@ import com.huhoot.model.Question;
 import com.huhoot.repository.ChallengeRepository;
 import com.huhoot.repository.QuestionRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,22 +23,24 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ManageQuestionServiceImpl implements ManageQuestionService{
+public class ManageQuestionServiceImpl implements ManageQuestionService {
 
     private final ChallengeRepository challengeRepository;
     private final QuestionMapper questionMapper;
     private final ListConverter listConverter;
     private final QuestionRepository questionRepository;
+
     @Override
     public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
         Page<QuestionResponse> questions = questionRepository.findAllByChallengeIdAndAdminId(challengeId, userDetails.getId(), pageable);
         return listConverter.toPageResponse(questions);
     }
+
     @Override
-    public QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+    public QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NullPointerException {
         Optional<Challenge> optional = challengeRepository.findOneById(request.getChallengeId());
 
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Challenge challenge = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         checker.accept(userDetails, challenge);
 
@@ -58,17 +59,18 @@ public class ManageQuestionServiceImpl implements ManageQuestionService{
         return questionMapper.toDto(save);
 
     }
+
     @Override
-    public void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NotFoundException {
+    public void updateOneQuestion(Admin userDetails, QuestionUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NullPointerException {
         Optional<Question> optional = questionRepository.findOneById(request.getId());
 
-        Question question = optional.orElseThrow(() -> new NotFoundException("Question not found"));
+        Question question = optional.orElseThrow(() -> new NullPointerException("Question not found"));
 
         checker.accept(userDetails, question.getChallenge());
 
         questionMapper.update(request, question);
 
-       questionRepository.save(question);
+        questionRepository.save(question);
     }
 
     @Override

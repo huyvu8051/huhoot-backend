@@ -5,7 +5,6 @@ import com.huhoot.functional.impl.CheckOwnerChallenge;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +37,7 @@ public class ManageQuestionController {
     }
 
     @PostMapping("/question")
-    public ResponseEntity<QuestionResponse> add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NotFoundException, NotYourOwnException {
+    public ResponseEntity<QuestionResponse> add(@Valid @RequestBody QuestionAddRequest request) throws IOException, NullPointerException, NotYourOwnException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -49,16 +48,16 @@ public class ManageQuestionController {
 
 
     @PatchMapping("/question")
-    public void update(@RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public void update(@RequestBody QuestionUpdateRequest request) throws NotYourOwnException, NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-      manageQuestionService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
+        manageQuestionService.updateOneQuestion(userDetails, request, checkOwnerChallenge);
 
 
     }
 
     @PatchMapping("/question/ordinal")
-    public void updateOrdinal(@RequestBody QuestionOrdinalUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public void updateOrdinal(@RequestBody QuestionOrdinalUpdateRequest request) throws NotYourOwnException, NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         manageQuestionService.updateOrdinal(userDetails, request);

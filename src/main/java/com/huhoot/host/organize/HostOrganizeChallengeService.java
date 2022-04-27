@@ -2,13 +2,9 @@ package com.huhoot.host.organize;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
-import com.huhoot.host.organize.AnswerResultResponse;
-import com.huhoot.host.organize.PublishQuestionResponse;
-import com.huhoot.host.organize.StudentScoreResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -29,15 +25,14 @@ public interface HostOrganizeChallengeService {
     void startChallenge(int challengeId, int adminId);
 
 
-
     /**
      * Sent all Answer to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
      * @param questionId {@link com.huhoot.model.Question} id
      * @param adminId    {@link Admin} id
-     * @throws NotFoundException not found exception
+     * @throws NullPointerException not found exception
      */
-    void showCorrectAnswer(int questionId, int adminId) throws NotFoundException;
+    void showCorrectAnswer(int questionId, int adminId) throws NullPointerException;
 
     /**
      * @param challengeId {@link Challenge} id
@@ -60,9 +55,9 @@ public interface HostOrganizeChallengeService {
      *
      * @param challengeId {@link Challenge} id
      * @param adminId     {@link Admin} id
-     * @throws NotFoundException
+     * @throws NullPointerException
      */
-    void endChallenge(int challengeId, int adminId) throws NotFoundException;
+    void endChallenge(int challengeId, int adminId) throws NullPointerException;
 
 
     /**
@@ -74,5 +69,5 @@ public interface HostOrganizeChallengeService {
 
     void publishNextQuestion(int challengeId, Admin admin) throws Exception;
 
-    PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NotFoundException;
+    PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NullPointerException;
 }

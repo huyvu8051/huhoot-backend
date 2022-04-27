@@ -3,7 +3,6 @@ package com.huhoot.host.organize;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -56,11 +55,11 @@ public class OrganizeController {
      * Show correct answer
      *
      * @param questionId {@link com.huhoot.model.Question} id
-     * @throws NotFoundException not found
+     * @throws NullPointerException not found
      */
     @GetMapping("/showCorrectAnswer")
     public void showCorrectAnswer(@RequestParam int questionId,
-                                  @RequestParam(defaultValue = "20") int size) throws NotFoundException {
+                                  @RequestParam(defaultValue = "20") int size) throws NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostOrganizeChallengeService.showCorrectAnswer(questionId, userDetails.getId());
@@ -97,10 +96,10 @@ public class OrganizeController {
     /**
      * @param challengeId {@link com.huhoot.model.Challenge} id
      * @return List of {@link StudentScoreResponse}
-     * @throws NotFoundException not found
+     * @throws NullPointerException not found
      */
     @GetMapping("/endChallenge")
-    public void endChallenge(@RequestParam int challengeId) throws NotFoundException {
+    public void endChallenge(@RequestParam int challengeId) throws NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());

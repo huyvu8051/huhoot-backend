@@ -4,7 +4,6 @@ import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingRequest;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class ManageStudentController {
     }
 
     @PatchMapping("/student")
-    public void update(@RequestBody StudentUpdateRequest request) throws NotFoundException, UsernameExistedException {
+    public void update(@RequestBody StudentUpdateRequest request) throws UsernameExistedException {
         manageStudentService.updateStudentAccount(request);
     }
 

@@ -57,4 +57,7 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
             "FROM StudentInChallenge n " +
             "WHERE n.primaryKey.challenge.id = :challengeId and n.primaryKey.challenge.admin.id = :adminId")
     Page<StudentInChallengeResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("adminId") int adminId, Pageable pageable);
+
+    @Query("SELECT COUNT(a.primaryKey.student.id) FROM StudentInChallenge a WHERE a.primaryKey.challenge.id = :challengeId AND a.isLogin = true")
+    int getTotalStudentInChallenge(@Param("challengeId") int challengeId);
 }

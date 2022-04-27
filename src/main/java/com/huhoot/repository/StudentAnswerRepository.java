@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, Integer> {
 
@@ -101,5 +102,10 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
             "SET q.score = :point, q.isCorrect = :isCorrect, q.answerDate = :answerDate " +
             "WHERE q.primaryKey.answer.id IN (:ids) AND q.primaryKey.student.id = :studentId")
     void updateAnswerPoint(@Param("ids") List<Integer> ids,@Param("studentId") int studentId,@Param("point") double point,@Param("isCorrect") boolean isCorrect,@Param("answerDate") long answerDate);
+
+    @Query("SELECT COUNT(DISTINCT a.primaryKey.student.id) FROM StudentAnswer a WHERE a.primaryKey.question.id = :questionId AND a.isCorrect = :isCorrect GROUP BY a.primaryKey.student.id")
+    Optional<Integer> getTotalStudentAnswerByQuestIdAndIsCorrect(@Param("questionId") int questionId, @Param("isCorrect") Boolean isCorrect);
+
+
 }
 //

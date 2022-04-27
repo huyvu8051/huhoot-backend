@@ -6,7 +6,6 @@ import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingRequest;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +50,7 @@ public class ManageChallengeController {
     }
 
     @PatchMapping("/challenge")
-    public void update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException, NotFoundException {
+    public void update(@Valid @RequestBody ChallengeUpdateRequest request) throws NotYourOwnException, NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         manageChallengeService.updateOneChallenge(userDetails, request, checkOwnerChallenge);

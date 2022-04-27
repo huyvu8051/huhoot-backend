@@ -24,7 +24,7 @@ public class StudentParticipateController {
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(studentParticipateService.answer(request, userDetails));
+        return ResponseEntity.ok(studentParticipateService.sendAnswer(request, userDetails));
 
     }
 

@@ -7,7 +7,6 @@ import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingRequest;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.PageRequest;
@@ -37,8 +36,6 @@ public class ManageStudentChallengeController {
     }
 
 
-
-
     @PostMapping("/studentChallenge/findAll")
     public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestBody FindAllQuestionRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
@@ -65,7 +62,7 @@ public class ManageStudentChallengeController {
     }
 
     @PostMapping("/studentChallenge/add")
-    public ResponseEntity<List<StudentChallengeAddError>> add(@Valid @RequestBody StudentInChallengeAddRequest request) throws IOException, NotFoundException {
+    public ResponseEntity<List<StudentChallengeAddError>> add(@Valid @RequestBody StudentInChallengeAddRequest request) throws IOException, NullPointerException {
 
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -77,7 +74,7 @@ public class ManageStudentChallengeController {
 
 
     @PatchMapping("/studentChallenge")
-    public void update(@RequestBody StudentInChallengeUpdateRequest request) throws NotFoundException {
+    public void update(@RequestBody StudentInChallengeUpdateRequest request) throws NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         hostService.updateStudentInChallenge(userDetails, request);

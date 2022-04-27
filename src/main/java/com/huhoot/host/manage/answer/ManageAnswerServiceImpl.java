@@ -10,7 +10,6 @@ import com.huhoot.model.Question;
 import com.huhoot.repository.AnswerRepository;
 import com.huhoot.repository.QuestionRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +25,7 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
     private final AnswerRepository answerRepository;
     private final ListConverter listConverter;
     private final QuestionRepository questionRepository;
+
     @Override
     public PageResponse<PublishAnswer> findAllAnswerByQuestionId(Admin userDetails, int questionId, Pageable pageable) {
         Page<PublishAnswer> answers = answerRepository.findAllByQuestionIdAndAdminId(questionId, userDetails.getId(), pageable);
@@ -38,7 +38,7 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
     public void addOneAnswer(Admin userDetails, AnswerAddRequest request) throws Exception {
         Optional<Question> optional = questionRepository.findOneById(request.getQuestionId());
 
-        Question question = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Question question = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         Answer answer = AnswerConverter.toEntity(request);
         int nextOrdinalNumber = answerRepository.getNextOrdinalNumber(question.getId());
@@ -51,10 +51,10 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
     private final AnswerMapper answerMapper;
 
     @Override
-    public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) throws NotFoundException {
+    public void updateOneAnswer(Admin userDetails, AnswerUpdateRequest request) {
         Optional<Answer> optional = answerRepository.findOneById(request.getId());
 
-        Answer answer = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Answer answer = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         answerMapper.updateAnswer(request, answer);
 
@@ -62,15 +62,15 @@ public class ManageAnswerServiceImpl implements ManageAnswerService {
     }
 
     @Override
-    public void updateOrdinal(Admin userDetails, AnswerOrdinalUpdateRequest request) throws NotFoundException {
+    public void updateOrdinal(Admin userDetails, AnswerOrdinalUpdateRequest request) {
         List<AnswerOrdinal> list = request.getList();
         List<Answer> result = new ArrayList<>();
 
         for (AnswerOrdinal dto : list) {
             Optional<Answer> optional = answerRepository.findOneById(dto.getId());
-            Answer entity = optional.orElseThrow(() -> new NotFoundException("Question not found"));
+            Answer entity = optional.orElseThrow(() -> new NullPointerException("Question not found"));
             entity.setOrdinalNumber(dto.getOrdinalNumber());
-         result.add(entity);
+            result.add(entity);
         }
 
         answerRepository.saveAll(result);

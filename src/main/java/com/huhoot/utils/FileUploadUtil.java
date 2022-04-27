@@ -1,6 +1,7 @@
 package com.huhoot.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,11 @@ public class FileUploadUtil {
     public void saveFile(String fileName,
                          MultipartFile multipartFile) throws IOException {
 
-        Path uploadPath = Paths.get("/" + getParentDirectoryFromJar() + "/uploads/" + fileName);
+        String absolutePath = new FileSystemResource("").getFile().getAbsolutePath();
+
+       // Path uploadPath = Paths.get("/" + getParentDirectoryFromJar() + "/uploads/" + fileName);
+
+        Path uploadPath = Paths.get(absolutePath + "/target/uploads/" + fileName);
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);

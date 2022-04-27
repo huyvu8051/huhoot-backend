@@ -6,7 +6,6 @@ import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Student;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,6 @@ public class ManageStudentServiceImpl implements ManageStudentService {
         return listConverter.toPageResponse(all);
 
     }
-
 
 
     private void addOneStudent(StudentAddRequest addRequest) throws UsernameExistedException {
@@ -94,7 +92,7 @@ public class ManageStudentServiceImpl implements ManageStudentService {
 
 
     @Override
-    public void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException, UsernameExistedException {
+    public void updateStudentAccount(StudentUpdateRequest request) throws UsernameExistedException {
 
         Optional<Student> duplicate = studentRepository.findOneByUsername(request.getUsername());
 
@@ -104,18 +102,12 @@ public class ManageStudentServiceImpl implements ManageStudentService {
 
         Optional<Student> optional = studentRepository.findOneById(request.getId());
 
-        Student entity = optional.orElseThrow(() -> new NotFoundException("Student not found"));
+        Student entity = optional.orElseThrow(() -> new NullPointerException("Student not found"));
 
         studentMapper.update(request, entity);
 
         studentRepository.save(entity);
     }
-
-
-
-
-
-
 
 
 }

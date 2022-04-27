@@ -1,5 +1,6 @@
 package com.huhoot.config;
 
+import com.corundumstudio.socketio.SocketIOServer;
 import com.github.javafaker.Faker;
 import com.huhoot.host.organize.EncryptUtil;
 import com.huhoot.repository.StudentRepository;
@@ -10,7 +11,9 @@ import com.huhoot.enums.Role;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +25,7 @@ import java.util.*;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class DataLoader implements ApplicationRunner {
 
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +37,21 @@ public class DataLoader implements ApplicationRunner {
     private final AnswerRepository answerRepository;
 
 
+
+    @Autowired
+    private SocketIOServer server;
+
+
     public void run(ApplicationArguments args) {
+
+        try {
+            server.start();
+            log.info("Socket launch successful!");
+        } catch (Exception e) {
+            log.error("Socket launch failure!");
+            log.error(e.getMessage());
+        }
+
         Random random = new Random();
 
         Faker faker = new Faker(new Locale("vi-VN"));
@@ -65,9 +83,9 @@ public class DataLoader implements ApplicationRunner {
             Admin admin = new Admin("admin", passwordEncoder.encode("password"));
             admin.setRole(Role.ADMIN);
             admin.setCreatedDate(date);
-            admin.setCreatedBy("BobVu");
+            admin.setCreatedBy("System");
             admin.setModifiedDate(date);
-            admin.setModifiedBy("Nobody");
+            admin.setModifiedBy("System");
 
             adminRepository.save(admin);
 
@@ -180,36 +198,6 @@ public class DataLoader implements ApplicationRunner {
             }
 
 
-            long t1 = System.nanoTime();
-
-/*
-
-        List<Answer> answers = new ArrayList<>();
-        for(int i = 0; i < 10; i++){
-            Answer answer = new Answer();
-            answer.setOrdinalNumber(i);
-            answer.setAnswerContent("content " + i);
-            answer.setCorrect((i) % 2 == 0);
-
-            answer.setCreatedDate(date);
-            answer.setCreatedBy("BobVu");
-            answer.setModifiedDate(date);
-            answer.setModifiedBy("Nobody");
-
-            answers.add(answer);
-        }
-
-        answerRepository.saveAll(answers);
-
-
-
-        // end time
-
-        double elapsedTimeInSecond = (double) (t1 - t0) / 1_000_000_000;
-        System.out.println("Elapsed time =" + elapsedTimeInSecond + " seconds");
-
-
- */
         }
     }
 

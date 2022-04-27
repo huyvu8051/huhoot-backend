@@ -2,7 +2,6 @@ package com.huhoot.admin.manage.student;
 
 import com.huhoot.exception.UsernameExistedException;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -27,6 +26,6 @@ public interface ManageStudentService {
     /**
      * @param request student update request
      */
-    void updateStudentAccount(StudentUpdateRequest request) throws NotFoundException, UsernameExistedException;
+    void updateStudentAccount(StudentUpdateRequest request) throws UsernameExistedException;
 
 }

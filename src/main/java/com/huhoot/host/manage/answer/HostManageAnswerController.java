@@ -4,7 +4,6 @@ import com.huhoot.host.organize.PublishAnswer;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import com.huhoot.vue.vdatatable.paging.VDataTablePagingConverter;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +42,14 @@ public class HostManageAnswerController {
     }
 
     @PatchMapping("/answer")
-    public void update(@Valid @RequestBody AnswerUpdateRequest request) throws NotFoundException {
+    public void update(@Valid @RequestBody AnswerUpdateRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         manageAnswerService.updateOneAnswer(userDetails, request);
     }
 
     @PatchMapping("/answer/ordinal")
-    public void updateOrdinal(@Valid @RequestBody AnswerOrdinalUpdateRequest request) throws NotFoundException {
+    public void updateOrdinal(@Valid @RequestBody AnswerOrdinalUpdateRequest request) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         manageAnswerService.updateOrdinal(userDetails, request);

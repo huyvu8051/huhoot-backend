@@ -10,5 +10,9 @@ import java.util.List;
 public class CorrectAnswerResponse {
     private List<AnswerResultResponse> answers;
     private String encryptKey;
+    private int totalStudent;
+    private int totalStudentCorrect;
+    private int totalStudentWrong;
+
 
 }

@@ -11,7 +11,6 @@ import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -70,17 +69,17 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      *
      * @param questionId {@link com.huhoot.model.Question} id
      * @param adminId    {@link Admin} id
-     * @throws NotFoundException not found exception
+     * @throws NullPointerException not found exception
      */
     @Override
-    public void showCorrectAnswer(int questionId, int adminId) throws NotFoundException {
+    public void showCorrectAnswer(int questionId, int adminId) throws NullPointerException {
 
         Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
-        Integer challengeId = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Integer challengeId = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         Optional<Question> optionalQuestion = questionRepository.findOneById(questionId);
 
-        Question question = optionalQuestion.orElseThrow(() -> new NotFoundException("Question not found"));
+        Question question = optionalQuestion.orElseThrow(() -> new NullPointerException("Question not found"));
 
         List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId, adminId);
 
@@ -91,9 +90,19 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         byte[] byteKey = question.getEncryptKey();
         String keyForJS = EncryptUtil.genKeyForJsSide(byteKey);
 
+
+        int totalStudent = studentInChallengeRepository.getTotalStudentInChallenge(challengeId);
+
+        int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, true).orElse(0);
+
+        int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, false).orElse(0);
+
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
                 .answers(answerResult)
                 .encryptKey(keyForJS)
+                        .totalStudent(totalStudent)
+                        .totalStudentCorrect(totalStudentCorrectAns)
+                        .totalStudentWrong(totalStudentWrongAns)
                 .build());
     }
 
@@ -131,13 +140,13 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      *
      * @param challengeId {@link Challenge} id
      * @param adminId     {@link Admin} id
-     * @throws NotFoundException not found
+     * @throws NullPointerException not found
      */
     @Override
-    public void endChallenge(int challengeId, int adminId) throws NotFoundException {
+    public void endChallenge(int challengeId, int adminId) throws NullPointerException {
 
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, adminId);
-        optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.ENDED, challengeId, adminId);
 
@@ -174,7 +183,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public void publishNextQuestion(int challengeId, Admin admin) throws Exception {
-            Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
+        Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
         Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
 
         int countQuestion = challengeRepository.findCountQuestion(challengeId);
@@ -203,17 +212,14 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         publishQuest.setAskDate(askDate);
 
 
-
         // update ask date and decryptKey
         questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, question.getId());
 
         // hash correct answer ids
         Stream<PublishAnswer> stream = answerRepository.findAllByQuestionIdAndAdminId(question.getId(), admin.getId(), Pageable.unpaged()).stream();
-        String numbersString = stream.filter(PublishAnswer::getIsCorrect).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e->String.valueOf(e.getId()))
+        String numbersString = stream.filter(PublishAnswer::getIsCorrect).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e -> String.valueOf(e.getId()))
                 .collect(Collectors.joining(""));
         String hashCorrectAnswerIds = EncryptUtil.encrypt(numbersString, question.getEncryptKey());
-
-
 
 
         socketIOServer.getRoomOperations(challengeId + "")
@@ -231,11 +237,11 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     }
 
     @Override
-    public PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NotFoundException {
+    public PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NullPointerException {
 
         Optional<PublishQuestion> optional = challengeRepository.findCurrentPublishedQuestion(challengeId, adminId);
 
-        PublishQuestion question = optional.orElseThrow(() -> new NotFoundException("Question  not found"));
+        PublishQuestion question = optional.orElseThrow(() -> new NullPointerException("Question  not found"));
 
         int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
 
@@ -251,7 +257,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     @Override
     public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
         Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
-        Challenge challenge = optional.orElseThrow(() -> new NotFoundException("Challenge not found"));
+        Challenge challenge = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         long t0 = System.nanoTime();
         this.createAllStudentAnswerInChallenge(challenge);
@@ -292,7 +298,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
                     StudentAnswerId id = StudentAnswerId.builder().student(stu).answer(ans).challenge(challenge).question(quest).build();
 
-                    studentAnswers.add(StudentAnswer.builder().primaryKey(id).score(0d).isCorrect(false).answerDate(null).build());
+                    studentAnswers.add(StudentAnswer.builder().primaryKey(id).score(0d).isCorrect(null).answerDate(null).build());
 
                 }
             }
