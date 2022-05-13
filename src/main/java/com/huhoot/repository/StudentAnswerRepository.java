@@ -1,7 +1,7 @@
 package com.huhoot.repository;
 
-import com.huhoot.host.organize.AnswerResultResponse;
-import com.huhoot.host.organize.StudentScoreResponse;
+import com.huhoot.organize.AnswerResultResponse;
+import com.huhoot.organize.StudentScoreResponse;
 import com.huhoot.model.StudentAnswer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,10 +36,10 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @return list of student id, fullName, score <br/>
      * Not contain <b>rank</b>
      */
-    @Query("SELECT new com.huhoot.host.organize.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName)  " +
+    @Query("SELECT new com.huhoot.organize.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName, m.primaryKey.student.username)  " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
-            "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName " +
+            "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName, m.primaryKey.student.username " +
             "ORDER BY SUM(m.score) DESC")
     Page<StudentScoreResponse> findTopStudent(@Param("challengeId")int challengeId,
                                               @Param("adminId")int adminId,
@@ -54,7 +54,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @param hostId     host id
      * @return List of answer contain number of student choose
      */
-    @Query("SELECT new com.huhoot.host.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
+    @Query("SELECT new com.huhoot.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
@@ -65,7 +65,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
 
 
 
-    @Query("SELECT new com.huhoot.host.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
+    @Query("SELECT new com.huhoot.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
             "FROM Answer m LEFT JOIN StudentAnswer n " +
             "ON m.id = n.primaryKey.answer.id " +
             "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +

@@ -1,7 +1,6 @@
 package com.huhoot.repository;
 
 import com.huhoot.host.manage.question.QuestionResponse;
-import com.huhoot.host.organize.PublishQuestion;
 import com.huhoot.model.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,10 +31,12 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Transactional
     @Modifying
     @Query("UPDATE Question q " +
-            "SET q.askDate = :askDate " +
+            "SET q.askDate = :askDate, " +
+            "q.publishedOrderNumber = :publishedOrderNumber " +
             "WHERE q.id = :questionId")
-    void updateAskDateAndEncryptKeyByQuestionId(@Param("askDate") long askDate,
-                                                @Param("questionId") int questionId);
+    void updateAskDateAndPublishedOrderNumber(@Param("askDate") long askDate,
+                                              @Param("publishedOrderNumber") Integer publishedOrderNumber,
+                                              @Param("questionId") int questionId);
 
 
 
@@ -58,4 +58,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "FROM Question n " +
             "WHERE n.challenge.id = :challengeId")
     int getNextOrdinalNumber(@Param("challengeId") int challengeId);
+
+
+    @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId ")
+    int countQuestionInChallenge(@Param("challengeId") int challengeId);
 }

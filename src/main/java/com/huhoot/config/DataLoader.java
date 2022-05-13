@@ -2,7 +2,7 @@ package com.huhoot.config;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.github.javafaker.Faker;
-import com.huhoot.host.organize.EncryptUtil;
+import com.huhoot.organize.EncryptUtil;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
@@ -12,7 +12,6 @@ import com.huhoot.model.*;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -158,6 +157,7 @@ public class DataLoader implements ApplicationRunner {
                         question.setEncryptKey(byteKey);
 
 
+                        question.setEncryptKey2(UUID.randomUUID().toString());
                         question.setCreatedDate(date);
                         question.setCreatedBy("BobVu");
                         question.setModifiedDate(date);
@@ -167,7 +167,7 @@ public class DataLoader implements ApplicationRunner {
 
                         List<Answer> answers = new ArrayList<>();
 
-                        int i1 = random.nextInt(7);
+                        int i1 = random.nextInt(6);
 
                         for (int a = 0; a < i1 + 1; a++) {
                             int randAnswerCorrect = random.nextInt(10);

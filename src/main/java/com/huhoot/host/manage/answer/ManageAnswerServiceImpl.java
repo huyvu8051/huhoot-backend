@@ -2,7 +2,7 @@ package com.huhoot.host.manage.answer;
 
 import com.huhoot.converter.AnswerConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.host.organize.PublishAnswer;
+import com.huhoot.organize.PublishAnswer;
 import com.huhoot.mapper.AnswerMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Answer;

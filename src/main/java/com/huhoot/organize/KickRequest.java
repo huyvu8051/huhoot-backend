@@ -1,4 +1,4 @@
-package com.huhoot.host.organize;
+package com.huhoot.organize;
 
 import lombok.Data;
 

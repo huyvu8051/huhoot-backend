@@ -1,4 +1,4 @@
-package com.huhoot.host.organize;
+package com.huhoot.organize;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeService {
 
-    private final QuestionRepository questionRepository;
+    private final QuestionRepository questRepo;
     private final StudentInChallengeRepository studentInChallengeRepository;
     private final ChallengeRepository challengeRepository;
     private final SocketIOServer socketIOServer;
@@ -77,7 +77,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
         Integer challengeId = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        Optional<Question> optionalQuestion = questionRepository.findOneById(questionId);
+        Optional<Question> optionalQuestion = questRepo.findOneById(questionId);
 
         Question question = optionalQuestion.orElseThrow(() -> new NullPointerException("Question not found"));
 
@@ -103,6 +103,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
                         .totalStudent(totalStudent)
                         .totalStudentCorrect(totalStudentCorrectAns)
                         .totalStudentWrong(totalStudentWrongAns)
+                        .encryptKey2(question.getEncryptKey2())
                 .build());
     }
 
@@ -183,11 +184,11 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     @Override
     public void publishNextQuestion(int challengeId, Admin admin) throws Exception {
-        Optional<Question> optional = questionRepository.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
+        Optional<Question> optional = questRepo.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
         Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
 
-        int countQuestion = challengeRepository.findCountQuestion(challengeId);
-        int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
+        int countQuestion = questRepo.countQuestionInChallenge(challengeId);
+        int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
 
         PublishQuestion publishQuest = PublishQuestion.builder()
                 .id(question.getId())
@@ -213,7 +214,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
 
         // update ask date and decryptKey
-        questionRepository.updateAskDateAndEncryptKeyByQuestionId(askDate, question.getId());
+        questRepo.updateAskDateAndPublishedOrderNumber(askDate, questionOrder, question.getId());
 
         // hash correct answer ids
         Stream<PublishAnswer> stream = answerRepository.findAllByQuestionIdAndAdminId(question.getId(), admin.getId(), Pageable.unpaged()).stream();
@@ -243,7 +244,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         PublishQuestion question = optional.orElseThrow(() -> new NullPointerException("Question  not found"));
 
-        int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
+        int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
 
         question.setQuestionOrder(questionOrder);
 
@@ -280,7 +281,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         List<Student> students = studentRepository.findAllStudentInChallenge(challenge.getId());
 
-        List<Question> questions = questionRepository.findAllByChallengeId(challenge.getId());
+        List<Question> questions = questRepo.findAllByChallengeId(challenge.getId());
 
         if (students.size() == 0 || questions.size() == 0)
             throw new ChallengeException("No student or question found in challenge id = " + challenge.getId());
@@ -304,7 +305,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
             }
         }
 
-        questionRepository.saveAll(questions);
+        questRepo.saveAll(questions);
         studentAnswerRepository.saveAll(studentAnswers);
 
     }

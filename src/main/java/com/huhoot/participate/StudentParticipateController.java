@@ -1,4 +1,4 @@
-package com.huhoot.student.participate;
+package com.huhoot.participate;
 
 import com.huhoot.model.Student;
 import lombok.AllArgsConstructor;

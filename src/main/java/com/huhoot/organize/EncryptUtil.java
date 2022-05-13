@@ -1,4 +1,4 @@
-package com.huhoot.host.organize;
+package com.huhoot.organize;
 
 import com.google.common.primitives.Bytes;
 import org.apache.tomcat.util.codec.binary.Base64;
