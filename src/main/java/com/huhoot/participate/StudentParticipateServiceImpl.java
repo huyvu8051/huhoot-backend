@@ -1,10 +1,11 @@
-package com.huhoot.student.participate;
+package com.huhoot.participate;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.huhoot.auth.JwtUtil;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
-import com.huhoot.host.organize.EncryptUtil;
+import com.huhoot.organize.EncryptUtil;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
 import com.huhoot.model.Student;
@@ -37,6 +38,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     private final StudentAnswerRepository studentAnswerRepository;
 
     private final QuestionRepository questionRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void join(SocketIOClient client, int challengeId, Student student) throws ChallengeException {
@@ -79,7 +81,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
 
     @Override
-    public SendAnswerResponse sendAnswer(StudentAnswerRequest request, Student userDetails) throws Exception {
+    public SendAnswerResponse sendAnswer(StudentAnswerRequest request, Student student) throws Exception {
 
         long nowLong = System.currentTimeMillis();
 
@@ -92,8 +94,10 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         String collect = request.getAnswerIds().stream().sorted().map(e -> e.toString()).collect(Collectors.joining(""));
         boolean isAnswersCorrect = decrypt.equals(collect);
 
+        int comboCount = jwtUtil.extractCombo(request.getComboToken(), student.getUsername(), quest.getPublishedOrderNumber() + "");
+
         double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), nowLong, quest.getPoint().getValue(), quest.getAnswerTimeLimit()) : 0;
-        studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), userDetails.getId(), point / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
+        studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), student.getId(), point / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
 
 
         // sent socket to host notice answered
@@ -104,8 +108,25 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
         byte[] byteKey = quest.getEncryptKey();
         String pointsReceived = EncryptUtil.encrypt(point + "", byteKey);
 
+
+        if(isAnswersCorrect){
+            comboCount ++;
+        }else {
+            comboCount = 0;
+        }
+
+        String nextQuestionSign = quest.getPublishedOrderNumber() + 1 + "";
+
+        String comboToken = jwtUtil.createComboToken(student.getUsername(), nextQuestionSign, comboCount + "");
+
+        String comboEncrypted = EncryptUtil.encrypt(comboCount + "", byteKey);
+
+        jwtUtil.testToken(student);
         return SendAnswerResponse.builder()
-                .pointsReceived(pointsReceived).build();
+                .comboToken(comboToken)
+                .combo(comboEncrypted)
+                .pointsReceived(pointsReceived)
+                .build();
 
     }
 

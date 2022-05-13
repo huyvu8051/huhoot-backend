@@ -1,6 +1,6 @@
 package com.huhoot.host.manage.answer;
 
-import com.huhoot.host.organize.PublishAnswer;
+import com.huhoot.organize.PublishAnswer;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.Pageable;

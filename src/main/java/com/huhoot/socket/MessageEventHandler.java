@@ -16,7 +16,7 @@ import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.*;
-import com.huhoot.student.participate.StudentParticipateService;
+import com.huhoot.participate.StudentParticipateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

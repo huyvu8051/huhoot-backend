@@ -1,4 +1,4 @@
-package com.huhoot.student.participate;
+package com.huhoot.participate;
 
 import lombok.Data;
 
@@ -10,4 +10,5 @@ public class StudentAnswerRequest {
     private int questionId;
     private String hashCorrectAnswerIds;
     private String adminSocketId;
+    private String comboToken;
 }

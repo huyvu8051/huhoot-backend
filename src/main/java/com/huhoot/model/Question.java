@@ -5,12 +5,10 @@ import com.huhoot.enums.Points;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,11 @@ public class Question extends Auditable {
     @GeneratedValue
     private int id;
 
-    private int ordinalNumber;
+    private int ordinalNumber; // order
+
+    private Integer publishedOrderNumber; // num of published quest
+
+    private String encryptKey2; // need to delete
 
 
     @Column(columnDefinition = "nvarchar(255)")

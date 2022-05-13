@@ -1,4 +1,4 @@
-package com.huhoot.host.organize;
+package com.huhoot.organize;
 
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.Points;

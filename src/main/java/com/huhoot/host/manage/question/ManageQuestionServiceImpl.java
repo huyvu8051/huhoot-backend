@@ -4,7 +4,7 @@ import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
-import com.huhoot.host.organize.EncryptUtil;
+import com.huhoot.organize.EncryptUtil;
 import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -50,6 +51,8 @@ public class ManageQuestionServiceImpl implements ManageQuestionService {
 
         question.setOrdinalNumber(nextOrdinalNumber);
         question.setChallenge(challenge);
+
+        question.setEncryptKey2(UUID.randomUUID().toString());
 
         byte[] byteKey = EncryptUtil.generateRandomKeyStore();
         question.setEncryptKey(byteKey);

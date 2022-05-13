@@ -1,4 +1,4 @@
-package com.huhoot.host.organize;
+package com.huhoot.organize;
 
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +13,7 @@ public class CorrectAnswerResponse {
     private int totalStudent;
     private int totalStudentCorrect;
     private int totalStudentWrong;
+    private String encryptKey2;
 
 
 }

@@ -1,4 +1,4 @@
-package com.huhoot.student.participate;
+package com.huhoot.participate;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.huhoot.exception.ChallengeException;
