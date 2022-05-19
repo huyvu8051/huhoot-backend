@@ -15,8 +15,8 @@ import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
+import com.huhoot.participate.ParticipateService;
 import com.huhoot.repository.*;
-import com.huhoot.participate.StudentParticipateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,6 +50,11 @@ public class MessageEventHandler {
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
 
+        Integer adminId = client.get("adminId");
+        if(adminId != null){
+
+        }
+
         client.disconnect();
         log.info("a client was disconnected");
 
@@ -57,20 +62,15 @@ public class MessageEventHandler {
 
     @OnEvent("messageEvent")
     public void onEvent(SocketIOClient client, AckRequest request, String data) {
-        log.info("get data = " + data.toString());
-        client.sendEvent("message", "a dump message");
+
     }
 
     @OnEvent("registerHostSocket")
     public void registerHostSocket(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
         try {
             String token = request.getToken().substring(7);
-
             String username = jwtUtil.extractUsername(token);
-
-            Optional<Admin> optional = adminRepository.findOneByUsername(username);
-
-            Admin admin = optional.orElseThrow(() -> new NullPointerException("Admin not found"));
+            Admin admin = adminRepository.findOneByUsername(username).orElseThrow(() -> new NullPointerException("Admin not found"));
 
             if (!jwtUtil.validateToken(token, admin)) {
                 throw new Exception("Bad token");
@@ -78,22 +78,17 @@ public class MessageEventHandler {
 
             // missing set security context holder
 
-            Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId());
-            Challenge challenge = optionalChallenge.orElseThrow(() -> new NullPointerException("Challenge not found"));
-
-
-            client.joinRoom(challenge.getId() + "");
+            Challenge challenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId()).orElseThrow(() -> new NullPointerException("Challenge not found"));
+            client.joinRoom(String.valueOf(challenge.getId()));
 
             ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
-
             client.sendEvent("registerSuccess", challengeResponse);
 
-            challengeRepository.save(challenge);
+            client.set("adminId", admin.getId());
 
             admin.setSocketId(client.getSessionId());
             adminRepository.save(admin);
 
-            log.info("save admin success");
         } catch (Exception e) {
             log.error(e.getMessage());
             client.sendEvent("joinError", "joinError");
@@ -101,7 +96,7 @@ public class MessageEventHandler {
         }
     }
 
-    private final StudentParticipateService studentParticipateService;
+    private final ParticipateService participateService;
 
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
@@ -122,7 +117,7 @@ public class MessageEventHandler {
 
             // missing set security context holder
 
-            studentParticipateService.join(client, request.getChallengeId(), student);
+            participateService.join(client, request.getChallengeId(), student);
 
             log.info("Client connect socket success!");
         } catch (Exception e) {

@@ -19,15 +19,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @AllArgsConstructor
-public class StudentParticipateServiceImpl implements StudentParticipateService {
+public class ParticipateServiceImpl implements ParticipateService {
 
     private final SocketIOServer socketIOServer;
 

@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeService {
+public class OrganizeServiceImpl implements OrganizeService {
 
     private final QuestionRepository questRepo;
     private final StudentInChallengeRepository studentInChallengeRepository;
