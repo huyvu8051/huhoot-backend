@@ -3,9 +3,9 @@ package com.huhoot.participate;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.auth.JwtUtil;
+import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
-import com.huhoot.organize.EncryptUtil;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
 import com.huhoot.model.Student;
@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,7 +39,9 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     private final StudentAnswerRepository studentAnswerRepository;
 
     private final QuestionRepository questionRepository;
+
     private final JwtUtil jwtUtil;
+    private final EncryptUtils encryptUtils;
 
     @Override
     public void join(SocketIOClient client, int challengeId, Student student) throws ChallengeException {
@@ -80,58 +83,64 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
     }
 
 
+
     @Override
     public SendAnswerResponse sendAnswer(StudentAnswerRequest request, Student student) throws Exception {
 
+
         long nowLong = System.currentTimeMillis();
 
-        Question quest = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId()).orElseThrow(() -> new NullPointerException("Question not found"));
 
-        // sinh viên gửi lên 1 cái danh sách id đáp án(bị sắp xếp + nối chuỗi)
+        Long answerTimeLimit = encryptUtils.decryptQuestionToken(request.getQuestionToken(), request.getAnswerIds());
 
-        // isAnswersCorrect
-        String decrypt = EncryptUtil.decrypt(request.getHashCorrectAnswerIds(), quest.getEncryptKey());
-        String collect = request.getAnswerIds().stream().sorted().map(e -> e.toString()).collect(Collectors.joining(""));
-        boolean isAnswersCorrect = decrypt.equals(collect);
 
-        int comboCount = jwtUtil.extractCombo(request.getComboToken(), student.getUsername(), quest.getPublishedOrderNumber() + "");
+        Question quest = questionRepository.findOneByIdAndAskDateNotNull(request.getQuestionId()).orElseThrow(() -> new NullPointerException("question not found"));
 
-        double point = isAnswersCorrect ? calculatePoint(quest.getAskDate(), nowLong, quest.getPoint().getValue(), quest.getAnswerTimeLimit()) : 0;
-        studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), student.getId(), point / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
+        int comboCount = 0;
+        double pointReceive = 0;
+
+        boolean isAnswersCorrect;
+
+        if (answerTimeLimit == null) {
+            // wrong answer
+            isAnswersCorrect = false;
+
+        } else if (answerTimeLimit >= nowLong) {
+            // correct answer
+            isAnswersCorrect = true;
+            comboCount = encryptUtils.extractCombo(request.getComboToken(), student.getUsername(), quest.getPublishedOrderNumber());
+            comboCount++;
+            pointReceive = calculatePoint(quest.getAskDate(), nowLong, quest.getPoint().getValue(), quest.getAnswerTimeLimit(), comboCount);
+
+        } else {
+            // out of time limit
+
+
+            return null;
+        }
+
+
+        studentAnswerRepository.updateAnswerPoint(request.getAnswerIds(), student.getId(), pointReceive / request.getAnswerIds().size(), isAnswersCorrect, nowLong);
 
 
         // sent socket to host notice answered
         UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
-        socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer", quest.getId());
+        socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer");
 
         // encrypt response message
-        byte[] byteKey = quest.getEncryptKey();
-        String pointsReceived = EncryptUtil.encrypt(point + "", byteKey);
+        String nextComboToken = encryptUtils.prepareComboToken(student.getUsername(), quest.getPublishedOrderNumber() + 1, comboCount);
 
+        String encryptedResponse = encryptUtils.genEncryptedResponse(pointReceive, comboCount, quest.getEncryptKey());
 
-        if(isAnswersCorrect){
-            comboCount ++;
-        }else {
-            comboCount = 0;
-        }
-
-        String nextQuestionSign = quest.getPublishedOrderNumber() + 1 + "";
-
-        String comboToken = jwtUtil.createComboToken(student.getUsername(), nextQuestionSign, comboCount + "");
-
-        String comboEncrypted = EncryptUtil.encrypt(comboCount + "", byteKey);
-
-        jwtUtil.testToken(student);
         return SendAnswerResponse.builder()
-                .comboToken(comboToken)
-                .combo(comboEncrypted)
-                .pointsReceived(pointsReceived)
+                .comboToken(nextComboToken)
+                .encryptedResponse(encryptedResponse)
                 .build();
 
     }
 
 
-    private double calculatePoint(long askDate, long now, int pointCoefficient, int answerTimeLimit) {
+    private double calculatePoint(long askDate, long now, int pointCoefficient, int answerTimeLimit, int combo) {
 
         long timeLeft = askDate + (answerTimeLimit * 1000L) - now;
 
@@ -143,7 +152,7 @@ public class StudentParticipateServiceImpl implements StudentParticipateService 
 
         int defaultCorrectPoint = 500;
 
-        return (defaultCorrectPoint + (500 * timeLeftPercent)) * pointCoefficient;
+        return (defaultCorrectPoint + (500 * timeLeftPercent)) * pointCoefficient + combo * 50;
     }
 
 

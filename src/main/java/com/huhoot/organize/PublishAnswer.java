@@ -20,7 +20,7 @@ public class PublishAnswer extends AuditableDto {
     private boolean isSelected;
 
     public PublishAnswer(int id, int ordinalNumber, String answerContent, Boolean isCorrect,
-                         boolean isSelected, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
+                         boolean isSelected, Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.ordinalNumber = ordinalNumber;

@@ -19,10 +19,10 @@ public class ChallengeConverter {
         response.setChallengeStatus(entity.getChallengeStatus());
         response.setOwner(entity.getAdmin().getUsername());
         if(entity.getCreatedDate() != null){
-            response.setCreatedDate(entity.getCreatedDate().getTime());
+            response.setCreatedDate(entity.getCreatedDate());
         }
         if(entity.getModifiedDate() != null){
-            response.setModifiedDate(entity.getModifiedDate().getTime());
+            response.setModifiedDate(entity.getModifiedDate());
         }
         response.setCreatedBy(entity.getCreatedBy());
 

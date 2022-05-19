@@ -17,7 +17,7 @@ public class HostResponse extends AuditableDto {
     private String username;
     private Boolean isNonLocked;
 
-    public HostResponse(int id, String username, Boolean isNonLocked, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
+    public HostResponse(int id, String username, Boolean isNonLocked, Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.username = username;

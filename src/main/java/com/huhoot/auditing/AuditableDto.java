@@ -13,16 +13,10 @@ public abstract class AuditableDto {
     private Long modifiedDate;
     private String modifiedBy;
 
-    public AuditableDto(Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
-        if (createdDate != null) {
-            setCreatedDate(createdDate.getTime());
-        }
-
-        if (modifiedDate != null) {
-            setModifiedDate(modifiedDate.getTime());
-        }
+    public AuditableDto(Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {
+        setCreatedDate(createdDate);
+        setModifiedDate(modifiedDate);
         setCreatedBy(createdBy);
-
         setModifiedBy(modifiedBy);
     }
 }

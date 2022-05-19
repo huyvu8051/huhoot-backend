@@ -2,8 +2,10 @@ package com.huhoot.organize;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.huhoot.auth.JwtUtil;
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentInChallengeConverter;
+import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
@@ -17,12 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -37,6 +37,8 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
     private final StudentRepository studentRepository;
     private final StudentInChallengeRepository studentChallengeRepository;
+    private final JwtUtil jwtUtil;
+    private final EncryptUtils encryptUtils;
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
@@ -88,22 +90,19 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         // gen key for js size
         byte[] byteKey = question.getEncryptKey();
-        String keyForJS = EncryptUtil.genKeyForJsSide(byteKey);
+        String jsSideKey = encryptUtils.genKeyForJsSide(byteKey);
 
 
         int totalStudent = studentInChallengeRepository.getTotalStudentInChallenge(challengeId);
-
         int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, true).orElse(0);
-
         int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, false).orElse(0);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
                 .answers(answerResult)
-                .encryptKey(keyForJS)
-                        .totalStudent(totalStudent)
-                        .totalStudentCorrect(totalStudentCorrectAns)
-                        .totalStudentWrong(totalStudentWrongAns)
-                        .encryptKey2(question.getEncryptKey2())
+                .encryptKey(jsSideKey)
+                .totalStudent(totalStudent)
+                .totalStudentCorrect(totalStudentCorrectAns)
+                .totalStudentWrong(totalStudentWrongAns)
                 .build());
     }
 
@@ -217,17 +216,18 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         questRepo.updateAskDateAndPublishedOrderNumber(askDate, questionOrder, question.getId());
 
         // hash correct answer ids
-        Stream<PublishAnswer> stream = answerRepository.findAllByQuestionIdAndAdminId(question.getId(), admin.getId(), Pageable.unpaged()).stream();
-        String numbersString = stream.filter(PublishAnswer::getIsCorrect).sorted(Comparator.comparingInt(PublishAnswer::getId)).map(e -> String.valueOf(e.getId()))
-                .collect(Collectors.joining(""));
-        String hashCorrectAnswerIds = EncryptUtil.encrypt(numbersString, question.getEncryptKey());
+
+        List<PublishAnswer> publishAnswers2 = answerRepository.findAllAnswerByQuestionIdAndAdminId(question.getId());
+
+        String questionToken =encryptUtils.generateQuestionToken(publishAnswers2, askDate, question.getAnswerTimeLimit());
+
 
 
         socketIOServer.getRoomOperations(challengeId + "")
                 .sendEvent("publishQuestion", PublishQuestionResponse.builder()
+                        .questionToken(questionToken)
                         .question(publishQuest)
                         .answers(publishAnswers)
-                        .hashCorrectAnswerIds(hashCorrectAnswerIds)
                         .adminSocketId(admin.getSocketId().toString())
                         .build());
 

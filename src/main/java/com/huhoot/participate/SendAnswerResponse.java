@@ -10,5 +10,6 @@ public class SendAnswerResponse {
     private String combo;
     private String comboToken;
     private String answerResultToken;
+    private String encryptedResponse;
 
 }

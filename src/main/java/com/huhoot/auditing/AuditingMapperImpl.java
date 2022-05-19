@@ -12,11 +12,11 @@ public class AuditingMapperImpl implements AuditingMapper{
         dto.setModifiedBy(entity.getModifiedBy());
 
         if (entity.getCreatedDate() != null) {
-            dto.setCreatedDate(entity.getCreatedDate().getTime());
+            dto.setCreatedDate(entity.getCreatedDate());
         }
 
         if (entity.getModifiedDate() != null) {
-            dto.setModifiedDate(entity.getModifiedDate().getTime());
+            dto.setModifiedDate(entity.getModifiedDate());
         }
     }
 }

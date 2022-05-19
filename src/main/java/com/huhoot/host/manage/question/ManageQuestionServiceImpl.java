@@ -4,7 +4,7 @@ import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.QuestionConverter;
 import com.huhoot.exception.NotYourOwnException;
 import com.huhoot.functional.CheckedFunction;
-import com.huhoot.organize.EncryptUtil;
+import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.mapper.QuestionMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +29,8 @@ public class ManageQuestionServiceImpl implements ManageQuestionService {
     private final QuestionMapper questionMapper;
     private final ListConverter listConverter;
     private final QuestionRepository questionRepository;
+
+    private final EncryptUtils encryptUtils;
 
     @Override
     public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
@@ -52,9 +53,7 @@ public class ManageQuestionServiceImpl implements ManageQuestionService {
         question.setOrdinalNumber(nextOrdinalNumber);
         question.setChallenge(challenge);
 
-        question.setEncryptKey2(UUID.randomUUID().toString());
-
-        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
+        byte[] byteKey = encryptUtils.generateRandomKey().getEncoded();
         question.setEncryptKey(byteKey);
 
         Question save = questionRepository.save(question);

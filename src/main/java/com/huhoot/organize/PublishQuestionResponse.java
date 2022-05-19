@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class PublishQuestionResponse {
+    private String questionToken;
     private PublishQuestion question;
     private List<AnswerResultResponse> answers;
     private String hashCorrectAnswerIds;

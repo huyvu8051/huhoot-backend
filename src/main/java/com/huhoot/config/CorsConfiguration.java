@@ -1,4 +1,4 @@
-package com.huhoot.cors;
+package com.huhoot.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
