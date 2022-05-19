@@ -19,7 +19,7 @@ public class StudentInChallengeResponse extends AuditableDto {
 
     private Boolean isNonDeleted;
 
-    public StudentInChallengeResponse(int studentId, String studentUsername, String studentFullName, Boolean isLogin, Boolean isKicked, Boolean isOnline, String createdBy, Date createdDate, String modifiedBy, Date modifiedDate, Boolean isNonDeleted) {
+    public StudentInChallengeResponse(int studentId, String studentUsername, String studentFullName, Boolean isLogin, Boolean isKicked, Boolean isOnline, String createdBy, Long createdDate, String modifiedBy, Long modifiedDate, Boolean isNonDeleted) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.studentId = studentId;
         this.studentUsername = studentUsername;

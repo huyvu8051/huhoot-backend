@@ -29,11 +29,11 @@ public abstract class Auditable {
 
     @CreatedDate
     @Column(updatable = false)
-    private Timestamp createdDate;
+    private Long createdDate;
 
     @LastModifiedBy
     private String modifiedBy;
 
     @LastModifiedDate
-    private Timestamp modifiedDate;
+    private Long modifiedDate;
 }

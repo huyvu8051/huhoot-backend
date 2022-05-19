@@ -28,7 +28,7 @@ public class QuestionResponse extends AuditableDto {
 
     public QuestionResponse(int id, int ordinalNumber, String questionContent, String questionImage,
                             int answerTimeLimit, Points point, AnswerOption answerOption, Long askDate,
-                            boolean isNonDeleted, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
+                            boolean isNonDeleted, Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.ordinalNumber = ordinalNumber;

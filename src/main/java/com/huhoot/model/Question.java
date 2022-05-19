@@ -28,8 +28,6 @@ public class Question extends Auditable {
 
     private Integer publishedOrderNumber; // num of published quest
 
-    private String encryptKey2; // need to delete
-
 
     @Column(columnDefinition = "nvarchar(255)")
     private String questionContent;

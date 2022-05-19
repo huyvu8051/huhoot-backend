@@ -16,7 +16,7 @@ public class StudentResponse extends AuditableDto {
 
     private Boolean isNonLocked;
 
-    public StudentResponse(int id, String username, String fullName, Date createdDate, String createdBy, Date modifiedDate, String modifiedBy, Boolean isNonLocked) {
+    public StudentResponse(int id, String username, String fullName, Long createdDate, String createdBy, Long modifiedDate, String modifiedBy, Boolean isNonLocked) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.username = username;

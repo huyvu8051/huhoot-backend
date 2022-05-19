@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class StudentAnswerRequest {
+    private String questionToken;
     private List<Integer> answerIds;
     private int questionId;
     private String hashCorrectAnswerIds;

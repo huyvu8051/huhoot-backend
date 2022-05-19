@@ -23,7 +23,7 @@ public class ChallengeResponse extends AuditableDto {
 
     public ChallengeResponse(int id, String title, String coverImage, boolean randomAnswer, boolean randomQuest,
                              ChallengeStatus challengeStatus, String owner, UUID adminSocketId,
-                             Date createdDate, String createdBy, Date modifiedDate, String modifiedBy) {
+                             Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {
         super(createdDate, createdBy, modifiedDate, modifiedBy);
         this.id = id;
         this.title = title;

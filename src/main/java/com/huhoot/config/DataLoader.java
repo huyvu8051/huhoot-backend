@@ -2,7 +2,7 @@ package com.huhoot.config;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.github.javafaker.Faker;
-import com.huhoot.organize.EncryptUtil;
+import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
@@ -18,7 +18,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 
@@ -34,6 +33,7 @@ public class DataLoader implements ApplicationRunner {
     private final QuestionRepository questionRepository;
     private final StudentInChallengeRepository studentChallengeRepository;
     private final AnswerRepository answerRepository;
+    private final EncryptUtils encryptUtils;
 
 
 
@@ -56,7 +56,7 @@ public class DataLoader implements ApplicationRunner {
         Faker faker = new Faker(new Locale("vi-VN"));
 
 
-        Timestamp date = new Timestamp(System.currentTimeMillis());
+        long date = System.currentTimeMillis();
 
         // start time
         long t0 = System.nanoTime();
@@ -153,11 +153,9 @@ public class DataLoader implements ApplicationRunner {
 
                         question.setChallenge(chall);
 
-                        byte[] byteKey = EncryptUtil.generateRandomKeyStore();
-                        question.setEncryptKey(byteKey);
+                        byte[] key = encryptUtils.generateRandomKey().getEncoded();
+                        question.setEncryptKey(key);
 
-
-                        question.setEncryptKey2(UUID.randomUUID().toString());
                         question.setCreatedDate(date);
                         question.setCreatedBy("BobVu");
                         question.setModifiedDate(date);

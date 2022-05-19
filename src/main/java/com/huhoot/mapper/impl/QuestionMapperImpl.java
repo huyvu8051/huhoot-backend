@@ -69,7 +69,7 @@ public class QuestionMapperImpl implements QuestionMapper {
 
         questionResponse.setNonDeleted(entity.isNonDeleted());
         if (entity.getCreatedDate() != null) {
-            questionResponse.setCreatedDate(entity.getCreatedDate().getTime());
+            questionResponse.setCreatedDate(entity.getCreatedDate());
         }
         return questionResponse;
     }
