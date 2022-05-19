@@ -31,7 +31,7 @@ public class Challenge extends Auditable {
 
     private ChallengeStatus challengeStatus;
 
-    private Integer currentQuestionId;
+    private Integer studentOrganizeId;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")

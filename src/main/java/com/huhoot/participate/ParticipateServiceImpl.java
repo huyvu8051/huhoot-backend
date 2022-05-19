@@ -122,8 +122,8 @@ public class ParticipateServiceImpl implements ParticipateService {
 
 
         // sent socket to host notice answered
-        UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
-        socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer");
+//        UUID adminSocketId = UUID.fromString(request.getAdminSocketId());
+//        socketIOServer.getClient(adminSocketId).sendEvent("studentAnswer");
 
         // encrypt response message
         String nextComboToken = encryptUtils.prepareComboToken(student.getUsername(), quest.getPublishedOrderNumber() + 1, comboCount);

@@ -1,9 +1,7 @@
 package com.huhoot.socket;
 
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
@@ -21,7 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.Collection;
 
 @Component
 @Slf4j
@@ -49,11 +47,33 @@ public class MessageEventHandler {
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
+        String roomId = client.get("roomId");
+        BroadcastOperations room = server.getRoomOperations(roomId);
+        Collection<SocketIOClient> clients = room.getClients();
 
-        Integer adminId = client.get("adminId");
-        if(adminId != null){
+
+
+
+        if (clients.size() == 0) {
+
+            // Nobody in challenge;
+            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), null);
+        } else {
+            // greater than or equal one in challenge
+
+            SocketIOClient randClient = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot get client"));
+
+
+            Integer clientId = randClient.get("id");
+            randClient.sendEvent("hostDisconnect", "chungtacuahientai");
+            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), clientId);
+
 
         }
+
+
+
+
 
         client.disconnect();
         log.info("a client was disconnected");
@@ -78,13 +98,14 @@ public class MessageEventHandler {
 
             // missing set security context holder
 
-            Challenge challenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId()).orElseThrow(() -> new NullPointerException("Challenge not found"));
+            Challenge challenge = challengeRepository.findOneById(request.getChallengeId()).orElseThrow(() -> new NullPointerException("Challenge not found"));
             client.joinRoom(String.valueOf(challenge.getId()));
 
             ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
             client.sendEvent("registerSuccess", challengeResponse);
 
-            client.set("adminId", admin.getId());
+            client.set("id", admin.getId());
+            client.set("roomId", String.valueOf(challenge.getId()));
 
             admin.setSocketId(client.getSessionId());
             adminRepository.save(admin);
@@ -107,14 +128,14 @@ public class MessageEventHandler {
 
             String username = jwtUtil.extractUsername(token);
 
-            Optional<Student> optionalStudent = studentRepository.findOneByUsername(username);
-
-            Student student = optionalStudent.orElseThrow(() -> new StudentAddException("Student not found"));
+            Student student = studentRepository.findOneByUsername(username).orElseThrow(() -> new StudentAddException("Student not found"));
 
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");
             }
 
+            client.set("id", student.getId());
+            client.set("roomId", String.valueOf(request.getChallengeId()));
             // missing set security context holder
 
             participateService.join(client, request.getChallengeId(), student);

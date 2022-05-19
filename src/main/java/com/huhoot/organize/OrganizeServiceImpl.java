@@ -1,5 +1,6 @@
 package com.huhoot.organize;
 
+import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.auth.JwtUtil;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +56,7 @@ public class OrganizeServiceImpl implements OrganizeService {
     @Override
     public void startChallenge(int challengeId, int adminId) {
 
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.IN_PROGRESS, challengeId, adminId);
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.IN_PROGRESS, challengeId);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("startChallenge");
 
@@ -69,20 +71,17 @@ public class OrganizeServiceImpl implements OrganizeService {
      * Sent all AnswerResponse to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
      * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
      * @throws NullPointerException not found exception
      */
     @Override
-    public void showCorrectAnswer(int questionId, int adminId) throws NullPointerException {
+    public void showCorrectAnswer(int questionId) throws NullPointerException {
 
-        Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
+        Optional<Integer> optional = challengeRepository.findOneByQuestionId(questionId);
         Integer challengeId = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        Optional<Question> optionalQuestion = questRepo.findOneById(questionId);
+        Question question = questRepo.findOneById(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
 
-        Question question = optionalQuestion.orElseThrow(() -> new NullPointerException("Question not found"));
-
-        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId, adminId);
+        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId);
 
         // question.setAskDate(null);
         // questionRepository.save(question);
@@ -138,16 +137,15 @@ public class OrganizeServiceImpl implements OrganizeService {
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
      *
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link Admin} id
      * @throws NullPointerException not found
      */
     @Override
-    public void endChallenge(int challengeId, int adminId) throws NullPointerException {
+    public void endChallenge(int challengeId) throws NullPointerException {
 
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, adminId);
+        Optional<Challenge> optional = challengeRepository.findOneById(challengeId);
         optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.ENDED, challengeId, adminId);
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.ENDED, challengeId);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("endChallenge");
     }
@@ -181,9 +179,10 @@ public class OrganizeServiceImpl implements OrganizeService {
     }
 
     @Override
-    public void publishNextQuestion(int challengeId, Admin admin) throws Exception {
-        Optional<Question> optional = questRepo.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
-        Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
+    public void publishNextQuestion(int challengeId) throws Exception {
+
+        Question question = questRepo.findFirstByChallengeIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId).orElseThrow(() -> new Exception("Not found or empty question"));
+
 
         int countQuestion = questRepo.countQuestionInChallenge(challengeId);
         int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
@@ -227,36 +226,18 @@ public class OrganizeServiceImpl implements OrganizeService {
                         .questionToken(questionToken)
                         .question(publishQuest)
                         .answers(publishAnswers)
-                        .adminSocketId(admin.getSocketId().toString())
                         .build());
 
-        // update current question id
-        challengeRepository.updateCurrentQuestionId(challengeId, question.getId());
+
 
 
     }
 
-    @Override
-    public PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NullPointerException {
 
-        Optional<PublishQuestion> optional = challengeRepository.findCurrentPublishedQuestion(challengeId, adminId);
-
-        PublishQuestion question = optional.orElseThrow(() -> new NullPointerException("Question  not found"));
-
-        int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
-
-        question.setQuestionOrder(questionOrder);
-
-        question.setTheLastQuestion(question.getTotalQuestion() == question.getQuestionOrder());
-
-        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
-
-        return PublishQuestionResponse.builder().question(question).answers(publishAnswers).build();
-    }
 
     @Override
     public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
+        Optional<Challenge> optional = challengeRepository.findOneById(challengeId);
         Challenge challenge = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         long t0 = System.nanoTime();
@@ -267,7 +248,7 @@ public class OrganizeServiceImpl implements OrganizeService {
 
 
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.WAITING, challengeId);
 
         List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
         return listConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
@@ -324,5 +305,18 @@ public class OrganizeServiceImpl implements OrganizeService {
                 throw new ChallengeException("SINGLE_SELECT: Ony one answer is correct for question id = " + quest.getId());
 
         }
+    }
+
+
+    public void adminDisconnected(int challengeId){
+        BroadcastOperations roomOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
+        Collection<SocketIOClient> clients = roomOperations.getClients();
+        SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("No client in thisRoom"));
+        Integer id = client.get("username");
+
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException());
+        challenge.setStudentOrganizeId(id);
+        challengeRepository.save(challenge);
+
     }
 }
