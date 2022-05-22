@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("student")
 @AllArgsConstructor
-public class StudentParticipateController {
+public class ParticipateController {
 
-    private final StudentParticipateService studentParticipateService;
+    private final ParticipateService participateService;
 
     @PostMapping("/sendAnswer")
     public ResponseEntity<SendAnswerResponse> sendAnswer(@RequestBody StudentAnswerRequest request) throws Exception {
@@ -24,7 +24,7 @@ public class StudentParticipateController {
         Student userDetails = (Student) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(studentParticipateService.sendAnswer(request, userDetails));
+        return ResponseEntity.ok(participateService.sendAnswer(request, userDetails));
 
     }
 

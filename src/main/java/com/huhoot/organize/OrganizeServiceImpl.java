@@ -1,5 +1,6 @@
 package com.huhoot.organize;
 
+import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.huhoot.auth.JwtUtil;
@@ -9,9 +10,12 @@ import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
+import com.huhoot.host.manage.challenge.ChallengeMapper;
+import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
+import com.huhoot.socket.ParticipateJoinSuccessRes;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +23,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeService {
+public class OrganizeServiceImpl implements OrganizeService {
 
     private final QuestionRepository questRepo;
     private final StudentInChallengeRepository studentInChallengeRepository;
@@ -39,6 +43,9 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     private final StudentInChallengeRepository studentChallengeRepository;
     private final JwtUtil jwtUtil;
     private final EncryptUtils encryptUtils;
+    private final ChallengeMapper challengeMapper;
+
+
 
     @Override
     public List<StudentInChallengeResponse> getAllStudentInChallengeIsLogin(Admin userDetails, int challengeId) {
@@ -55,7 +62,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     @Override
     public void startChallenge(int challengeId, int adminId) {
 
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.IN_PROGRESS, challengeId, adminId);
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.IN_PROGRESS, challengeId);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("startChallenge");
 
@@ -70,20 +77,30 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      * Sent all AnswerResponse to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
      * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
      * @throws NullPointerException not found exception
      */
     @Override
-    public void showCorrectAnswer(int questionId, int adminId) throws NullPointerException {
+    public void showCorrectAnswer(int questionId) throws NullPointerException {
 
-        Optional<Integer> optional = challengeRepository.findOneByQuestionIdAndAdminId(questionId, adminId);
-        Integer challengeId = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        Optional<Question> optionalQuestion = questRepo.findOneById(questionId);
+        long now = System.currentTimeMillis();
 
-        Question question = optionalQuestion.orElseThrow(() -> new NullPointerException("Question not found"));
+        Challenge challenge = challengeRepository.findOneByQuestionId(questionId).orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId, adminId);
+//        Question asked = questRepo.findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(challenge.getId()).orElse(Question.builder().askDate(now).build());
+//
+//        if (now < asked.getAskDate() + asked.getAnswerTimeLimit() * 1000){
+//            throw new NullPointerException("last question not finish");
+//        }
+
+        Question question = questRepo.findOneByIdAndAskDateNotNull(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
+
+
+        long answerTimeLimit = question.getAskDate() + question.getAnswerTimeLimit() * 1000;
+
+        if (now < answerTimeLimit) return;
+
+        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId);
 
         // question.setAskDate(null);
         // questionRepository.save(question);
@@ -93,17 +110,11 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
         String jsSideKey = encryptUtils.genKeyForJsSide(byteKey);
 
 
-        int totalStudent = studentInChallengeRepository.getTotalStudentInChallenge(challengeId);
+        int totalStudent = studentInChallengeRepository.getTotalStudentInChallenge(challenge.getId());
         int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, true).orElse(0);
         int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, false).orElse(0);
 
-        socketIOServer.getRoomOperations(challengeId + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder()
-                .answers(answerResult)
-                .encryptKey(jsSideKey)
-                .totalStudent(totalStudent)
-                .totalStudentCorrect(totalStudentCorrectAns)
-                .totalStudentWrong(totalStudentWrongAns)
-                .build());
+        socketIOServer.getRoomOperations(challenge.getId() + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder().answers(answerResult).encryptKey(jsSideKey).totalStudent(totalStudent).totalStudentCorrect(totalStudentCorrectAns).totalStudentWrong(totalStudentWrongAns).build());
     }
 
     /**
@@ -139,16 +150,15 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
      *
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link Admin} id
      * @throws NullPointerException not found
      */
     @Override
-    public void endChallenge(int challengeId, int adminId) throws NullPointerException {
+    public void endChallenge(int challengeId) throws NullPointerException {
 
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, adminId);
+        Optional<Challenge> optional = challengeRepository.findOneById(challengeId);
         optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.ENDED, challengeId, adminId);
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.ENDED, challengeId);
 
         socketIOServer.getRoomOperations(challengeId + "").sendEvent("endChallenge");
     }
@@ -182,26 +192,15 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
     }
 
     @Override
-    public void publishNextQuestion(int challengeId, Admin admin) throws Exception {
-        Optional<Question> optional = questRepo.findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId, admin.getId());
-        Question question = optional.orElseThrow(() -> new Exception("Not found or empty question"));
+    public void publishNextQuestion(int challengeId) throws Exception {
+
+        Question question = questRepo.findFirstByChallengeIdAndAskDateNullOrderByOrdinalNumberAsc(challengeId).orElseThrow(() -> new Exception("Not found or empty question"));
+
 
         int countQuestion = questRepo.countQuestionInChallenge(challengeId);
         int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
 
-        PublishQuestion publishQuest = PublishQuestion.builder()
-                .id(question.getId())
-                .ordinalNumber(question.getOrdinalNumber())
-                .questionContent(question.getQuestionContent())
-                .questionImage(question.getQuestionImage())
-                .answerTimeLimit(question.getAnswerTimeLimit())
-                .point(question.getPoint())
-                .answerOption(question.getAnswerOption())
-                .challengeId(challengeId)
-                .totalQuestion(countQuestion)
-                .questionOrder(questionOrder)
-                .theLastQuestion(countQuestion == questionOrder)
-                .build();
+        PublishQuestion publishQuest = PublishQuestion.builder().id(question.getId()).ordinalNumber(question.getOrdinalNumber()).questionContent(question.getQuestionContent()).questionImage(question.getQuestionImage()).answerTimeLimit(question.getAnswerTimeLimit()).point(question.getPoint()).answerOption(question.getAnswerOption()).challengeId(challengeId).totalQuestion(countQuestion).questionOrder(questionOrder).theLastQuestion(countQuestion == questionOrder).build();
 
         List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
 
@@ -219,45 +218,62 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         List<PublishAnswer> publishAnswers2 = answerRepository.findAllAnswerByQuestionIdAndAdminId(question.getId());
 
-        String questionToken =encryptUtils.generateQuestionToken(publishAnswers2, askDate, question.getAnswerTimeLimit());
+        String questionToken = encryptUtils.generateQuestionToken(publishAnswers2, askDate, question.getAnswerTimeLimit());
 
 
+        socketIOServer.getRoomOperations(challengeId + "").sendEvent("publishQuestion", PublishedExam.builder().questionToken(questionToken).question(publishQuest).answers(publishAnswers).build());
 
-        socketIOServer.getRoomOperations(challengeId + "")
-                .sendEvent("publishQuestion", PublishQuestionResponse.builder()
-                        .questionToken(questionToken)
-                        .question(publishQuest)
-                        .answers(publishAnswers)
-                        .adminSocketId(admin.getSocketId().toString())
-                        .build());
 
-        // update current question id
-        challengeRepository.updateCurrentQuestionId(challengeId, question.getId());
+    }
 
+    public PublishedExam getCurrentPublishedExam(int challengeId) {
+        Optional<Question> op = questRepo.findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(challengeId);
+
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+        ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
+        if (!op.isPresent()) {
+
+
+            return PublishedExam.builder().challenge(challengeResponse).build();
+        }
+
+        Question currQuestion = op.get();
+
+        int countQuestion = questRepo.countQuestionInChallenge(challengeId);
+        int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
+
+        PublishQuestion publishQuest = PublishQuestion.builder().id(currQuestion.getId()).ordinalNumber(currQuestion.getOrdinalNumber()).askDate(currQuestion.getAskDate()).questionContent(currQuestion.getQuestionContent()).questionImage(currQuestion.getQuestionImage()).answerTimeLimit(currQuestion.getAnswerTimeLimit()).point(currQuestion.getPoint()).answerOption(currQuestion.getAnswerOption()).challengeId(challengeId).totalQuestion(countQuestion).questionOrder(questionOrder).theLastQuestion(countQuestion == questionOrder).build();
+
+        List<PublishAnswer> publishAnswers2 = answerRepository.findAllAnswerByQuestionIdAndAdminId(currQuestion.getId());
+
+        String questionToken = encryptUtils.generateQuestionToken(publishAnswers2, currQuestion.getAskDate(), currQuestion.getAnswerTimeLimit());
+        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(currQuestion.getId());
+
+        return PublishedExam.builder().questionToken(questionToken).challenge(challengeResponse).question(publishQuest).answers(publishAnswers).build();
 
     }
 
     @Override
-    public PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NullPointerException {
+    public void setAutoOrganize(int challengeId, boolean b) {
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("challeng not found"));
+        challenge.setAutoOrganize(b);
+        challengeRepository.save(challenge);
 
-        Optional<PublishQuestion> optional = challengeRepository.findCurrentPublishedQuestion(challengeId, adminId);
+        BroadcastOperations roomOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
+        if (b) {
+            Collection<SocketIOClient> clients = roomOperations.getClients();
+            SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot find random client"));
 
-        PublishQuestion question = optional.orElseThrow(() -> new NullPointerException("Question  not found"));
-
-        int questionOrder = questRepo.findNumberOfPublishedQuestion(challengeId) + 1;
-
-        question.setQuestionOrder(questionOrder);
-
-        question.setTheLastQuestion(question.getTotalQuestion() == question.getQuestionOrder());
-
-        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(question.getId());
-
-        return PublishQuestionResponse.builder().question(question).answers(publishAnswers).build();
+            client.sendEvent("enableAutoOrganize", this.getCurrentPublishedExam(challengeId));
+        } else {
+            roomOperations.sendEvent("disableAutoOrganize", "chung ta la ang may ben troi voi vang ngang qua");
+        }
     }
+
 
     @Override
     public List<StudentInChallengeResponse> openChallenge(Admin userDetails, int challengeId) throws Exception {
-        Optional<Challenge> optional = challengeRepository.findOneByIdAndAdminId(challengeId, userDetails.getId());
+        Optional<Challenge> optional = challengeRepository.findOneById(challengeId);
         Challenge challenge = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         long t0 = System.nanoTime();
@@ -268,7 +284,7 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
 
         challenge.setChallengeStatus(ChallengeStatus.WAITING);
-        challengeRepository.updateChallengeStatusByIdAndAdminId(ChallengeStatus.WAITING, challengeId, userDetails.getId());
+        challengeRepository.updateChallengeStatusById(ChallengeStatus.WAITING, challengeId);
 
         List<StudentInChallenge> studentsInChallenge = studentChallengeRepository.findAllByPrimaryKeyChallengeIdAndPrimaryKeyChallengeAdminId(challengeId, userDetails.getId());
         return listConverter.toListResponse(studentsInChallenge, StudentInChallengeConverter::toStudentChallengeResponse);
@@ -326,4 +342,6 @@ public class HostOrganizeChallengeServiceImpl implements HostOrganizeChallengeSe
 
         }
     }
+
+
 }

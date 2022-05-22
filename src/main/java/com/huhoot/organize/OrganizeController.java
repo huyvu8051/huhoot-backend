@@ -18,14 +18,14 @@ import java.util.List;
 public class OrganizeController {
 
 
-    private final HostOrganizeChallengeService hostOrganizeChallengeService;
+    private final OrganizeService organizeService;
 
     @GetMapping("/openChallenge")
     public ResponseEntity<List<StudentInChallengeResponse>> openChallenge(@RequestParam int challengeId) throws Exception {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostOrganizeChallengeService.openChallenge(userDetails, challengeId));
+        return ResponseEntity.ok(organizeService.openChallenge(userDetails, challengeId));
     }
 
     @GetMapping("/studentOnline")
@@ -33,7 +33,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostOrganizeChallengeService.getAllStudentInChallengeIsLogin(userDetails, challengeId));
+        return ResponseEntity.ok(organizeService.getAllStudentInChallengeIsLogin(userDetails, challengeId));
     }
 
     /**
@@ -47,7 +47,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        hostOrganizeChallengeService.startChallenge(challengeId, userDetails.getId());
+        organizeService.startChallenge(challengeId, userDetails.getId());
     }
 
 
@@ -58,11 +58,8 @@ public class OrganizeController {
      * @throws NullPointerException not found
      */
     @GetMapping("/showCorrectAnswer")
-    public void showCorrectAnswer(@RequestParam int questionId,
-                                  @RequestParam(defaultValue = "20") int size) throws NullPointerException {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        hostOrganizeChallengeService.showCorrectAnswer(questionId, userDetails.getId());
+    public void showCorrectAnswer(@RequestParam int questionId) throws NullPointerException {
+        organizeService.showCorrectAnswer(questionId);
     }
 
     /**
@@ -77,7 +74,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
-        return ResponseEntity.ok(hostOrganizeChallengeService.getTopStudent(challengeId, userDetails.getId(), pageable));
+        return ResponseEntity.ok(organizeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
     /**
@@ -89,7 +86,7 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(hostOrganizeChallengeService.getAnswerStatistics(questionId, userDetails.getId()));
+        return ResponseEntity.ok(organizeService.getAnswerStatistics(questionId, userDetails.getId()));
     }
 
 
@@ -102,7 +99,7 @@ public class OrganizeController {
     public void endChallenge(@RequestParam int challengeId) throws NullPointerException {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
+        organizeService.endChallenge(challengeId);
     }
 
 
@@ -115,7 +112,7 @@ public class OrganizeController {
     public void kickStudent(@RequestBody KickRequest req) {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        hostOrganizeChallengeService.kickStudent(req.getStudentIds(), req.getChallengeId(), userDetails.getId());
+        organizeService.kickStudent(req.getStudentIds(), req.getChallengeId(), userDetails.getId());
     }
 
     @GetMapping("/publishNextQuestion")
@@ -123,18 +120,14 @@ public class OrganizeController {
         Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         try {
-            hostOrganizeChallengeService.publishNextQuestion(challengeId, userDetails);
+            organizeService.publishNextQuestion(challengeId);
         } catch (Exception e) {
-            hostOrganizeChallengeService.endChallenge(challengeId, userDetails.getId());
+            organizeService.endChallenge(challengeId);
         }
     }
 
-    @GetMapping("/getCurrentQuestion")
-    public ResponseEntity<PublishQuestionResponse> getCurrentQuestion(@RequestParam int challengeId) throws Exception {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        return ResponseEntity.ok(hostOrganizeChallengeService.getCurrentQuestion(challengeId, userDetails.getId()));
-    }
+
+
 
 
 }

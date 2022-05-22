@@ -1,9 +1,7 @@
 package com.huhoot.socket;
 
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
@@ -14,14 +12,16 @@ import com.huhoot.host.manage.challenge.ChallengeMapper;
 import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
+import com.huhoot.model.Question;
 import com.huhoot.model.Student;
+import com.huhoot.organize.PublishedExam;
+import com.huhoot.participate.ParticipateService;
 import com.huhoot.repository.*;
-import com.huhoot.participate.StudentParticipateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.Collection;
 
 @Component
 @Slf4j
@@ -49,6 +49,38 @@ public class MessageEventHandler {
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
+        String roomId = client.get("roomId");
+        BroadcastOperations room = server.getRoomOperations(roomId);
+        Collection<SocketIOClient> clients = room.getClients();
+
+
+
+
+        if (clients.size() == 0) {
+
+            // Nobody in challenge;
+            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), null);
+        } else {
+            // greater than or equal one in challenge
+
+            SocketIOClient randClient = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot get client"));
+
+
+            String clientId = randClient.get("id");
+
+
+            PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(Integer.valueOf(roomId));
+
+
+            randClient.sendEvent("enableAutoOrganize", currentPublishedExam);
+            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), clientId);
+
+
+        }
+
+
+
+
 
         client.disconnect();
         log.info("a client was disconnected");
@@ -57,20 +89,15 @@ public class MessageEventHandler {
 
     @OnEvent("messageEvent")
     public void onEvent(SocketIOClient client, AckRequest request, String data) {
-        log.info("get data = " + data.toString());
-        client.sendEvent("message", "a dump message");
+
     }
 
     @OnEvent("registerHostSocket")
     public void registerHostSocket(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
         try {
             String token = request.getToken().substring(7);
-
             String username = jwtUtil.extractUsername(token);
-
-            Optional<Admin> optional = adminRepository.findOneByUsername(username);
-
-            Admin admin = optional.orElseThrow(() -> new NullPointerException("Admin not found"));
+            Admin admin = adminRepository.findOneByUsername(username).orElseThrow(() -> new NullPointerException("Admin not found"));
 
             if (!jwtUtil.validateToken(token, admin)) {
                 throw new Exception("Bad token");
@@ -78,22 +105,20 @@ public class MessageEventHandler {
 
             // missing set security context holder
 
-            Optional<Challenge> optionalChallenge = challengeRepository.findOneByIdAndAdminId(request.getChallengeId(), admin.getId());
-            Challenge challenge = optionalChallenge.orElseThrow(() -> new NullPointerException("Challenge not found"));
+
+            client.joinRoom(String.valueOf(request.getChallengeId()));
+
+            PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(request.getChallengeId());
 
 
-            client.joinRoom(challenge.getId() + "");
+            client.sendEvent("registerSuccess",currentPublishedExam );
 
-            ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
-
-            client.sendEvent("registerSuccess", challengeResponse);
-
-            challengeRepository.save(challenge);
+            client.set("id", admin.getUsername());
+            client.set("roomId", String.valueOf(request.getChallengeId()));
 
             admin.setSocketId(client.getSessionId());
             adminRepository.save(admin);
 
-            log.info("save admin success");
         } catch (Exception e) {
             log.error(e.getMessage());
             client.sendEvent("joinError", "joinError");
@@ -101,7 +126,7 @@ public class MessageEventHandler {
         }
     }
 
-    private final StudentParticipateService studentParticipateService;
+    private final ParticipateService participateService;
 
     @OnEvent("clientConnectRequest")
     public void clientConnectRequest(SocketIOClient client, SocketAuthorizationRequest request) throws Exception {
@@ -112,17 +137,16 @@ public class MessageEventHandler {
 
             String username = jwtUtil.extractUsername(token);
 
-            Optional<Student> optionalStudent = studentRepository.findOneByUsername(username);
-
-            Student student = optionalStudent.orElseThrow(() -> new StudentAddException("Student not found"));
+            Student student = studentRepository.findOneByUsername(username).orElseThrow(() -> new StudentAddException("Student not found"));
 
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");
             }
-
+            client.set("id", student.getUsername());
+            client.set("roomId", String.valueOf(request.getChallengeId()));
             // missing set security context holder
 
-            studentParticipateService.join(client, request.getChallengeId(), student);
+            participateService.join(client, request.getChallengeId(), student);
 
             log.info("Client connect socket success!");
         } catch (Exception e) {

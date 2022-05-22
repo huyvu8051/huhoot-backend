@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface HostOrganizeChallengeService {
+public interface OrganizeService {
 
     List<StudentInChallengeResponse> openChallenge(Admin userDetails, int id) throws Exception;
 
@@ -29,10 +29,9 @@ public interface HostOrganizeChallengeService {
      * Sent all Answer to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
      * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
      * @throws NullPointerException not found exception
      */
-    void showCorrectAnswer(int questionId, int adminId) throws NullPointerException;
+    void showCorrectAnswer(int questionId) throws NullPointerException;
 
     /**
      * @param challengeId {@link Challenge} id
@@ -54,10 +53,9 @@ public interface HostOrganizeChallengeService {
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
      *
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link Admin} id
      * @throws NullPointerException
      */
-    void endChallenge(int challengeId, int adminId) throws NullPointerException;
+    void endChallenge(int challengeId) throws NullPointerException;
 
 
     /**
@@ -67,7 +65,7 @@ public interface HostOrganizeChallengeService {
      */
     void kickStudent(List<Integer> studentIds, int challengeId, int adminId);
 
-    void publishNextQuestion(int challengeId, Admin admin) throws Exception;
+    void publishNextQuestion(int challengeId) throws Exception;
 
-    PublishQuestionResponse getCurrentQuestion(int challengeId, int adminId) throws NullPointerException;
+    void setAutoOrganize(int challengeId,boolean b);
 }

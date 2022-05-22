@@ -40,7 +40,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
 
 
-    Optional<Question> findFirstByChallengeIdAndChallengeAdminIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId, int adminId);
+    Optional<Question> findFirstByChallengeIdAndAskDateNullOrderByOrdinalNumberAsc(int challengeId);
 
     @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId AND n.askDate IS NOT NULL")
     int findNumberOfPublishedQuestion(@Param("challengeId") int challengeId);
@@ -62,4 +62,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId ")
     int countQuestionInChallenge(@Param("challengeId") int challengeId);
+
+    Optional<Question> findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(Integer valueOf);
 }

@@ -17,7 +17,6 @@ import java.util.Optional;
 
 public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
-    Optional<Challenge> findOneById(int id);
 
     @Query("SELECT new com.huhoot.host.manage.challenge.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
             "n.randomQuest, n.challengeStatus, n.admin.username, n.admin.socketId, n.createdDate, n.createdBy, " +
@@ -31,57 +30,39 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     /**
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link com.huhoot.model.Admin} id
      * @return Challenge
      */
-    Optional<Challenge> findOneByIdAndAdminId( int challengeId, int adminId);
+    Optional<Challenge> findOneById(int challengeId);
 
     /**
      * Update challenge status
      *
      * @param challengeStatus challenge status
      * @param challengeId     challenge id
-     * @param adminId         admin id
      */
     @Modifying
     @Transactional
     @Query("UPDATE Challenge c " +
             "SET c.challengeStatus = :challengeStatus " +
-            "WHERE c.id =:challengeId AND c.admin.id = :adminId ")
-    void updateChallengeStatusByIdAndAdminId(@Param("challengeStatus") ChallengeStatus challengeStatus,
-                                             @Param("challengeId") int challengeId,
-                                             @Param("adminId") int adminId);
+            "WHERE c.id =:challengeId")
+    void updateChallengeStatusById(@Param("challengeStatus") ChallengeStatus challengeStatus,
+                                   @Param("challengeId") int challengeId);
 
 
     /**
      * @param questionId question id
-     * @param adminId    admin id
      * @return challenge id
      */
-    @Query("SELECT n.challenge.id " +
+    @Query("SELECT n.challenge " +
             "FROM Question n " +
-            "WHERE n.id = :questionId AND n.challenge.admin.id = :adminId")
-    Optional<Integer> findOneByQuestionIdAndAdminId(@Param("questionId") int questionId,@Param("adminId") int adminId);
-
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Challenge n " +
-            "SET n.currentQuestionId = :questionId " +
-            "WHERE n.id = :challengeId")
-    void updateCurrentQuestionId(@Param("challengeId")int challengeId,
-                                 @Param("questionId") int currentQuestionId);
+            "WHERE n.id = :questionId")
+    Optional<Challenge> findOneByQuestionId(@Param("questionId") int questionId);
 
 
 
 
-    @Query("SELECT new com.huhoot.organize.PublishQuestion(m.id, m.ordinalNumber, m.questionContent, m.questionImage, " +
-            "m.answerTimeLimit, m.point, m.askDate, m.answerOption, m.challenge.id, m.challenge.questions.size) " +
-            "FROM Question m " +
-            "WHERE m.id IN (SELECT n.currentQuestionId FROM Challenge n WHERE n.id = :challengeId " +
-            "AND n.admin.id = :adminId)")
-    Optional<PublishQuestion> findCurrentPublishedQuestion(@Param("challengeId") int challengeId,
-                                                           @Param("adminId") int adminId);
+
+
 
 
     @Query("SELECT n.primaryKey.challenge " +
@@ -89,4 +70,12 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "WHERE n.primaryKey.student.id = :studentId AND n.primaryKey.challenge.isNonDeleted = TRUE " +
             "AND n.primaryKey.challenge.challengeStatus <> com.huhoot.enums.ChallengeStatus.BUILDING")
     List<Challenge> findAllByStudentIdAndIsAvailable(@Param("studentId") int studentId, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Challenge n " +
+            "SET n.studentOrganizeId = :studentOrganizeId " +
+            "WHERE n.id = :challengeId")
+    void updateStudentOrganizeId(@Param("challengeId")int challengeId,
+                                 @Param("studentOrganizeId") String studentOrganizeId);
 }

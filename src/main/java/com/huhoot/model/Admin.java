@@ -50,6 +50,7 @@ public class Admin extends Auditable implements UserDetails {
 		return authorities;
 	}
 
+
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
