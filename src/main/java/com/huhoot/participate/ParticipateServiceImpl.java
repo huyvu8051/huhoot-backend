@@ -6,21 +6,24 @@ import com.huhoot.auth.JwtUtil;
 import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
+import com.huhoot.host.manage.challenge.ChallengeMapper;
+import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
-import com.huhoot.repository.QuestionRepository;
-import com.huhoot.repository.StudentAnswerRepository;
-import com.huhoot.repository.StudentInChallengeRepository;
-import com.huhoot.repository.StudentRepository;
-import com.huhoot.socket.SocketRegisterSuccessResponse;
+import com.huhoot.organize.AnswerResultResponse;
+import com.huhoot.organize.PublishAnswer;
+import com.huhoot.organize.PublishQuestion;
+import com.huhoot.organize.PublishedExam;
+import com.huhoot.repository.*;
+import com.huhoot.socket.ParticipateJoinSuccessRes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -40,6 +43,11 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     private final JwtUtil jwtUtil;
     private final EncryptUtils encryptUtils;
+
+    private final AnswerRepository answerRepository;
+    private final ChallengeRepository challengeRepository;
+    private final ChallengeMapper challengeMapper;
+
 
     @Override
     public void join(SocketIOClient client, int challengeId, Student student) throws ChallengeException {
@@ -70,9 +78,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         double totalPoints = studentAnswerRepository.getTotalPointInChallenge(challengeId, student.getId());
 
         client.joinRoom(challengeId + "");
-        client.sendEvent("registerSuccess", SocketRegisterSuccessResponse.builder()
-                .totalPoints(totalPoints)
-                .build());
+        client.sendEvent("registerSuccess", ParticipateJoinSuccessRes.builder().totalPoints(totalPoints).currentExam(this.getCurrentPublishedExam(challengeId)).build());
         // update socket id
         studentRepository.updateSocketId(client.getSessionId(), student.getId());
         studentInChallenge.setLogin(true);
@@ -80,6 +86,32 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     }
 
+    public PublishedExam getCurrentPublishedExam(int challengeId) {
+        Optional<Question> op = questionRepository.findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(challengeId);
+
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+        ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
+        if (!op.isPresent()) {
+
+
+            return PublishedExam.builder().challenge(challengeResponse).build();
+        }
+
+        Question currQuestion = op.get();
+
+        int countQuestion = questionRepository.countQuestionInChallenge(challengeId);
+        int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
+
+        PublishQuestion publishQuest = PublishQuestion.builder().id(currQuestion.getId()).ordinalNumber(currQuestion.getOrdinalNumber()).askDate(currQuestion.getAskDate()).questionContent(currQuestion.getQuestionContent()).questionImage(currQuestion.getQuestionImage()).answerTimeLimit(currQuestion.getAnswerTimeLimit()).point(currQuestion.getPoint()).answerOption(currQuestion.getAnswerOption()).challengeId(challengeId).totalQuestion(countQuestion).questionOrder(questionOrder).theLastQuestion(countQuestion == questionOrder).build();
+
+        List<PublishAnswer> publishAnswers2 = answerRepository.findAllAnswerByQuestionIdAndAdminId(currQuestion.getId());
+
+        String questionToken = encryptUtils.generateQuestionToken(publishAnswers2, currQuestion.getAskDate(), currQuestion.getAnswerTimeLimit());
+        List<AnswerResultResponse> publishAnswers = answerRepository.findAllPublishAnswer(currQuestion.getId());
+
+        return PublishedExam.builder().questionToken(questionToken).challenge(challengeResponse).question(publishQuest).answers(publishAnswers).build();
+
+    }
 
 
     @Override
@@ -130,10 +162,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
         String encryptedResponse = encryptUtils.genEncryptedResponse(pointReceive, comboCount, quest.getEncryptKey());
 
-        return SendAnswerResponse.builder()
-                .comboToken(nextComboToken)
-                .encryptedResponse(encryptedResponse)
-                .build();
+        return SendAnswerResponse.builder().comboToken(nextComboToken).encryptedResponse(encryptedResponse).build();
 
     }
 

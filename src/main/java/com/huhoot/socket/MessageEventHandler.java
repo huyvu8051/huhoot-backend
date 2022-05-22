@@ -12,7 +12,9 @@ import com.huhoot.host.manage.challenge.ChallengeMapper;
 import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
+import com.huhoot.model.Question;
 import com.huhoot.model.Student;
+import com.huhoot.organize.PublishedExam;
 import com.huhoot.participate.ParticipateService;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
@@ -64,8 +66,13 @@ public class MessageEventHandler {
             SocketIOClient randClient = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot get client"));
 
 
-            Integer clientId = randClient.get("id");
-            randClient.sendEvent("hostDisconnect", "chungtacuahientai");
+            String clientId = randClient.get("id");
+
+
+            PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(Integer.valueOf(roomId));
+
+
+            randClient.sendEvent("enableAutoOrganize", currentPublishedExam);
             challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), clientId);
 
 
@@ -98,14 +105,16 @@ public class MessageEventHandler {
 
             // missing set security context holder
 
-            Challenge challenge = challengeRepository.findOneById(request.getChallengeId()).orElseThrow(() -> new NullPointerException("Challenge not found"));
-            client.joinRoom(String.valueOf(challenge.getId()));
 
-            ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
-            client.sendEvent("registerSuccess", challengeResponse);
+            client.joinRoom(String.valueOf(request.getChallengeId()));
 
-            client.set("id", admin.getId());
-            client.set("roomId", String.valueOf(challenge.getId()));
+            PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(request.getChallengeId());
+
+
+            client.sendEvent("registerSuccess",currentPublishedExam );
+
+            client.set("id", admin.getUsername());
+            client.set("roomId", String.valueOf(request.getChallengeId()));
 
             admin.setSocketId(client.getSessionId());
             adminRepository.save(admin);
@@ -133,8 +142,7 @@ public class MessageEventHandler {
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");
             }
-
-            client.set("id", student.getId());
+            client.set("id", student.getUsername());
             client.set("roomId", String.valueOf(request.getChallengeId()));
             // missing set security context holder
 

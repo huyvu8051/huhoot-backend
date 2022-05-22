@@ -62,4 +62,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     @Query("SELECT COUNT(n.id) FROM Question n WHERE n.challenge.id = :challengeId ")
     int countQuestionInChallenge(@Param("challengeId") int challengeId);
+
+    Optional<Question> findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(Integer valueOf);
 }

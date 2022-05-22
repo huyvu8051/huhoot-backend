@@ -53,10 +53,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
      * @param questionId question id
      * @return challenge id
      */
-    @Query("SELECT n.challenge.id " +
+    @Query("SELECT n.challenge " +
             "FROM Question n " +
             "WHERE n.id = :questionId")
-    Optional<Integer> findOneByQuestionId(@Param("questionId") int questionId);
+    Optional<Challenge> findOneByQuestionId(@Param("questionId") int questionId);
 
 
 
@@ -77,5 +77,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "SET n.studentOrganizeId = :studentOrganizeId " +
             "WHERE n.id = :challengeId")
     void updateStudentOrganizeId(@Param("challengeId")int challengeId,
-                                 @Param("studentOrganizeId") Integer studentOrganizeId);
+                                 @Param("studentOrganizeId") String studentOrganizeId);
 }
