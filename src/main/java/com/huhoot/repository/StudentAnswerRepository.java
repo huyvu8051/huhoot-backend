@@ -46,23 +46,6 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
                                               Pageable pageable);
 
 
-    /**
-     * This method use StudentAnswer answerDate, maybe many StudentAnswer have same answerDate
-     * so this method may leave out some record
-     *
-     * @param questionId question id
-     * @param hostId     host id
-     * @return List of answer contain number of student choose
-     */
-    @Query("SELECT new com.huhoot.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.question.id) " +
-            "FROM Answer m LEFT JOIN StudentAnswer n " +
-            "ON m.id = n.primaryKey.answer.id " +
-            "WHERE m.question.id = :questionId AND m.question.challenge.admin.id = :hostId " +
-            "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.question.id ")
-    List<AnswerResultResponse> findStatisticsByQuestionId(@Param("questionId")int questionId,
-                                                          @Param("hostId") int hostId);
-
-
 
 
 

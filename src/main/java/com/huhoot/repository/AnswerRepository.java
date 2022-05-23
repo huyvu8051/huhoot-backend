@@ -16,7 +16,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     Optional<Answer> findOneById(int id);
 
-    List<Answer> findAllByIdIn(List<Integer> ids);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id

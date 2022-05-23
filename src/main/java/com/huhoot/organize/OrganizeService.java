@@ -41,13 +41,6 @@ public interface OrganizeService {
      */
     PageResponse<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable);
 
-    /**
-     * @param adminId    {@link Admin} id
-     * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
-     * @return list of answer contain number of student select
-     */
-    List<AnswerResultResponse> getAnswerStatistics(int adminId, int questionId);
 
     /**
      * Set challenge status ENDED and sent endChallenge event to all Client in Room

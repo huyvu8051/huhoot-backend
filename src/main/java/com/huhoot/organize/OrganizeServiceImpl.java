@@ -136,15 +136,7 @@ public class OrganizeServiceImpl implements OrganizeService {
         return listConverter.toPageResponse(response);
     }
 
-    /**
-     * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
-     * @return list of answer contain number of student select
-     */
-    @Override
-    public List<AnswerResultResponse> getAnswerStatistics(int questionId, int adminId) {
-        return studentAnswerRepository.findStatisticsByQuestionId(questionId, adminId);
-    }
+
 
     /**
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
