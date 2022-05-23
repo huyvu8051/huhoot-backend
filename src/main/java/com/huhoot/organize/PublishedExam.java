@@ -13,6 +13,5 @@ public class PublishedExam {
     private String questionToken;
     private PublishQuestion question;
     private List<AnswerResultResponse> answers;
-    private String hashCorrectAnswerIds;
 
 }

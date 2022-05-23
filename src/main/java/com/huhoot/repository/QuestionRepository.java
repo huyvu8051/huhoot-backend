@@ -32,9 +32,11 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Modifying
     @Query("UPDATE Question q " +
             "SET q.askDate = :askDate, " +
+            "q.timeout = :timeout, " +
             "q.publishedOrderNumber = :publishedOrderNumber " +
             "WHERE q.id = :questionId")
     void updateAskDateAndPublishedOrderNumber(@Param("askDate") long askDate,
+                                              @Param("timeout") long timeout,
                                               @Param("publishedOrderNumber") Integer publishedOrderNumber,
                                               @Param("questionId") int questionId);
 

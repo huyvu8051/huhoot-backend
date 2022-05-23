@@ -65,13 +65,6 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
 
 
 
-    @Query("SELECT new com.huhoot.organize.AnswerResultResponse(m.id, m.ordinalNumber, m.answerContent, COUNT(n.answerDate), m.isCorrect, m.question.id) " +
-            "FROM Answer m LEFT JOIN StudentAnswer n " +
-            "ON m.id = n.primaryKey.answer.id " +
-            "WHERE m.question.id = :questionId " +
-            "GROUP BY m.id, m.ordinalNumber, m.answerContent, m.isCorrect, m.question.id ")
-    List<AnswerResultResponse> findAnswerStatistics(@Param("questionId")int questionId);
-
 
 
     /**

@@ -41,6 +41,7 @@ public class Question extends Auditable {
     private AnswerOption answerOption;
 
     private Long askDate;
+    private Long timeout;
 
     private boolean isNonDeleted;
 
