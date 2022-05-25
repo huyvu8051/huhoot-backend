@@ -1,7 +1,10 @@
 package com.huhoot.socket;
 
 
-import com.corundumstudio.socketio.*;
+import com.corundumstudio.socketio.AckRequest;
+import com.corundumstudio.socketio.BroadcastOperations;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
@@ -9,10 +12,7 @@ import com.huhoot.auth.JwtUtil;
 import com.huhoot.auth.MyUserDetailsService;
 import com.huhoot.exception.StudentAddException;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.model.Admin;
-import com.huhoot.model.Challenge;
-import com.huhoot.model.Question;
 import com.huhoot.model.Student;
 import com.huhoot.organize.PublishedExam;
 import com.huhoot.participate.ParticipateService;
@@ -54,8 +54,6 @@ public class MessageEventHandler {
         Collection<SocketIOClient> clients = room.getClients();
 
 
-
-
         if (clients.size() == 0) {
 
             // Nobody in challenge;
@@ -77,9 +75,6 @@ public class MessageEventHandler {
 
 
         }
-
-
-
 
 
         client.disconnect();
@@ -111,7 +106,10 @@ public class MessageEventHandler {
             PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(request.getChallengeId());
 
 
-            client.sendEvent("registerSuccess",currentPublishedExam );
+            client.sendEvent("registerSuccess", HostRegisterSuccess.builder()
+                    .totalStudentInChallenge(0)
+                    .currentExam(currentPublishedExam)
+                    .build());
 
             client.set("id", admin.getUsername());
             client.set("roomId", String.valueOf(request.getChallengeId()));

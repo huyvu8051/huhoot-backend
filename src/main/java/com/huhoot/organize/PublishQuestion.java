@@ -21,6 +21,7 @@ public class PublishQuestion {
     private int answerTimeLimit;
 
     private long askDate;
+    private long timeout;
 
     private Points point;
 

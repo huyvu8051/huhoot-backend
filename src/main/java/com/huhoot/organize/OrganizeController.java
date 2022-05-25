@@ -77,18 +77,6 @@ public class OrganizeController {
         return ResponseEntity.ok(organizeService.getTopStudent(challengeId, userDetails.getId(), pageable));
     }
 
-    /**
-     * @param questionId {@link com.huhoot.model.Question} id
-     * @return List of {@link AnswerResultResponse}
-     */
-    @GetMapping("/getAnswerStatistics")
-    public ResponseEntity<List<AnswerResultResponse>> getAnswerStatistics(@RequestParam int questionId) {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-
-        return ResponseEntity.ok(organizeService.getAnswerStatistics(questionId, userDetails.getId()));
-    }
-
 
     /**
      * @param challengeId {@link com.huhoot.model.Challenge} id

@@ -95,12 +95,12 @@ public class OrganizeServiceImpl implements OrganizeService {
 
         Question question = questRepo.findOneByIdAndAskDateNotNull(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
 
+        if(question.getTimeout() != null & question.getTimeout() > now){
+            question.setTimeout(now);
+            questRepo.save(question);
+        }
 
-        long answerTimeLimit = question.getAskDate() + question.getAnswerTimeLimit() * 1000;
-
-        if (now < answerTimeLimit) return;
-
-        List<AnswerResultResponse> answerResult = studentAnswerRepository.findAnswerStatistics(questionId);
+        List<Integer> answerResult = answerRepository.findAllCorrectAnswerIds(questionId);
 
         // question.setAskDate(null);
         // questionRepository.save(question);
@@ -114,7 +114,7 @@ public class OrganizeServiceImpl implements OrganizeService {
         int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, true).orElse(0);
         int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, false).orElse(0);
 
-        socketIOServer.getRoomOperations(challenge.getId() + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder().answers(answerResult).encryptKey(jsSideKey).totalStudent(totalStudent).totalStudentCorrect(totalStudentCorrectAns).totalStudentWrong(totalStudentWrongAns).build());
+        socketIOServer.getRoomOperations(challenge.getId() + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder().answers(answerResult).timeout(question.getTimeout()).encryptKey(jsSideKey).totalStudent(totalStudent).totalStudentCorrect(totalStudentCorrectAns).totalStudentWrong(totalStudentWrongAns).build());
     }
 
     /**
@@ -136,15 +136,7 @@ public class OrganizeServiceImpl implements OrganizeService {
         return listConverter.toPageResponse(response);
     }
 
-    /**
-     * @param questionId {@link com.huhoot.model.Question} id
-     * @param adminId    {@link Admin} id
-     * @return list of answer contain number of student select
-     */
-    @Override
-    public List<AnswerResultResponse> getAnswerStatistics(int questionId, int adminId) {
-        return studentAnswerRepository.findStatisticsByQuestionId(questionId, adminId);
-    }
+
 
     /**
      * Set challenge status ENDED and sent endChallenge event to all Client in Room
@@ -208,11 +200,15 @@ public class OrganizeServiceImpl implements OrganizeService {
         // delay 6 sec
         long sec = 6;
         long askDate = System.currentTimeMillis() + sec * 1000;
+
+        long timeout = askDate + question.getAnswerTimeLimit() * 1000;
+
         publishQuest.setAskDate(askDate);
+        publishQuest.setTimeout(timeout);
 
 
         // update ask date and decryptKey
-        questRepo.updateAskDateAndPublishedOrderNumber(askDate, questionOrder, question.getId());
+        questRepo.updateAskDateAndPublishedOrderNumber(askDate,timeout, questionOrder, question.getId());
 
         // hash correct answer ids
 

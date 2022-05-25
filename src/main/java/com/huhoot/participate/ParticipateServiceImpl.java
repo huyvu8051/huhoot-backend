@@ -92,8 +92,6 @@ public class ParticipateServiceImpl implements ParticipateService {
         Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
         ChallengeResponse challengeResponse = challengeMapper.toDto(challenge);
         if (!op.isPresent()) {
-
-
             return PublishedExam.builder().challenge(challengeResponse).build();
         }
 
@@ -102,7 +100,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         int countQuestion = questionRepository.countQuestionInChallenge(challengeId);
         int questionOrder = questionRepository.findNumberOfPublishedQuestion(challengeId) + 1;
 
-        PublishQuestion publishQuest = PublishQuestion.builder().id(currQuestion.getId()).ordinalNumber(currQuestion.getOrdinalNumber()).askDate(currQuestion.getAskDate()).questionContent(currQuestion.getQuestionContent()).questionImage(currQuestion.getQuestionImage()).answerTimeLimit(currQuestion.getAnswerTimeLimit()).point(currQuestion.getPoint()).answerOption(currQuestion.getAnswerOption()).challengeId(challengeId).totalQuestion(countQuestion).questionOrder(questionOrder).theLastQuestion(countQuestion == questionOrder).build();
+        PublishQuestion publishQuest = PublishQuestion.builder().id(currQuestion.getId()).ordinalNumber(currQuestion.getOrdinalNumber()).askDate(currQuestion.getAskDate()).timeout(currQuestion.getTimeout()).questionContent(currQuestion.getQuestionContent()).questionImage(currQuestion.getQuestionImage()).answerTimeLimit(currQuestion.getAnswerTimeLimit()).point(currQuestion.getPoint()).answerOption(currQuestion.getAnswerOption()).challengeId(challengeId).totalQuestion(countQuestion).questionOrder(questionOrder).theLastQuestion(countQuestion == questionOrder).build();
 
         List<PublishAnswer> publishAnswers2 = answerRepository.findAllAnswerByQuestionIdAndAdminId(currQuestion.getId());
 

@@ -16,7 +16,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     Optional<Answer> findOneById(int id);
 
-    List<Answer> findAllByIdIn(List<Integer> ids);
 
     /**
      * @param questionId {@link com.huhoot.model.Question} id
@@ -62,6 +61,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
             "FROM Answer n " +
             "WHERE n.question.id = :questionId")
     int getNextOrdinalNumber(@Param("questionId") int questionId);
+
 
 
 

@@ -8,12 +8,12 @@ import java.util.List;
 @Data
 @Builder
 public class CorrectAnswerResponse {
-    private List<AnswerResultResponse> answers;
+    private List<Integer> answers;
     private String encryptKey;
+    private long timeout;
     private int totalStudent;
     private int totalStudentCorrect;
     private int totalStudentWrong;
-    private String encryptKey2;
 
 
 }
