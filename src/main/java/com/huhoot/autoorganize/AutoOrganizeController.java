@@ -49,10 +49,10 @@ public class AutoOrganizeController {
 
     @GetMapping("/enableAutoOrganize")
     public void enableAutoOrganize(@RequestParam int challengeId) throws Exception {
-        organizeService.setAutoOrganize(challengeId,true);
+        organizeService.findAnyClientAndEnableAutoOrganize(challengeId);
     } @GetMapping("/disableAutoOrganize")
     public void disableAutoOrganize(@RequestParam int challengeId) throws Exception {
-        organizeService.setAutoOrganize(challengeId,false);
+        organizeService.disableAutoOrganize(challengeId);
     }
 
 }

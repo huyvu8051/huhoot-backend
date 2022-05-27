@@ -66,6 +66,9 @@ public class ChallengeMapperImpl implements ChallengeMapper {
         challengeResponse.setRandomQuest(entity.isRandomQuest());
         challengeResponse.setChallengeStatus(entity.getChallengeStatus());
 
+        challengeResponse.setUserAutoOrganizeId(entity.getUserAutoOrganizeId());
+        challengeResponse.setAutoOrganize(entity.isAutoOrganize());
+
 
 
         return challengeResponse;

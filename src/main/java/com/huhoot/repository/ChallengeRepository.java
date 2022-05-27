@@ -2,7 +2,6 @@ package com.huhoot.repository;
 
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.host.manage.challenge.ChallengeResponse;
-import com.huhoot.organize.PublishQuestion;
 import com.huhoot.model.Challenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,8 +73,14 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
     @Modifying
     @Transactional
     @Query("UPDATE Challenge n " +
-            "SET n.studentOrganizeId = :studentOrganizeId " +
+            "SET n.userAutoOrganizeId = :userAutoOrganizeId " +
             "WHERE n.id = :challengeId")
-    void updateStudentOrganizeId(@Param("challengeId")int challengeId,
-                                 @Param("studentOrganizeId") String studentOrganizeId);
+    void updateUserAutoOrganizeId(@Param("challengeId")int challengeId,
+                                  @Param("userAutoOrganizeId") Integer userAutoOrganizeId);@Modifying
+    @Transactional
+    @Query("UPDATE Challenge n " +
+            "SET n.autoOrganize = :autoOrganize " +
+            "WHERE n.id = :challengeId")
+    void updateAutoOrganizeStatus(@Param("challengeId")int challengeId,
+                                  @Param("autoOrganize") boolean autoOrganize);
 }

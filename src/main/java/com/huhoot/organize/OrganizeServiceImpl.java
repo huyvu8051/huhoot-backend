@@ -15,7 +15,6 @@ import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
-import com.huhoot.socket.ParticipateJoinSuccessRes;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,6 @@ public class OrganizeServiceImpl implements OrganizeService {
     private final JwtUtil jwtUtil;
     private final EncryptUtils encryptUtils;
     private final ChallengeMapper challengeMapper;
-
 
 
     @Override
@@ -95,7 +93,7 @@ public class OrganizeServiceImpl implements OrganizeService {
 
         Question question = questRepo.findOneByIdAndAskDateNotNull(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
 
-        if(question.getTimeout() != null & question.getTimeout() > now){
+        if (question.getTimeout() != null & question.getTimeout() > now) {
             question.setTimeout(now);
             questRepo.save(question);
         }
@@ -135,7 +133,6 @@ public class OrganizeServiceImpl implements OrganizeService {
 
         return listConverter.toPageResponse(response);
     }
-
 
 
     /**
@@ -208,7 +205,7 @@ public class OrganizeServiceImpl implements OrganizeService {
 
 
         // update ask date and decryptKey
-        questRepo.updateAskDateAndPublishedOrderNumber(askDate,timeout, questionOrder, question.getId());
+        questRepo.updateAskDateAndPublishedOrderNumber(askDate, timeout, questionOrder, question.getId());
 
         // hash correct answer ids
 
@@ -249,21 +246,25 @@ public class OrganizeServiceImpl implements OrganizeService {
 
     }
 
-    @Override
-    public void setAutoOrganize(int challengeId, boolean b) {
-        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("challeng not found"));
-        challenge.setAutoOrganize(b);
-        challengeRepository.save(challenge);
 
-        BroadcastOperations roomOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
-        if (b) {
-            Collection<SocketIOClient> clients = roomOperations.getClients();
-            SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot find random client"));
+    public void findAnyClientAndEnableAutoOrganize(int challengeId) {
+        BroadcastOperations broadcastOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
+        broadcastOperations.sendEvent("disableAutoOrganize");
+        Collection<SocketIOClient> clients = broadcastOperations.getClients();
+        SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("no client left in this challenge"));
+        client.sendEvent("enableAutoOrganize", this.getCurrentPublishedExam(challengeId));
 
-            client.sendEvent("enableAutoOrganize", this.getCurrentPublishedExam(challengeId));
-        } else {
-            roomOperations.sendEvent("disableAutoOrganize", "chung ta la ang may ben troi voi vang ngang qua");
-        }
+        int id = client.get("id");
+        challengeRepository.updateUserAutoOrganizeId(challengeId, id);
+        challengeRepository.updateAutoOrganizeStatus(challengeId, true);
+    }
+
+    public void disableAutoOrganize(int challengeId) {
+        BroadcastOperations broadcastOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
+        broadcastOperations.sendEvent("disableAutoOrganize");
+
+        challengeRepository.updateUserAutoOrganizeId(challengeId, null);
+        challengeRepository.updateAutoOrganizeStatus(challengeId, false);
     }
 
 

@@ -60,5 +60,7 @@ public interface OrganizeService {
 
     void publishNextQuestion(int challengeId) throws Exception;
 
-    void setAutoOrganize(int challengeId,boolean b);
+
+    void findAnyClientAndEnableAutoOrganize(int challengeId);
+    void disableAutoOrganize(int challengeId);
 }
