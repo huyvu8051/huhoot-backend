@@ -2,6 +2,8 @@ package com.huhoot.organize;
 
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Question;
+import com.huhoot.repository.QuestionRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ import java.util.List;
 public class OrganizeController {
 
 
+    private final QuestionRepository questionRepository;
     private final OrganizeService organizeService;
 
     @GetMapping("/openChallenge")
@@ -59,7 +62,8 @@ public class OrganizeController {
      */
     @GetMapping("/showCorrectAnswer")
     public void showCorrectAnswer(@RequestParam int questionId) throws NullPointerException {
-        organizeService.showCorrectAnswer(questionId);
+        Question question = questionRepository.findOneByIdAndAskDateNotNull(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
+        organizeService.showCorrectAnswer(question);
     }
 
     /**

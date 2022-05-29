@@ -2,7 +2,6 @@ package com.huhoot.socket;
 
 
 import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
@@ -10,6 +9,7 @@ import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.huhoot.auth.JwtUtil;
 import com.huhoot.auth.MyUserDetailsService;
+import com.huhoot.exception.NoClientInBroadcastOperations;
 import com.huhoot.exception.StudentAddException;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
 import com.huhoot.model.Admin;
@@ -22,8 +22,6 @@ import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
 
 @Component
 @Slf4j
@@ -57,7 +55,12 @@ public class MessageEventHandler {
         Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
 
         if(challenge.isAutoOrganize()){
-            organizeService.findAnyClientAndEnableAutoOrganize(challengeId);
+            try {
+                organizeService.findAnyClientAndEnableAutoOrganize(challengeId);
+            }catch (NoClientInBroadcastOperations e){
+                organizeService.disableAutoOrganize(challengeId);
+                organizeService.updateChallengeStatusToClient(challengeId);
+            }
         }
 
         client.disconnect();

@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
-public class Student extends Auditable implements UserDetails{
+public class Student extends Auditable implements CustomUserDetails{
 	@Id
 	@GeneratedValue
 	private int id;

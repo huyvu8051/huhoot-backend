@@ -10,11 +10,13 @@ import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.AnswerOption;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
+import com.huhoot.exception.NoClientInBroadcastOperations;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
 import com.huhoot.host.manage.challenge.ChallengeResponse;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
+import com.huhoot.socket.HostRegisterSuccess;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,34 +76,27 @@ public class OrganizeServiceImpl implements OrganizeService {
     /**
      * Sent all AnswerResponse to all {@link SocketIOClient} in {@link com.corundumstudio.socketio.BroadcastOperations}
      *
-     * @param questionId {@link com.huhoot.model.Question} id
      * @throws NullPointerException not found exception
      */
     @Override
-    public void showCorrectAnswer(int questionId) throws NullPointerException {
+    public void showCorrectAnswer(Question question) throws NullPointerException {
 
 
         long now = System.currentTimeMillis();
 
-        Challenge challenge = challengeRepository.findOneByQuestionId(questionId).orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-//        Question asked = questRepo.findFirstByChallengeIdAndAskDateNotNullOrderByAskDateDesc(challenge.getId()).orElse(Question.builder().askDate(now).build());
-//
-//        if (now < asked.getAskDate() + asked.getAnswerTimeLimit() * 1000){
-//            throw new NullPointerException("last question not finish");
-//        }
 
-        Question question = questRepo.findOneByIdAndAskDateNotNull(questionId).orElseThrow(() -> new NullPointerException("Question not found"));
+
+
+        Challenge challenge = question.getChallenge();
 
         if (question.getTimeout() != null & question.getTimeout() > now) {
             question.setTimeout(now);
             questRepo.save(question);
         }
 
-        List<Integer> answerResult = answerRepository.findAllCorrectAnswerIds(questionId);
+        List<Integer> answerResult = answerRepository.findAllCorrectAnswerIds(question.getId());
 
-        // question.setAskDate(null);
-        // questionRepository.save(question);
 
         // gen key for js size
         byte[] byteKey = question.getEncryptKey();
@@ -109,8 +104,8 @@ public class OrganizeServiceImpl implements OrganizeService {
 
 
         int totalStudent = studentInChallengeRepository.getTotalStudentInChallenge(challenge.getId());
-        int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, true).orElse(0);
-        int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(questionId, false).orElse(0);
+        int totalStudentCorrectAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(question.getId(), true).orElse(0);
+        int totalStudentWrongAns = studentAnswerRepository.getTotalStudentAnswerByQuestIdAndIsCorrect(question.getId(), false).orElse(0);
 
         socketIOServer.getRoomOperations(challenge.getId() + "").sendEvent("showCorrectAnswer", CorrectAnswerResponse.builder().answers(answerResult).timeout(question.getTimeout()).encryptKey(jsSideKey).totalStudent(totalStudent).totalStudentCorrect(totalStudentCorrectAns).totalStudentWrong(totalStudentWrongAns).build());
     }
@@ -247,11 +242,11 @@ public class OrganizeServiceImpl implements OrganizeService {
     }
 
 
-    public void findAnyClientAndEnableAutoOrganize(int challengeId) {
+    public void findAnyClientAndEnableAutoOrganize(int challengeId) throws NoClientInBroadcastOperations {
         BroadcastOperations broadcastOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
         broadcastOperations.sendEvent("disableAutoOrganize");
         Collection<SocketIOClient> clients = broadcastOperations.getClients();
-        SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("no client left in this challenge"));
+        SocketIOClient client = clients.stream().findFirst().orElseThrow(() -> new NoClientInBroadcastOperations("no client left in this challenge"));
         client.sendEvent("enableAutoOrganize", this.getCurrentPublishedExam(challengeId));
 
         int id = client.get("id");
@@ -265,6 +260,12 @@ public class OrganizeServiceImpl implements OrganizeService {
 
         challengeRepository.updateUserAutoOrganizeId(challengeId, null);
         challengeRepository.updateAutoOrganizeStatus(challengeId, false);
+    }
+
+    @Override
+    public void updateChallengeStatusToClient(int challengeId) {
+        BroadcastOperations broadcastOperations = socketIOServer.getRoomOperations(String.valueOf(challengeId));
+        broadcastOperations.sendEvent("updateChallengeStatus", HostRegisterSuccess.builder().totalStudentInChallenge(0).currentExam(this.getCurrentPublishedExam(challengeId)).build());
     }
 
 

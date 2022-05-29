@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners({ AuditingEntityListener.class })
-public class Admin extends Auditable implements UserDetails {
+public class Admin extends Auditable implements CustomUserDetails {
 	@Id
 	@GeneratedValue
 	private int id;

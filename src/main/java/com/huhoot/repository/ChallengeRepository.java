@@ -83,4 +83,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "WHERE n.id = :challengeId")
     void updateAutoOrganizeStatus(@Param("challengeId")int challengeId,
                                   @Param("autoOrganize") boolean autoOrganize);
+
+    @Query("SELECT n " +
+            "FROM Challenge n " +
+            "WHERE n.id = :challengeId AND n.userAutoOrganizeId = :userAutoOrganizeId ")
+    Optional<Challenge> findOneByIdByAutoOrganizer(@Param("challengeId") int challengeId,@Param("userAutoOrganizeId") int userAutoOrganizeId);
 }
