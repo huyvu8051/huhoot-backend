@@ -21,6 +21,10 @@ public class ChallengeResponse extends AuditableDto {
 
     private UUID adminSocketId;
 
+    private Integer userAutoOrganizeId;
+
+    private boolean autoOrganize;
+
     public ChallengeResponse(int id, String title, String coverImage, boolean randomAnswer, boolean randomQuest,
                              ChallengeStatus challengeStatus, String owner, UUID adminSocketId,
                              Long createdDate, String createdBy, Long modifiedDate, String modifiedBy) {

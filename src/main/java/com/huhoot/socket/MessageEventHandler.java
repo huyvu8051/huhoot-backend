@@ -2,7 +2,6 @@ package com.huhoot.socket;
 
 
 import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.BroadcastOperations;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
@@ -10,18 +9,19 @@ import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.huhoot.auth.JwtUtil;
 import com.huhoot.auth.MyUserDetailsService;
+import com.huhoot.exception.NoClientInBroadcastOperations;
 import com.huhoot.exception.StudentAddException;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
 import com.huhoot.model.Admin;
+import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
+import com.huhoot.organize.OrganizeService;
 import com.huhoot.organize.PublishedExam;
 import com.huhoot.participate.ParticipateService;
 import com.huhoot.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
 
 @Component
 @Slf4j
@@ -39,6 +39,7 @@ public class MessageEventHandler {
     private final QuestionRepository questionRepository;
 
     private final ChallengeMapper challengeMapper;
+    private final OrganizeService organizeService;
 
     @OnConnect
     public void onConnect(SocketIOClient client) throws NullPointerException {
@@ -49,33 +50,18 @@ public class MessageEventHandler {
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
-        String roomId = client.get("roomId");
-        BroadcastOperations room = server.getRoomOperations(roomId);
-        Collection<SocketIOClient> clients = room.getClients();
+        Integer challengeId = client.get("challengeId");
 
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
 
-        if (clients.size() == 0) {
-
-            // Nobody in challenge;
-            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), null);
-        } else {
-            // greater than or equal one in challenge
-
-            SocketIOClient randClient = clients.stream().findFirst().orElseThrow(() -> new NullPointerException("Cannot get client"));
-
-
-            String clientId = randClient.get("id");
-
-
-            PublishedExam currentPublishedExam = participateService.getCurrentPublishedExam(Integer.valueOf(roomId));
-
-
-            randClient.sendEvent("enableAutoOrganize", currentPublishedExam);
-            challengeRepository.updateStudentOrganizeId(Integer.valueOf(roomId), clientId);
-
-
+        if(challenge.isAutoOrganize()){
+            try {
+                organizeService.findAnyClientAndEnableAutoOrganize(challengeId);
+            }catch (NoClientInBroadcastOperations e){
+                organizeService.disableAutoOrganize(challengeId);
+                organizeService.updateChallengeStatusToClient(challengeId);
+            }
         }
-
 
         client.disconnect();
         log.info("a client was disconnected");
@@ -111,8 +97,8 @@ public class MessageEventHandler {
                     .currentExam(currentPublishedExam)
                     .build());
 
-            client.set("id", admin.getUsername());
-            client.set("roomId", String.valueOf(request.getChallengeId()));
+            client.set("id", admin.getId());
+            client.set("challengeId", request.getChallengeId());
 
             admin.setSocketId(client.getSessionId());
             adminRepository.save(admin);
@@ -140,8 +126,8 @@ public class MessageEventHandler {
             if (!jwtUtil.validateToken(token, student)) {
                 throw new Exception("Bad token");
             }
-            client.set("id", student.getUsername());
-            client.set("roomId", String.valueOf(request.getChallengeId()));
+            client.set("id", student.getId());
+            client.set("challengeId", request.getChallengeId());
             // missing set security context holder
 
             participateService.join(client, request.getChallengeId(), student);

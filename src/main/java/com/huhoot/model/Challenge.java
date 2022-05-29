@@ -31,7 +31,7 @@ public class Challenge extends Auditable {
 
     private ChallengeStatus challengeStatus;
 
-    private String studentOrganizeId;
+    private Integer userAutoOrganizeId;
 
     private boolean autoOrganize;
 
