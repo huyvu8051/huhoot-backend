@@ -2,12 +2,10 @@ package com.huhoot.student.manage;
 
 import com.huhoot.converter.ChallengeConverter;
 import com.huhoot.converter.ListConverter;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.repository.ChallengeRepository;
-import com.huhoot.repository.StudentInChallengeRepository;
-import com.huhoot.student.manage.StudentManageService;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;

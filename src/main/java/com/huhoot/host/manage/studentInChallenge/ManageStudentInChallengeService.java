@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ManageStudentInChallengeService {
 
-    PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId);
+    PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(int challengeId, Pageable pageable);
 
     PageResponse<StudentInChallengeResponse> searchStudentInChallengeByUsername(Admin userDetails, String studentUsername, int challengeId, Pageable pageable);
 
@@ -17,4 +17,5 @@ public interface ManageStudentInChallengeService {
     void updateStudentInChallenge(Admin userDetails, StudentInChallengeUpdateRequest request) throws NullPointerException;
 
 
+    PageResponse<StudentInChallengeResponse> findAllParticipants(int challengeId, Pageable pageable1);
 }

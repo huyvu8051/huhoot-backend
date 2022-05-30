@@ -1,7 +1,7 @@
 package com.huhoot.host.manage.studentInChallenge;
 
 import com.huhoot.admin.manage.student.ManageStudentService;
-import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.dto.StudentResponse;
 import com.huhoot.host.manage.question.FindAllQuestionRequest;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
@@ -38,11 +38,10 @@ public class ManageStudentChallengeController {
 
     @PostMapping("/studentChallenge/findAll")
     public ResponseEntity<PageResponse<StudentInChallengeResponse>> findAll(@RequestBody FindAllQuestionRequest request) {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+
         Pageable pageable = vDataTablePagingConverter.toPageable(request);
 
-        return ResponseEntity.ok(hostService.findAllStudentInChallenge(userDetails, pageable, request.getChallengeId()));
+        return ResponseEntity.ok(hostService.findAllStudentInChallenge(request.getChallengeId(), pageable));
     }
 
 

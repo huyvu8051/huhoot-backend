@@ -37,11 +37,10 @@ public interface OrganizeService {
 
     /**
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link Admin} id
      * @param pageable    {@link Pageable}
      * @return List of top 20 student have best total challenge score
      */
-    PageResponse<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable);
+    PageResponse<StudentScoreResponse> getTopStudent(int challengeId, Pageable pageable);
 
 
     /**

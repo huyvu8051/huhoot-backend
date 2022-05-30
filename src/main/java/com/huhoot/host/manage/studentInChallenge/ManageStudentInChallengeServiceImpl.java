@@ -36,8 +36,8 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
     private final StudentRepository studentRepository;
 
     @Override
-    public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, userDetails.getId(), pageable);
+    public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(int challengeId, Pageable pageable) {
+        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, pageable);
         return listConverter.toPageResponse(page);
     }
 
@@ -86,6 +86,14 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
 
         studentChallengeRepository.save(studentInChallenge);
 
+    }
+
+    @Override
+    public PageResponse<StudentInChallengeResponse> findAllParticipants(int challengeId, Pageable pageable1) {
+
+        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, pageable1);
+
+        return listConverter.toPageResponse(page);
     }
 
 

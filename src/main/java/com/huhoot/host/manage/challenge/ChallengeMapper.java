@@ -1,5 +1,6 @@
 package com.huhoot.host.manage.challenge;
 
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import org.mapstruct.MappingTarget;
 

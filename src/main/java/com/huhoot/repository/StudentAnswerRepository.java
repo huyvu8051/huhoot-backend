@@ -38,11 +38,10 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      */
     @Query("SELECT new com.huhoot.organize.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName, m.primaryKey.student.username)  " +
             "FROM StudentAnswer m " +
-            "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
+            "WHERE m.primaryKey.challenge.id = :challengeId " +
             "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName, m.primaryKey.student.username " +
             "ORDER BY SUM(m.score) DESC")
     Page<StudentScoreResponse> findTopStudent(@Param("challengeId")int challengeId,
-                                              @Param("adminId")int adminId,
                                               Pageable pageable);
 
 

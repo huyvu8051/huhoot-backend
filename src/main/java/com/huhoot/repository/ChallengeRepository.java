@@ -1,7 +1,7 @@
 package com.huhoot.repository;
 
 import com.huhoot.enums.ChallengeStatus;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
 
-    @Query("SELECT new com.huhoot.host.manage.challenge.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
+    @Query("SELECT new com.huhoot.dto.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
             "n.randomQuest, n.challengeStatus, n.admin.username, n.admin.socketId, n.createdDate, n.createdBy, " +
             "n.modifiedDate, n.modifiedBy) " +
             "FROM Challenge n " +
@@ -88,4 +88,13 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "FROM Challenge n " +
             "WHERE n.id = :challengeId AND n.userAutoOrganizeId = :userAutoOrganizeId ")
     Optional<Challenge> findOneByIdByAutoOrganizer(@Param("challengeId") int challengeId,@Param("userAutoOrganizeId") int userAutoOrganizeId);
+
+
+    @Query("SELECT new com.huhoot.dto.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
+            "n.randomQuest, n.challengeStatus, n.admin.username, n.admin.socketId, n.createdDate, n.createdBy, " +
+            "n.modifiedDate, n.modifiedBy) " +
+            "FROM Challenge n ")
+    Page<ChallengeResponse> findAllChallengeResponse(Pageable pageable);
+
+
 }

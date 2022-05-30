@@ -75,10 +75,9 @@ public class OrganizeController {
     public ResponseEntity<PageResponse<StudentScoreResponse>> getTopStudent(@RequestParam int challengeId,
                                                                             @RequestParam(defaultValue = "1") int page,
                                                                             @RequestParam(defaultValue = "20") int itemsPerPage) {
-        Admin userDetails = (Admin) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
-        return ResponseEntity.ok(organizeService.getTopStudent(challengeId, userDetails.getId(), pageable));
+        return ResponseEntity.ok(organizeService.getTopStudent(challengeId, pageable));
     }
 
 

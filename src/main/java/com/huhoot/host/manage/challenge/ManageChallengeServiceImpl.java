@@ -1,8 +1,9 @@
 package com.huhoot.host.manage.challenge;
 
 import com.huhoot.converter.ListConverter;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.exception.NotYourOwnException;
-import com.huhoot.functional.CheckedFunction;
+import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.repository.ChallengeRepository;
@@ -12,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class ManageChallengeServiceImpl implements ManageChallengeService {
@@ -22,6 +21,12 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
     private final ListConverter listConverter;
 
     private final ChallengeMapper challengeMapper;
+
+    @Override
+    public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
+        Page<ChallengeResponse> challenges = challengeRepository.findAllChallengeResponse(pageable);
+        return listConverter.toPageResponse(challenges);
+    }
 
     @Override
     public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
@@ -44,14 +49,28 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
 
 
     @Override
-    public void updateOneChallenge(Admin userDetails, ChallengeUpdateRequest request, CheckedFunction<Admin, Challenge> checker) throws NotYourOwnException, NullPointerException {
-        Optional<Challenge> optional = challengeRepository.findOneById(request.getId());
-        Challenge challenge = optional.orElseThrow(() -> new NullPointerException("Challenge not found"));
-        checker.accept(userDetails, challenge);
+    public void updateOneChallenge(ChallengeUpdateRequest request, Challenge challenge) throws NullPointerException {
         challengeMapper.update(request, challenge);
         challengeRepository.save(challenge);
+    }
+
+    @Override
+    public Challenge findChallengeWithOwner(int challengeId, int userId) throws NotYourOwnException {
+        Challenge challenge = challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+
+        if (challenge.getAdmin().getId() == userId) {
+            return challenge;
+        } else {
+            throw new NotYourOwnException("Challenge not own");
+        }
 
     }
+
+    @Override
+    public Challenge findChallenge(int challengeId) {
+        return challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+    }
+
 
 
 }

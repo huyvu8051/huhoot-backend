@@ -1,7 +1,7 @@
 package com.huhoot.mapper;
 
 import com.huhoot.admin.manage.student.StudentAddRequest;
-import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.dto.StudentResponse;
 import com.huhoot.admin.manage.student.StudentUpdateRequest;
 import com.huhoot.model.Student;
 import org.mapstruct.MappingTarget;

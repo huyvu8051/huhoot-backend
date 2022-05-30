@@ -1,9 +1,12 @@
 package com.huhoot.admin.manage.student;
 
 import com.huhoot.converter.ListConverter;
+import com.huhoot.dto.StudentResponse;
 import com.huhoot.exception.UsernameExistedException;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.mapper.StudentMapper;
 import com.huhoot.model.Student;
+import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
@@ -31,6 +34,9 @@ public class ManageStudentServiceImpl implements ManageStudentService {
 
     private final ListConverter listConverter;
     private final StudentMapper studentMapper;
+
+
+    private final StudentInChallengeRepository sicRepo;
 
     @Override
     public PageResponse<StudentResponse> findAllStudentAccount(Pageable pageable) {
@@ -107,6 +113,20 @@ public class ManageStudentServiceImpl implements ManageStudentService {
         studentMapper.update(request, entity);
 
         studentRepository.save(entity);
+    }
+
+    @Override
+    public StudentResponse findOneByUsername(String username) {
+        return studentRepository.findOneStudentResponseByUsername(username);
+    }
+
+    @Override
+    public PageResponse<ChallengeResponse> findAllChallengeParticipateIn(String username, Pageable pageable1) {
+        Page<ChallengeResponse> page = sicRepo.findAllChallengeResByStudent(username, pageable1);
+
+        return listConverter.toPageResponse(page);
+
+
     }
 
 

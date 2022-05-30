@@ -12,7 +12,7 @@ import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.exception.NoClientInBroadcastOperations;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.*;
 import com.huhoot.repository.*;
@@ -112,14 +112,13 @@ public class OrganizeServiceImpl implements OrganizeService {
 
     /**
      * @param challengeId {@link Challenge} id
-     * @param adminId     {@link Admin} id
      * @param pageable    {@link Pageable}
      * @return List of top 20 student have best total challenge score
      */
     @Override
-    public PageResponse<StudentScoreResponse> getTopStudent(int challengeId, int adminId, Pageable pageable) {
+    public PageResponse<StudentScoreResponse> getTopStudent(int challengeId, Pageable pageable) {
 
-        Page<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, adminId, pageable);
+        Page<StudentScoreResponse> response = studentAnswerRepository.findTopStudent(challengeId, pageable);
 
         int rankNum = 1;
         for (StudentScoreResponse studentScoreResponse : response) {

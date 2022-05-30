@@ -2,7 +2,7 @@ package com.huhoot.converter;
 
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.host.manage.challenge.ChallengeAddRequest;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import org.springframework.stereotype.Component;
 
