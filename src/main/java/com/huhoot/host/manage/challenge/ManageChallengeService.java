@@ -14,15 +14,16 @@ public interface ManageChallengeService {
 
     PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable);
 
-    PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable);
+    PageResponse<ChallengeResponse> findAllOwnChallenge(int adminId, Pageable pageable);
 
     ChallengeResponse addOneChallenge(Admin userDetails, ChallengeAddRequest request) throws IOException;
 
     void updateOneChallenge(ChallengeUpdateRequest request, Challenge challenge) throws NotYourOwnException, NullPointerException;
 
-    Challenge findChallengeWithOwner(int id, int id1) throws NotYourOwnException;
+    Challenge findChallengeWithOwner(int challengeId, int userId) throws NotYourOwnException;
 
     Challenge findChallenge(int challengeId);
 
+    ChallengeResponse findChallengeResponse(int challengeId);
 
 }

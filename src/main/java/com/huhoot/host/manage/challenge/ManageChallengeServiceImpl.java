@@ -29,8 +29,8 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
     }
 
     @Override
-    public PageResponse<ChallengeResponse> findAllOwnChallenge(Admin userDetails, Pageable pageable) {
-        Page<ChallengeResponse> challenges = challengeRepository.findAllByAdminId(userDetails.getId(), pageable);
+    public PageResponse<ChallengeResponse> findAllOwnChallenge(int adminId, Pageable pageable) {
+        Page<ChallengeResponse> challenges = challengeRepository.findAllByAdminId(adminId, pageable);
         return listConverter.toPageResponse(challenges);
     }
 
@@ -71,6 +71,10 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
         return challengeRepository.findOneById(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
     }
 
+    @Override
+    public ChallengeResponse findChallengeResponse(int challengeId) {
+        return challengeRepository.findOneChallengeResponse(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+    }
 
 
 }

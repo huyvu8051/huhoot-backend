@@ -96,5 +96,11 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             "FROM Challenge n ")
     Page<ChallengeResponse> findAllChallengeResponse(Pageable pageable);
 
+    @Query("SELECT new com.huhoot.dto.ChallengeResponse(n.id, n.title, n.coverImage, n.randomAnswer, " +
+            "n.randomQuest, n.challengeStatus, n.admin.username, n.admin.socketId, n.createdDate, n.createdBy, " +
+            "n.modifiedDate, n.modifiedBy) " +
+            "FROM Challenge n " +
+            "WHERE n.id = :challengeId")
+    Optional<ChallengeResponse> findOneChallengeResponse(@Param("challengeId") int challengeId);
 
 }

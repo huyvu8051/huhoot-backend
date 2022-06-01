@@ -37,7 +37,7 @@ public class ManageChallengeController {
 
         Pageable pageable = vDataTablePagingConverter.toPageable(request);
 
-        return ResponseEntity.ok(manageChallengeService.findAllOwnChallenge(userDetails, pageable));
+        return ResponseEntity.ok(manageChallengeService.findAllOwnChallenge(userDetails.getId(), pageable));
     }
 
 
