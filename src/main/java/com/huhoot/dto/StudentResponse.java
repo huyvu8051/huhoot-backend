@@ -1,4 +1,4 @@
-package com.huhoot.admin.manage.student;
+package com.huhoot.dto;
 
 import com.huhoot.auditing.AuditableDto;
 import lombok.Data;

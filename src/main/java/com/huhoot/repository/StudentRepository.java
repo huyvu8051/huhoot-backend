@@ -1,6 +1,6 @@
 package com.huhoot.repository;
 
-import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.dto.StudentResponse;
 import com.huhoot.model.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +32,12 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     void updateSocketId(@Param("socketId") UUID socketId, @Param("studentId") int studentId);
 
 
-    @Query("SELECT new com.huhoot.admin.manage.student.StudentResponse(n.id, n.username, n.fullName, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy, n.isNonLocked) " +
+    @Query("SELECT new com.huhoot.dto.StudentResponse(n.id, n.username, n.fullName, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy, n.isNonLocked) " +
             "FROM Student n ")
     Page<StudentResponse> findAllStudent(Pageable pageable);
+
+    @Query("SELECT new com.huhoot.dto.StudentResponse(n.id, n.username, n.fullName, n.createdDate, n.createdBy, n.modifiedDate, n.modifiedBy, n.isNonLocked) " +
+            "FROM Student n " +
+            "WHERE n.username = :username")
+    StudentResponse findOneStudentResponseByUsername(@Param("username") String username);
 }

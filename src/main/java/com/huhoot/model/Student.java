@@ -25,7 +25,6 @@ public class Student extends Auditable implements CustomUserDetails{
 	@Column(unique = true)
 	private String username;
 
-
 	@Column(columnDefinition = "nvarchar(255)")
 	private String fullName;
 

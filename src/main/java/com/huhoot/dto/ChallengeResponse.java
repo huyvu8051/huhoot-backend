@@ -1,4 +1,4 @@
-package com.huhoot.host.manage.challenge;
+package com.huhoot.dto;
 
 import com.huhoot.auditing.AuditableDto;
 import com.huhoot.enums.ChallengeStatus;

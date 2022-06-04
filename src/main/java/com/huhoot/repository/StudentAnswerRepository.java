@@ -1,6 +1,6 @@
 package com.huhoot.repository;
 
-import com.huhoot.organize.AnswerResultResponse;
+import com.huhoot.dto.StudentAnswerResult;
 import com.huhoot.organize.StudentScoreResponse;
 import com.huhoot.model.StudentAnswer;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
      * @param studentId   student id
      * @return total point of student answer
      */
-    @Query("SELECT  COALESCE(SUM(m.score), 0) " +
+    @Query("SELECT COALESCE(SUM(m.score), 0) " +
             "FROM StudentAnswer m " +
             "WHERE m.primaryKey.challenge.id = :challengeId and m.primaryKey.student.id = :studentId")
     double getTotalPointInChallenge(@Param("challengeId")int challengeId,
@@ -31,18 +31,16 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
 
     /**
      * @param challengeId challenge id
-     * @param adminId     admin id
      * @param pageable    pageable
      * @return list of student id, fullName, score <br/>
      * Not contain <b>rank</b>
      */
     @Query("SELECT new com.huhoot.organize.StudentScoreResponse(m.primaryKey.student.id, SUM(m.score), m.primaryKey.student.fullName, m.primaryKey.student.username)  " +
             "FROM StudentAnswer m " +
-            "WHERE m.primaryKey.challenge.id = :challengeId AND m.primaryKey.challenge.admin.id = :adminId " +
+            "WHERE m.primaryKey.challenge.id = :challengeId " +
             "GROUP BY m.primaryKey.student.id, m.primaryKey.student.fullName, m.primaryKey.student.username " +
             "ORDER BY SUM(m.score) DESC")
     Page<StudentScoreResponse> findTopStudent(@Param("challengeId")int challengeId,
-                                              @Param("adminId")int adminId,
                                               Pageable pageable);
 
 
@@ -81,6 +79,10 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, In
     @Query("SELECT COUNT(DISTINCT a.primaryKey.student.id) FROM StudentAnswer a WHERE a.primaryKey.question.id = :questionId AND a.isCorrect = :isCorrect GROUP BY a.primaryKey.student.id")
     Optional<Integer> getTotalStudentAnswerByQuestIdAndIsCorrect(@Param("questionId") int questionId, @Param("isCorrect") Boolean isCorrect);
 
+    @Query("SELECT new com.huhoot.dto.StudentAnswerResult(a.score, a.isCorrect, a.answerDate,a.primaryKey.question.id, a.primaryKey.answer) " +
+            "FROM StudentAnswer a " +
+            "WHERE a.primaryKey.question.id in :questionIds AND a.primaryKey.student.id = :studentId")
+    List<StudentAnswerResult> findAllStudentAnswerResult(@Param("questionIds") List<Integer> questionIds, @Param("studentId")int studentId);
 
 }
 //

@@ -83,6 +83,11 @@ public class ManageHostServiceImpl implements ManageHostService {
 
     }
 
+    @Override
+    public HostResponse findOneHostResponseByUsername(String username) {
+        return adminRepository.findOneHostResponseByUsername(username).orElseThrow(()->new NullPointerException("Admin with username " + username + " not found"));
+    }
+
 
     private void addOneHostAccount(HostAddRequest addRequest) {
 

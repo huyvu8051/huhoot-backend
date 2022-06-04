@@ -1,7 +1,9 @@
 package com.huhoot.repository;
 
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.StudentInChallenge;
+import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,9 +57,17 @@ public interface StudentInChallengeRepository extends JpaRepository<StudentInCha
 
     @Query("SELECT new com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse(n.primaryKey.student.id, n.primaryKey.student.username, n.primaryKey.student.fullName, n.isLogin, n.isKicked, n.isOnline, n.createdBy, n.createdDate, n.modifiedBy, n.modifiedDate,  n.isNonDeleted) " +
             "FROM StudentInChallenge n " +
-            "WHERE n.primaryKey.challenge.id = :challengeId and n.primaryKey.challenge.admin.id = :adminId")
-    Page<StudentInChallengeResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("adminId") int adminId, Pageable pageable);
+            "WHERE n.primaryKey.challenge.id = :challengeId ")
+    Page<StudentInChallengeResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, Pageable pageable);
 
     @Query("SELECT COUNT(a.primaryKey.student.id) FROM StudentInChallenge a WHERE a.primaryKey.challenge.id = :challengeId AND a.isLogin = true")
     int getTotalStudentInChallenge(@Param("challengeId") int challengeId);
+
+
+    @Query("SELECT new com.huhoot.dto.ChallengeResponse(n.primaryKey.challenge.id, n.primaryKey.challenge.title, n.primaryKey.challenge.coverImage, n.primaryKey.challenge.randomAnswer, " +
+            "n.primaryKey.challenge.randomQuest, n.primaryKey.challenge.challengeStatus, n.primaryKey.challenge.admin.username, n.primaryKey.challenge.admin.socketId, n.primaryKey.challenge.createdDate, n.primaryKey.challenge.createdBy, " +
+            "n.primaryKey.challenge.modifiedDate, n.primaryKey.challenge.modifiedBy) " +
+            "FROM StudentInChallenge n " +
+            "WHERE n.primaryKey.student.username = :username")
+    Page<ChallengeResponse> findAllChallengeResByStudent(@Param("username") String username, Pageable pageable1);
 }

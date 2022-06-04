@@ -18,8 +18,20 @@ public class VDataTablePagingConverterImpl implements VDataTablePagingConverter 
     public Pageable toPageable(VDataTablePagingRequest request) {
 
 
-        List<String> sortBy = request.getSortBy();
-        List<Boolean> sortDesc = request.getSortDesc();
+        List<String> sortBy;
+        if(request.getSortBy() != null){
+            sortBy = request.getSortBy();
+        }else {
+            sortBy = new ArrayList<>();
+        }
+        List<Boolean> sortDesc;
+        if(request.getSortDesc() != null){
+            sortDesc = request.getSortDesc();
+        }else {
+            sortDesc = new ArrayList<>();
+        }
+
+
 
         List<Sort.Order> orders = new ArrayList<>();
 

@@ -32,7 +32,7 @@ public class ManageQuestionController {
                 .getPrincipal();
 
         Pageable pageable = vDataTablePagingConverter.toPageable(request);
-        PageResponse<QuestionResponse> response = manageQuestionService.findAllQuestionInChallenge(userDetails, request.getChallengeId(), pageable);
+        PageResponse<QuestionResponse> response = manageQuestionService.findAllQuestionInChallenge(request.getChallengeId(), pageable);
         return ResponseEntity.ok(response);
     }
 

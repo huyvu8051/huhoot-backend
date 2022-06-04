@@ -1,6 +1,6 @@
 package com.huhoot.organize;
 
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import lombok.Builder;
 import lombok.Data;
 

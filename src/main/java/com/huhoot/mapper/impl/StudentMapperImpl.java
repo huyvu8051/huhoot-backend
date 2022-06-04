@@ -2,7 +2,7 @@ package com.huhoot.mapper.impl;
 
 import com.huhoot.admin.manage.student.StudentAddRequest;
 import com.huhoot.mapper.StudentMapper;
-import com.huhoot.admin.manage.student.StudentResponse;
+import com.huhoot.dto.StudentResponse;
 import com.huhoot.admin.manage.student.StudentUpdateRequest;
 import com.huhoot.auditing.AuditingMapperImpl;
 import com.huhoot.model.Student;

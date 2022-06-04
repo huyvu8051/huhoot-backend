@@ -37,4 +37,5 @@ public interface ManageHostService {
      */
     List<HostAddErrorResponse> addManyHostAccount(List<HostAddRequest> hostDTOs);
 
+    HostResponse findOneHostResponseByUsername(String username);
 }

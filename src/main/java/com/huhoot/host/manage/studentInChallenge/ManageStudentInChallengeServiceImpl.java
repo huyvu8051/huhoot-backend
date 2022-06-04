@@ -2,12 +2,14 @@ package com.huhoot.host.manage.studentInChallenge;
 
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentInChallengeConverter;
+import com.huhoot.dto.StudentAnswerResult;
 import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.ChallengeRepository;
+import com.huhoot.repository.StudentAnswerRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
@@ -33,11 +35,13 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
 
     private final StudentInChallengeMapper studentInChallengeMapper;
 
+
     private final StudentRepository studentRepository;
+    private final StudentAnswerRepository studentAnswerRepository;
 
     @Override
-    public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(Admin userDetails, Pageable pageable, int challengeId) {
-        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, userDetails.getId(), pageable);
+    public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(int challengeId, Pageable pageable) {
+        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, pageable);
         return listConverter.toPageResponse(page);
     }
 
@@ -85,6 +89,22 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
         studentInChallengeMapper.update(request, studentInChallenge);
 
         studentChallengeRepository.save(studentInChallenge);
+
+    }
+
+    @Override
+    public PageResponse<StudentInChallengeResponse> findAllParticipants(int challengeId, Pageable pageable1) {
+
+        Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, pageable1);
+
+        return listConverter.toPageResponse(page);
+    }
+
+    @Override
+    public List<StudentAnswerResult> findAllStudentAnswerResult(List<Integer> questionIds, int studentId) {
+
+
+        return studentAnswerRepository.findAllStudentAnswerResult(questionIds, studentId);
 
     }
 

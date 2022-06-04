@@ -7,7 +7,7 @@ import com.huhoot.encrypt.EncryptUtils;
 import com.huhoot.enums.ChallengeStatus;
 import com.huhoot.exception.ChallengeException;
 import com.huhoot.host.manage.challenge.ChallengeMapper;
-import com.huhoot.host.manage.challenge.ChallengeResponse;
+import com.huhoot.dto.ChallengeResponse;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Question;
 import com.huhoot.model.Student;
