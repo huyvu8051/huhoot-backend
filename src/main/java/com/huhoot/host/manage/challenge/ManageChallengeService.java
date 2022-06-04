@@ -26,4 +26,7 @@ public interface ManageChallengeService {
 
     ChallengeResponse findChallengeResponse(int challengeId);
 
+    int findStudentRank(int studentId, int challengeId);
+
+    double getStudentTotalPoint(int studentId, int challengeId);
 }

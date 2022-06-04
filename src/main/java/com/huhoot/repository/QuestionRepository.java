@@ -52,9 +52,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
             "n.createdBy, n.modifiedDate, n.modifiedBy) " +
             "FROM Question n " +
             "WHERE n.challenge.id = :challengeId " +
-            "AND n.challenge.admin.id = :adminId " +
             "ORDER BY n.ordinalNumber ASC")
-    Page<QuestionResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, @Param("adminId") int adminId, Pageable pageable);
+    Page<QuestionResponse> findAllByChallengeIdAndAdminId(@Param("challengeId") int challengeId, Pageable pageable);
 
     @Query("SELECT COALESCE(MAX (n.ordinalNumber + 1), 0) " +
             "FROM Question n " +

@@ -7,6 +7,7 @@ import com.huhoot.host.manage.studentInChallenge.StudentInChallengeResponse;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.repository.ChallengeRepository;
+import com.huhoot.repository.StudentAnswerRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,9 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
     private final ListConverter listConverter;
 
     private final ChallengeMapper challengeMapper;
+    private final StudentAnswerRepository studentAnswerRepository;
+
+
 
     @Override
     public PageResponse<ChallengeResponse> findAllChallenge(Pageable pageable) {
@@ -74,6 +78,18 @@ public class ManageChallengeServiceImpl implements ManageChallengeService {
     @Override
     public ChallengeResponse findChallengeResponse(int challengeId) {
         return challengeRepository.findOneChallengeResponse(challengeId).orElseThrow(() -> new NullPointerException("Challenge not found"));
+    }
+
+    @Override
+    public int findStudentRank(int studentId, int challengeId) {
+
+        return 0;
+    }
+
+    @Override
+    public double getStudentTotalPoint(int studentId, int challengeId) {
+
+        return studentAnswerRepository.getTotalPointInChallenge(challengeId, studentId);
     }
 
 

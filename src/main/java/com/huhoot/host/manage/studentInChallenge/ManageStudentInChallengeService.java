@@ -1,5 +1,6 @@
 package com.huhoot.host.manage.studentInChallenge;
 
+import com.huhoot.dto.StudentAnswerResult;
 import com.huhoot.model.Admin;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,6 @@ public interface ManageStudentInChallengeService {
 
 
     PageResponse<StudentInChallengeResponse> findAllParticipants(int challengeId, Pageable pageable1);
+
+    List<StudentAnswerResult> findAllStudentAnswerResult(List<Integer> questionIds, int studentId);
 }

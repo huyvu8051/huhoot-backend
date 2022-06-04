@@ -33,8 +33,8 @@ public class ManageQuestionServiceImpl implements ManageQuestionService {
     private final EncryptUtils encryptUtils;
 
     @Override
-    public PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable) {
-        Page<QuestionResponse> questions = questionRepository.findAllByChallengeIdAndAdminId(challengeId, userDetails.getId(), pageable);
+    public PageResponse<QuestionResponse> findAllQuestionInChallenge(int challengeId, Pageable pageable) {
+        Page<QuestionResponse> questions = questionRepository.findAllByChallengeIdAndAdminId(challengeId, pageable);
         return listConverter.toPageResponse(questions);
     }
 

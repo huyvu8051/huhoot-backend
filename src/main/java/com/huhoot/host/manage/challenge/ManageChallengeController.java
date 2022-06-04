@@ -58,7 +58,7 @@ public class ManageChallengeController {
 
 
 
-        Challenge c = manageChallengeService.findChallengeWithOwner(request.getId(), userDetails.getId());
+        Challenge c = manageChallengeService.findChallenge(request.getId());
 
         manageChallengeService.updateOneChallenge(request, c);
 

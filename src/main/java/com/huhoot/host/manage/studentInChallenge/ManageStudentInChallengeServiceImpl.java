@@ -2,12 +2,14 @@ package com.huhoot.host.manage.studentInChallenge;
 
 import com.huhoot.converter.ListConverter;
 import com.huhoot.converter.StudentInChallengeConverter;
+import com.huhoot.dto.StudentAnswerResult;
 import com.huhoot.mapper.StudentInChallengeMapper;
 import com.huhoot.model.Admin;
 import com.huhoot.model.Challenge;
 import com.huhoot.model.Student;
 import com.huhoot.model.StudentInChallenge;
 import com.huhoot.repository.ChallengeRepository;
+import com.huhoot.repository.StudentAnswerRepository;
 import com.huhoot.repository.StudentInChallengeRepository;
 import com.huhoot.repository.StudentRepository;
 import com.huhoot.vue.vdatatable.paging.PageResponse;
@@ -33,7 +35,9 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
 
     private final StudentInChallengeMapper studentInChallengeMapper;
 
+
     private final StudentRepository studentRepository;
+    private final StudentAnswerRepository studentAnswerRepository;
 
     @Override
     public PageResponse<StudentInChallengeResponse> findAllStudentInChallenge(int challengeId, Pageable pageable) {
@@ -94,6 +98,14 @@ public class ManageStudentInChallengeServiceImpl implements ManageStudentInChall
         Page<StudentInChallengeResponse> page = studentChallengeRepository.findAllByChallengeIdAndAdminId(challengeId, pageable1);
 
         return listConverter.toPageResponse(page);
+    }
+
+    @Override
+    public List<StudentAnswerResult> findAllStudentAnswerResult(List<Integer> questionIds, int studentId) {
+
+
+        return studentAnswerRepository.findAllStudentAnswerResult(questionIds, studentId);
+
     }
 
 

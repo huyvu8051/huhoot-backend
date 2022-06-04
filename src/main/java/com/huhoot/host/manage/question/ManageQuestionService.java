@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ManageQuestionService {
 
-    PageResponse<QuestionResponse> findAllQuestionInChallenge(Admin userDetails, int challengeId, Pageable pageable);
+    PageResponse<QuestionResponse> findAllQuestionInChallenge(int challengeId, Pageable pageable);
 
     QuestionResponse addOneQuestion(Admin userDetails, QuestionAddRequest request, CheckedFunction<Admin, Challenge> checker) throws NullPointerException, NotYourOwnException;
 
